@@ -19,10 +19,10 @@ class Footer extends React.Component {
             </div>
             <div className='col-sm-7 hidden-xs'>
               <br/>
-              <p><strong>Users online: </strong>-1</p>
-                <p><strong>Next auction: </strong>-1</p>
-                  <p><strong>Vehicles in next auction: </strong>-1</p>
-                  <p><strong>Total vehicles available: </strong>-1</p>
+              <p><strong>Users online: </strong>1</p>
+                <p><strong>Next auction: </strong>unknown</p>
+                  <p><strong>Vehicles in next auction: </strong>7</p>
+                  <p><strong>Total vehicles available: </strong>99</p>
               {/*<ul className='list-inline'>
                 {leaderboardCharacters}
               </ul>*/}

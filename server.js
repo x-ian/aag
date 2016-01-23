@@ -19,9 +19,8 @@ var xml2js = require('xml2js');
 var _ = require('underscore');
 
 var config = require('./config');
-var routes = require('./app/routes');
 
-var Vehicle = require('./models/vehicle');
+var routes = require('./app/routes');
 
 var app = express();
 
@@ -38,119 +37,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-/**
- * GET all vehicles
- */
-app.get('/api/vehicles', function(req, res, next) {
-  Vehicle.find()
-    .exec(function(err, vehicles) {
-      if (err) return next(err);
-
-        return res.send(vehicles);
-    });
-});
-
-/**
- * GET one vehicle
- */
-app.get('/api/vehicles/:id', function(req, res) { 
-  Vehicle.findOne({ _id : req.params.id }, function(error, vehicle) {
-    if (error || !vehicle) {
-      res.render('error', {});
-    } else { 
-      res.status('vehicle').send({ vehicle : vehicle });
-    }
-  });
-});
-
-/**
- * DELETE one vehicle
- */
-app.delete('/api/vehicles/:id', function(req,res,next) {
-  var id = req.params.id;
-  Vehicle.findByIdAndRemove(id, function (error,vehicle){
-    if (error || !vehicle) {
-      res.render('error', {});
-    } else { 
-      res.status('vehicle').send({ vehicle : vehicle });
-    }
-  });
-});
-
-/**
- * PUT update existing vehicle
- */
-app.put('/api/vehicles/:id', function(req, res) { 
-  Vehicle.findOne({ _id : req.params.id }, function(error, vehicle) {
-    if (error || !vehicle) {
-      res.render('error', {});
-    } else { 
-      console.log(vehicle._id);
-      var title = req.body.title;
-      var description = req.body.description;
-      // var classification = req.body.classification;
-      // var vehicleDataRegistrationDate = req.body.vehicleDataRegistrationDate;
-      // var vehicleDataCondition = req.body.vehicleDataCondition;
-      // var vehicleDataNumberPreviousOwners = req.body.vehicleDataNumberPreviousOwners;
-      // var vehicleDataHu = req.body.vehicleDataHu;
-      // var vehicleDataSchadstoffklasse = req.body.vehicleDataSchadstoffklasse;
-      // var vehicleDataUmweltplakette = req.body.vehicleDataUmweltplakette;
-      // var damages = req.body.damages;
-
-      vehicle.title = title;
-      vehicle.description = description;
-      vehicle.save(function(err) {
-        if (err) {
-          console.log('error)');
-          return next(err);
-        }
-        console.log('done');
-        res.send({ message: title + ' has been added successfully!' });
-      });
-    }
-  });
-});
-
-
-/**
- * POST new vehicle
- */
-app.post('/api/vehicles', function(req, res, next) {
-  var title = req.body.title;
-  var description = req.body.description;
-  var classification = req.body.classification;
-  var vehicleDataRegistrationDate = req.body.vehicleDataRegistrationDate;
-  var vehicleDataCondition = req.body.vehicleDataCondition;
-  var vehicleDataNumberPreviousOwners = req.body.vehicleDataNumberPreviousOwners;
-  var vehicleDataHu = req.body.vehicleDataHu;
-  var vehicleDataSchadstoffklasse = req.body.vehicleDataSchadstoffklasse;
-  var vehicleDataUmweltplakette = req.body.vehicleDataUmweltplakette;
-  var damages = req.body.damages;
-
-    var vehicle = new Vehicle({
-      title: title,
-      description: description,
-      classification: classification,
-      vehicleData: {
-        registrationDate: vehicleDataRegistrationDate,
-        condition: vehicleDataCondition,
-        numberPreviousOwners: vehicleDataNumberPreviousOwners,
-        hu: vehicleDataHu,
-        schadstoffklasse: vehicleDataSchadstoffklasse,
-        umweltplakette: vehicleDataUmweltplakette
-      },
-      damages: damages
-    });
-
-    vehicle.save(function(err) {
-      if (err) return next(err);
-      res.send({ message: title + ' has been added successfully!' });
-    });
-});
-
-
-
+// CRUD access for DB documents
+require('./routes/api-auctions')(app);
+require('./routes/api-auctionitems')(app);
+require('./routes/api-bids')(app);
+require('./routes/api-users')(app);
+require('./routes/api-vehicles')(app);
+require('./routes/api-liveauction')(app);
 
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {
@@ -191,18 +84,41 @@ io.sockets.on('connection', function(socket) {
     onlineUsers--;
     io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
   });
+
+});
+
+// var io  = require('socket.io')(http, { path: '/myapp/socket.io'});
+
+io.of('/my-namespace')
+  .on('connection', function(socket){
+    console.log('a user connected with id %s', socket.id);
+    onlineUsers++;
+    onlineUsers++;
+    onlineUsers++;
+    onlineUsers++;
+
+    io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
+
+    socket.on('disconnect', function() {
+      onlineUsers--;
+      onlineUsers--;
+      onlineUsers--;
+      onlineUsers--;
+      io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
+    });
+
+    // socket.on('my-message', function (data) {
+    //     io.of('my-namespace').emit('my-message', data);
+    //     // or socket.emit(...)
+    //     console.log('broadcasting my-message', data);
+    // });
 });
 
 server.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
 
-  // just for development 
+  // just for development to notify about server restart
   var osascript = require('node-osascript');
   osascript.execute("display notification \"aag (re)started\" with title \"nodemon\"");
   osascript.execute("beep 1");
-  // function(err, result, raw){
-  //   if (err) return console.error(err);
-  //   console.log(result, raw);
-  // });
-
 });
