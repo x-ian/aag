@@ -24,6 +24,20 @@ class PromoterStatus extends React.Component {
 
   onClickOpenBidding(event) {
     event.preventDefault();
+
+    // temp emit a recent bid message
+    $.ajax({
+      url: '/api/newbid',
+      dataType: 'json' })
+      .done((data) => {
+        // this.setState(data)
+      })
+      .fail((jqXhr) => {
+        // this.titleValidationState = 'has-error';
+        // this.helpBlock = errorMessage;
+
+        // this.actions.getVehicleFail(jqXhr);
+      });
   }
 
   render() {

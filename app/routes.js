@@ -13,6 +13,7 @@ import PromoterAuction from './components/promoter/Auction';
 import PromoterVehicle from './components/promoter/Vehicle';
 
 import AuctionStart from './components/auction/Start';
+import AuctionIndex from './components/auction/Auction';
 
 export default (
   <Route component={App}>
@@ -31,6 +32,7 @@ export default (
     <Route path='/promoter/vehicles/:id' component={PromoterVehicle} />
 
     <Route path='/auction/start' component={AuctionStart} />
+    <Route path='/auction/index' component={AuctionIndex} />
 
   </Route>
 );

@@ -37,13 +37,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
 // CRUD access for DB documents
 require('./routes/api-auctions')(app);
 require('./routes/api-auctionitems')(app);
 require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);
-require('./routes/api-liveauction')(app);
+require('./routes/api-liveauction')(app, io);
 
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {
@@ -70,20 +73,36 @@ app.use(function(err, req, res, next) {
 /**
  * Socket.io stuff.
  */
-var server = require('http').createServer(app);
-
-var io = require('socket.io')(server);
-var onlineUsers = 0;
-
 io.sockets.on('connection', function(socket) {
-  onlineUsers++;
+  console.log('socket connected');
+  // Bid.find(function(err, item) {
+  //   if (err || !item) return next(err);
+  //   // return res.send(item);
+  //
+  //   {bid.sequenceNumber} - {bid.amount} - {bid.status} - {bid.timestamp} - {bid.user.name}
+  //
+  //   return res.json({
+  //     _id: item._id;
+  //     amount: item.amount;
+  //     status: item.status;
+  //     timestamp: item.timestamp;
+  //     sequenceNumber:
+  //   });
+  // });
 
-  io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
-
-  socket.on('disconnect', function() {
-    onlineUsers--;
-    io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
+  io.sockets.emit('recentBid', {
+    _id: 123,
+    amount: 200,
+    status: 'accepted',
+    timestamp: new Date(),
+    sequenceNumber: 1,
+    user: { name: 'ichichich'}
   });
+
+  // socket.on('disconnect', function() {
+  //   onlineUsers--;
+  //   io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
+  // });
 
 });
 

@@ -1,6 +1,6 @@
 var Auction = require('../models/auction');
 
-module.exports = function (app) {
+module.exports = function (app, io) {
 
   /**
    * GET next current or future auction
@@ -17,4 +17,18 @@ module.exports = function (app) {
       });
     });
   });
+
+  app.get('/api/newbid', function(req, res, next) {
+    io.sockets.emit('recentBid', {
+      _id: 1234,
+      amount: 200,
+      status: 'accepted',
+      timestamp: new Date(),
+      sequenceNumber: 1,
+      user: { name: 'ichichich'}
+    });
+
+    return res.json({ message: 'Item deleted' });
+  });
+
 }

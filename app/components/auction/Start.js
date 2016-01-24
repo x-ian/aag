@@ -16,14 +16,18 @@ class Start extends React.Component {
   }
 
   componentDidMount() {
-    console.log('didmount');
     this.getNextAuction();
-    setInterval(function() { this.getNextAuction(); }.bind(this), 10000);
+    this.interval = setInterval(function() { this.getNextAuction(); }.bind(this), 10000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   componentDidUpdate(prevProps) {
-    console.log('didupdate');
-    // this.getNextAuction();
+    // if (this.props.params.id && prevProps.params.id !== this.props.params.id) {
+    //   this.getNextAuction();
+    // }
   }
 
   getNextAuction() {
@@ -41,10 +45,16 @@ class Start extends React.Component {
       });
   }
 
+  onClickJoin(event) {
+    event.preventDefault();
+    this.props.history.pushState(null, '/auction/index');
+  }
+
+
   render() {
     var auction = <p>No auction active or scheduled.</p>;
       if (this.state.currentlyActive) {
-        auction = <p>Active auction since {this.state.openAt}. Join.</p>
+        auction = <p>Active auction since {this.state.openAt}. <button className='btn btn-secondary' onClick={this.onClickJoin.bind(this)}>Join</button></p>
       } else {
         auction = <p>No active auction.<br/>Next scheduled auction starts at {this.state.openAt}</p>
       }

@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var bidSchema = new mongoose.Schema({
   amount: Number,
   timestamp: Date,
+  sequenceNumber: Number,
   status: String,
   auctionItem: {
        type: mongoose.Schema.Types.ObjectId,
