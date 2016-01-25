@@ -2,61 +2,79 @@ import React from 'react';
 import {Link} from 'react-router';
 import {isEqual} from 'underscore';
 
-const resetState = {
-  buttonState: "OPEN_BIDDING"
-};
-
-var ButtonStatesEnum = Object.freeze({
-  "OPEN_BIDDING":1, "WAITING_FOR_BIDS":2, "INCOMING_BID":7,
-  "BID_ACCEPTED":3, "BID_REJECTED":4, "FINAL_CALL":5, "SOLD":6
-});
-
 class PromoterStatus extends React.Component {
 
   constructor() {
     super();
-    this.state = resetState;
-  }
-
-  onClick(event) {
-    event.preventDefault();
   }
 
   onClickOpenBidding(event) {
-    event.preventDefault();
+    this.props.updateAfterAction(event, 'OPEN');
+  }
 
-    // temp emit a recent bid message
-    $.ajax({
-      url: '/api/newbid',
-      dataType: 'json' })
-      .done((data) => {
-        // this.setState(data)
-      })
-      .fail((jqXhr) => {
-        // this.titleValidationState = 'has-error';
-        // this.helpBlock = errorMessage;
+  onClickFinalCall(event) {
+    this.props.updateAfterAction(event, 'FINAL_CALL');
+  }
 
-        // this.actions.getVehicleFail(jqXhr);
-      });
+  onClickFinalCallEmpty(event) {
+    this.props.updateAfterAction(event, 'FINAL_CALL_EMPTY');
+  }
+
+  onClickAcceptBid(event) {
+    this.props.updateAfterAction(event, 'ACCEPT');
+  }
+
+  onClickRejectBid(event) {
+    this.props.updateAfterAction(event, 'REJECT');
+  }
+
+  onClickSell(event) {
+    this.props.updateAfterAction(event, 'SELL');
+  }
+
+  onClickClose(event) {
+    this.props.updateAfterAction(event, 'CLOSE');
   }
 
   render() {
     return (
-      <div>
-        {(() => {
-  switch (this.state.buttonState) {
-    case "OPEN_BIDDING":
-      return <button className='btn btn-secondary' onClick={this.onClickOpenBidding.bind(this)}>Open bidding</button>;
-    case "green": return "#00FF00";
-    case "blue":  return "#0000FF";
-    default:      return "#FFFFFF";
-  }
-})()}
+      <div className='container'>
+        <div className='list-group'>
+          <div className='panel-heading'>Status &amp; actions</div>
+          <div key='button' className='list-group-item animated fadeIn'>
+            <div className='media'>
 
+              {(() => {
+                switch (this.props.status) {
+                  case "NOT_OPEN":
+                    return <button className='btn btn-secondary' onClick={this.onClickOpenBidding.bind(this)}>Open bidding</button>;
+                  case "NO_BIDS_YET":
+                    return <button className='btn btn-secondary' onClick={this.onClickFinalCall.bind(this)}>Final call</button>;
+                  case "WAITING_FOR_BIDS":
+                    return <button className='btn btn-secondary' onClick={this.onClickFinalCall.bind(this)}>Final call</button>;
+                  case "INCOMING_BID":
+                    return <div><button className='btn btn-secondary' onClick={this.onClickAcceptBid.bind(this)}>Accept bid</button>
+                      <button className='btn btn-secondary' onClick={this.onClickRejectBid.bind(this)}>Reject bid</button></div>;
+                  case "WAITING_FINAL_CALL":
+                    return <button className='btn btn-secondary' onClick={this.onClickSell.bind(this)}>Sell</button>;
+                  case "WAITING_FINAL_CALL_EMPTY":
+                    return <button className='btn btn-secondary' onClick={this.onClickSell.bind(this)}>Close</button>;
+                  case "SOLD":
+                    return '';
+                  case "CLOSED_EMPTY":
+                    return '';
+                  default:
+                    return "(unknown state)";
+                }
+              })()}
+
+              (&nbsp;{this.props.status})
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
-
 };
 
 export default PromoterStatus;

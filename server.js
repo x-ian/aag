@@ -46,7 +46,9 @@ require('./routes/api-auctionitems')(app);
 require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);
-require('./routes/api-liveauction')(app, io);
+require('./routes/live-common')(app, io);
+require('./routes/live-bidder')(app, io);
+require('./routes/live-promoter')(app, io);
 
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {

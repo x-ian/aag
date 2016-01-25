@@ -6,7 +6,7 @@ var Auction = React.createClass({
   getInitialState: function() {
     return {upcomingVehicles: [], closedVehicles: []};
   },
- 
+
   componentDidMount: function() {
     $.ajax({
       url: '/api/vehicles',
@@ -39,7 +39,7 @@ var Auction = React.createClass({
         <div key={vehicle._id} className='list-group-item animated fadeIn'>
           <div className='media'>
             {vehicle._id} - {vehicle.title} - {vehicle.classification} -
-            <Link to={'/promoter/vehicles/' + vehicle._id}>Activate</Link>
+            <Link to={'/promoter/auctionitem/' + vehicle._id}>Activate</Link>
           </div>
         </div>
       );

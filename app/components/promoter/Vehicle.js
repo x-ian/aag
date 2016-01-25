@@ -52,7 +52,6 @@ class Vehicle extends React.Component {
             <tbody>
               <tr>
                 <td>
-                  Vehicle Details:<br/>
                   <VehicleDetails vehicle={this.state}/>
                 </td>
                 <td>

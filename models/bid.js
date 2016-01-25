@@ -4,16 +4,16 @@ var bidSchema = new mongoose.Schema({
   amount: Number,
   timestamp: Date,
   sequenceNumber: Number,
-  status: String,
+  status: { type: String, enum: ['PENDING', 'ACCEPTED', 'REJECTED', 'WON'] },
   auctionItem: {
        type: mongoose.Schema.Types.ObjectId,
        ref: 'AuctionItem'
   },
-  bidder: {
+  user: {
        type: mongoose.Schema.Types.ObjectId,
        ref: 'User'
   },
-  bidderIpAddress: String
+  userIpAddress: String
 });
 
 module.exports = mongoose.model('Bid', bidSchema);

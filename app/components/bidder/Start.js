@@ -33,21 +33,17 @@ class Start extends React.Component {
   getNextAuction() {
     $.ajax({
       url: '/api/nextauction/',
-      dataType: 'json' })
-      .done((data) => {
-        this.setState(data);
-      })
-      .fail((jqXhr) => {
-        // this.titleValidationState = 'has-error';
-        // this.helpBlock = errorMessage;
-
-        // this.actions.getVehicleFail(jqXhr);
-      });
+      dataType: 'json'
+    }).done((data) => {
+      this.setState(data);
+    }).fail((jqXhr) => {
+      console.log("ERROR " + jqXhr);
+    });
   }
 
   onClickJoin(event) {
     event.preventDefault();
-    this.props.history.pushState(null, '/auction/index');
+    this.props.history.pushState(null, '/bidder/auction/' + this.state._id);
   }
 
 
