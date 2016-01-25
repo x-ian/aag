@@ -79,13 +79,28 @@ module.exports = function (app, io) {
    app.post('/api/promoteraction/:id', function(req, res, next) {
 
      var auctionItemId = req.params.id;
+     var currentBidId = req.body.currentBidId;
+     var action = req.body.action;
 
      AuctionItem.findById(auctionItemId, function(err, item) {
        if (err || !item) return next(err);
-       console.log(req.body.action);
 
-       item.status = calcNewAuctionItemStatus(req.body.action, item.status);
-       // TODO update bid if necessary
+       item.status = calcNewAuctionItemStatus(action, item.status);
+       if (currentBidId) {
+         var bidStatus;
+         if (action === 'ACCEPT') {
+           bidStatus = 'ACCEPTED';
+         } else if (action === 'REJECT') {
+           bidStatus = 'REJECTED';
+         } else if (action === 'SELL') {
+           bidStatus = 'WON';
+         } else {
+           console.log('Unknown combination of action and currentbid');
+         }
+         Bid.findByIdAndUpdate(currentBidId, {status: bidStatus}).exec();
+       } else if (action === 'ACCEPT' || action === 'REJECTED' || action === 'SELL') {
+         console.log('Unknown combination of action and currentbid');         
+       }
 
        item.save(function (err) {
          if (err) return next(err);
@@ -96,7 +111,7 @@ module.exports = function (app, io) {
            if (err || !bids) return next(err);
 
            // send back results to all
-           io.sockets.emit('auctionAction', {auctionItem: item, recentBids: bids});
+           io.sockets.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: null});
            // and just for this request
            return res.json({auctionItem: item, recentBids: bids});
          });

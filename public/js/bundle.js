@@ -2327,6 +2327,7 @@ var AuctionItem = function (_React$Component) {
         _this2.setState({ auctionItem: data['auctionItem'] });
         _this2.setState({ recentBids: data['recentBids'] });
         // TODO: if already a current bid present, deny this newly incoming one
+        _this2.setState({ currentBidId: null });
         if (data['currentBidId']) _this2.setState({ currentBidId: data['currentBidId'] });
       });
     }

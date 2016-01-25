@@ -33,6 +33,7 @@ class AuctionItem extends React.Component {
       this.setState({auctionItem: data['auctionItem'] });
       this.setState({recentBids: data['recentBids'] });
       // TODO: if already a current bid present, deny this newly incoming one
+      this.setState({currentBidId: null});
       if (data['currentBidId']) this.setState({currentBidId: data['currentBidId'] });
     });
   }
