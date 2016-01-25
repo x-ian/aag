@@ -10,6 +10,7 @@ const resetState = {
   vehicle: null,
   auction: null,
   recentBids: [],
+  currentBidId: null,
   // optimization shortcut
   latestBid: null
 }
@@ -30,11 +31,9 @@ class AuctionItem extends React.Component {
     socket.on('auctionAction', (data) => {
       console.log('IO AuctionItem status ' + this.state.auctionItem.status);
       this.setState({auctionItem: data['auctionItem'] });
-      if (data['latestBid']) this.setState({latestBid: data['latestBid'] });
-
-      var newArray = this.state.recentBids.slice(0,4);
-      newArray.unshift(this.state.latestBid);
-      this.setState({recentBids: newArray});
+      this.setState({recentBids: data['recentBids'] });
+      // TODO: if already a current bid present, deny this newly incoming one
+      if (data['currentBidId']) this.setState({currentBidId: data['currentBidId'] });
     });
   }
 
@@ -82,7 +81,8 @@ class AuctionItem extends React.Component {
         dataType: 'json',
         type: 'POST',
         data: {
-          action: button
+          action: button,
+          currentBidId: this.state.currentBidId
         }
       }).done((data) => {
         this.setState(data);

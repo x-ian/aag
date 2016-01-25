@@ -1,5 +1,35 @@
 var Auction = require('../models/auction');
 var AuctionItem = require('../models/auctionitem');
+var Bid = require('../models/bid');
+
+function calcNewAuctionItemStatus(action, prevStatus) {
+  switch (action) {
+    case "OPEN":
+      return 'NO_BIDS_YET';
+      break;
+    case "ACCEPT":
+      return 'WAITING_FOR_BIDS';
+      break;
+    case "REJECT":
+     return 'WAITING_FOR_BIDS';
+     break;
+    case "FINAL_CALL":
+      return 'WAITING_FINAL_CALL';
+      break;
+    case "SELL":
+      return 'SOLD';
+      break;
+    case "FINAL_CALL_EMPTY":
+      return 'WAITING_FINAL_CALL_EMPTY'
+      break;
+    case "CLOSE":
+      return 'CLOSED_EMPTY'
+      break;
+    default:
+       console.log("Unknown status");
+  }
+}
+
 
 module.exports = function (app, io) {
 
@@ -48,39 +78,28 @@ module.exports = function (app, io) {
 
    app.post('/api/promoteraction/:id', function(req, res, next) {
 
-     AuctionItem.findById(req.params.id, function(err, item) {
+     var auctionItemId = req.params.id;
+
+     AuctionItem.findById(auctionItemId, function(err, item) {
        if (err || !item) return next(err);
        console.log(req.body.action);
-       switch (req.body.action) {
-         case "OPEN":
-           item.status = 'NO_BIDS_YET';
-           break;
-         case "ACCEPT":
-           item.status = 'WAITING_FOR_BIDS';
-           break;
-         case "REJECT":
-          item.status = 'WAITING_FOR_BIDS';
-          break;
-         case "FINAL_CALL":
-           item.status = 'WAITING_FINAL_CALL';
-           break;
-         case "SELL":
-           item.status = 'SOLD';
-           break;
-         case "FINAL_CALL_EMPTY":
-           item.status = 'WAITING_FINAL_CALL_EMPTY'
-           break;
-         case "CLOSE":
-           item.status = 'CLOSED_EMPTY'
-           break;
-         default:
-            console.log("Unknown status");
-       }
+
+       item.status = calcNewAuctionItemStatus(req.body.action, item.status);
+       // TODO update bid if necessary
+
        item.save(function (err) {
          if (err) return next(err);
-         io.sockets.emit('auctionAction', {auctionItem: item});
 
-         return res.json({auctionItem: item});
+         // 3. get new recent 5 bids
+         Bid.find({'auctionItem':auctionItemId}).populate('user')
+         .sort('-timestamp').limit(5).exec(function(err, bids) {
+           if (err || !bids) return next(err);
+
+           // send back results to all
+           io.sockets.emit('auctionAction', {auctionItem: item, recentBids: bids});
+           // and just for this request
+           return res.json({auctionItem: item, recentBids: bids});
+         });
        });
      });
    });

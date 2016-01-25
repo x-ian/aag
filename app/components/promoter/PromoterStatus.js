@@ -49,7 +49,7 @@ class PromoterStatus extends React.Component {
                   case "NOT_OPEN":
                     return <button className='btn btn-secondary' onClick={this.onClickOpenBidding.bind(this)}>Open bidding</button>;
                   case "NO_BIDS_YET":
-                    return <button className='btn btn-secondary' onClick={this.onClickFinalCall.bind(this)}>Final call</button>;
+                    return <button className='btn btn-secondary' onClick={this.onClickFinalCallEmpty.bind(this)}>Final call (no bids)</button>;
                   case "WAITING_FOR_BIDS":
                     return <button className='btn btn-secondary' onClick={this.onClickFinalCall.bind(this)}>Final call</button>;
                   case "INCOMING_BID":
@@ -58,7 +58,7 @@ class PromoterStatus extends React.Component {
                   case "WAITING_FINAL_CALL":
                     return <button className='btn btn-secondary' onClick={this.onClickSell.bind(this)}>Sell</button>;
                   case "WAITING_FINAL_CALL_EMPTY":
-                    return <button className='btn btn-secondary' onClick={this.onClickSell.bind(this)}>Close</button>;
+                    return <button className='btn btn-secondary' onClick={this.onClickClose.bind(this)}>Close</button>;
                   case "SOLD":
                     return '';
                   case "CLOSED_EMPTY":

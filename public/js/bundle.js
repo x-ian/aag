@@ -1671,6 +1671,12 @@ var AuctionItem = function (_React$Component) {
       });
     }
   }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      // not sure if this works
+      socket.removeListener('auctionAction');
+    }
+  }, {
     key: 'getVehicle',
     value: function getVehicle(id) {
       var _this3 = this;
@@ -2289,6 +2295,7 @@ var resetState = {
   vehicle: null,
   auction: null,
   recentBids: [],
+  currentBidId: null,
   // optimization shortcut
   latestBid: null
 };
@@ -2318,11 +2325,9 @@ var AuctionItem = function (_React$Component) {
       socket.on('auctionAction', function (data) {
         console.log('IO AuctionItem status ' + _this2.state.auctionItem.status);
         _this2.setState({ auctionItem: data['auctionItem'] });
-        if (data['latestBid']) _this2.setState({ latestBid: data['latestBid'] });
-
-        var newArray = _this2.state.recentBids.slice(0, 4);
-        newArray.unshift(_this2.state.latestBid);
-        _this2.setState({ recentBids: newArray });
+        _this2.setState({ recentBids: data['recentBids'] });
+        // TODO: if already a current bid present, deny this newly incoming one
+        if (data['currentBidId']) _this2.setState({ currentBidId: data['currentBidId'] });
       });
     }
   }, {
@@ -2382,7 +2387,8 @@ var AuctionItem = function (_React$Component) {
         dataType: 'json',
         type: 'POST',
         data: {
-          action: button
+          action: button,
+          currentBidId: this.state.currentBidId
         }
       }).done(function (data) {
         _this6.setState(data);
@@ -2628,8 +2634,8 @@ var PromoterStatus = function (_React$Component) {
                   case "NO_BIDS_YET":
                     return _react2.default.createElement(
                       'button',
-                      { className: 'btn btn-secondary', onClick: _this2.onClickFinalCall.bind(_this2) },
-                      'Final call'
+                      { className: 'btn btn-secondary', onClick: _this2.onClickFinalCallEmpty.bind(_this2) },
+                      'Final call (no bids)'
                     );
                   case "WAITING_FOR_BIDS":
                     return _react2.default.createElement(
@@ -2661,7 +2667,7 @@ var PromoterStatus = function (_React$Component) {
                   case "WAITING_FINAL_CALL_EMPTY":
                     return _react2.default.createElement(
                       'button',
-                      { className: 'btn btn-secondary', onClick: _this2.onClickSell.bind(_this2) },
+                      { className: 'btn btn-secondary', onClick: _this2.onClickClose.bind(_this2) },
                       'Close'
                     );
                   case "SOLD":

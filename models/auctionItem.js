@@ -6,7 +6,7 @@ var auctionItemSchema = new mongoose.Schema({
   startTimestamp: Date,
   endTimestamp: Date,
   status: { type: String, enum: ['NOT_OPEN', 'NO_BIDS_YET', 'WAITING_FOR_BIDS',
-    'INCOMING_BID', 'BID_ACCEPTED', 'BID_REJECTED', 'WAITING_FINAL_CALL', 
+    'INCOMING_BID', 'WAITING_FINAL_CALL', 
     'SOLD', 'WAITING_FINAL_CALL_EMPTY', 'CLOSED_EMPTY']
   },
   vehicle: {

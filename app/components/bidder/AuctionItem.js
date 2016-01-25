@@ -31,6 +31,11 @@ class AuctionItem extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    // not sure if this works
+    socket.removeListener('auctionAction');
+  }
+
   getVehicle(id) {
     $.ajax({
       url: '/api/vehicles/' + id,
