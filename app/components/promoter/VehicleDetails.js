@@ -6,7 +6,6 @@ class VehicleDetails extends React.Component {
 
   render() {
     return (
-      <div className='container'>
         <div className='list-group'>
           <div className='panel-heading'>Vehicle details</div>
           <div key={this.props.vehicle ? this.props.vehicle._id : ''} className='list-group-item animated fadeIn'>
@@ -17,7 +16,6 @@ class VehicleDetails extends React.Component {
             </div>
           </div>
         </div>
-      </div>
     );
   }
 

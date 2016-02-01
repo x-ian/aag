@@ -2,7 +2,7 @@ var Auction = require('../models/auction');
 var AuctionItem = require('../models/auctionitem');
 var Bid = require('../models/bid');
 
-module.exports = function (app, io) {
+module.exports = function (app, io, clients) {
 
   app.get('/api/recentBids/:id', function(req, res, next) {
 
@@ -10,6 +10,14 @@ module.exports = function (app, io) {
       if (err || !item) return next(err);
       return res.json(item.slice(-5));
     });
+  });
+
+  app.get('/api/participants', function(req, res, next) {
+    // console.log(clients);
+    var keys = Object.keys(clients);
+    var values = keys.map(function(v) { return clients[v]; });
+
+    return res.json(values);
   });
 
 

@@ -19,12 +19,10 @@ class BidHistory extends React.Component {
     });
 
     return (
-      <div className='container'>
         <div className='list-group'>
           <div className='panel-heading'>Recent bids</div>
           {bids}
         </div>
-      </div>
     );
   }
 }

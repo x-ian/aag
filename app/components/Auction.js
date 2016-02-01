@@ -3,8 +3,9 @@ import {Link} from 'react-router';
 
 import moment from "moment";
 import DateTimeField from "react-bootstrap-datetimepicker";
-require('react-datetime');
-import DateTime from 'react-datetime';
+
+import DateTimeSelect from './common/DateTimeSelect.js'
+//import DateTime from 'react-datetime';
 
 const resetState = {
   _id: "",
@@ -36,7 +37,7 @@ class Auction extends React.Component {
 
   onChangeOpenAt(e) { this.setState({openAt: e}) }
 
-  onChangeCloseAt(e) { this.setState({closeAt: e}) }
+  onChangeCloseAt(e) { (e === 'Invalid date') ? this.setState({closeAt: ''}) : this.setState({closeAt: e}); }
 
   onClickDelete(event) {
     event.preventDefault();
@@ -54,8 +55,7 @@ class Auction extends React.Component {
            this.setState(resetState);
        })
        .fail((jqXhr) => {
-         console.log('nok ');
-      //   //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+         console.log('ERROR: ' + jqXhr);
       });
 
   }
@@ -74,10 +74,7 @@ class Auction extends React.Component {
         this.setState(data);
       })
       .fail((jqXhr) => {
-        // this.titleValidationState = 'has-error';
-        // this.helpBlock = errorMessage;
-
-        // this.actions.getVehicleFail(jqXhr);
+        console.log('ERROR: ' + jqXhr);
       });
   }
 
@@ -101,7 +98,7 @@ class Auction extends React.Component {
            this.setState(resetState);
        })
        .fail((jqXhr) => {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+         console.log('ERROR: ' + jqXhr);
        });
   }
 
@@ -126,7 +123,7 @@ class Auction extends React.Component {
            this.setState(resetState);
        })
        .fail((jqXhr) => {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+         console.log('ERROR: ' + jqXhr);
        });
   }
 
@@ -144,7 +141,7 @@ class Auction extends React.Component {
     }
 
     if (openAt) {
-      if (this.state.id) {
+      if (this.state._id) {
         this.updateAuction(this.state._id, openAt, closeAt, location)
       } else {
         this.addAuction(openAt, closeAt, location);
@@ -154,54 +151,57 @@ class Auction extends React.Component {
 
   render() {
     return (
-      <div className="auctionBox">
-        <div className='container'>
-          <div className='row flipInX animated'>
-            <div className='col-sm-8'>
-              <div className='panel panel-default'>
-                <div className='panel-heading'>View/edit/add Auction</div>
-                <div className='panel-body'>
-                <form onSubmit={this.handleSubmit.bind(this)}>
-                  <table><tbody>
-                <tr>
-                    <td>
-                      <label className='control-label'>ID</label>
-                    </td><td>
-                      {this.state._id}
-                    </td>
-                  </tr><tr>
-                    <td>
-                      <label className='control-label'>Location</label>
-                    </td><td>
-                      <input type='text' className='form-control' ref='locationTextField' value={this.state.location}
-                        onChange={this.onChangeLocation.bind(this)} autoFocus/>
-                    </td>
-                  </tr><tr>
-                    <td>
-                      <label className='control-label'>Open At</label>
-                    </td><td>
-                      <DateTime
-                          ref='openAtDateField'
-                           inputFormat='DD/MM/YYYY HHmm'
-                            value={this.state.openAt}
-                          onChange={this.onChangeOpenAt.bind(this)}
-                        />
-                      <span className='help-block'>{this.state.helpBlock}</span>
-                    </td>
-                  </tr><tr>
-                    <td>
-                      <label className='control-label'>Close At</label>
-                    </td><td>
-                    <DateTimeField
-                        ref='closeAtDateField'
-                         inputFormat='DD/MM/YYYY HHmm'
-                        onChange={this.onChangeCloseAt.bind(this)}
-                      />
-                   </td>
-                  </tr>
-                  </tbody></table>
+      <div className="container">
+        <div className='panel panel-default'>
+          <div className='panel-heading'>View/edit/add Auction</div>
+          <div className='panel-body'>
+            <form onSubmit={this.handleSubmit.bind(this)} className='form-horizontal'>
+              <div className="form-group">
+                <label className="col-sm-2 control-label">ID</label>
+                <div className="col-sm-10">
+                  <p className="form-control-static">{this.state._id}</p>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="col-sm-2 control-label">Location</label>
+                <div className="col-sm-10">
+{/*
+                    <input type='text' className='form-control' ref='locationTextField' value={this.state.location}
+                    onChange={this.onChangeLocation.bind(this)} autoFocus/>
+*/}
 
-                {this.state._id ?
+                  <select value={this.state.location} className="form-control" ref='locationSelect' onChange={this.onChangeLocation.bind(this)} >
+                    <option value=""></option>
+                    <option value="Kaiserslautern">Kaiserslautern</option>
+                    <option value="Nierstein">Nierstein</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="col-sm-2 control-label">Open at</label>
+                <div className="col-sm-10">
+                  <DateTimeSelect onChange={this.onChangeOpenAt.bind(this)} dateTime={this.state.openAt} ref='openAtDateField'/>
+                {/*
+                  <input type='text' className='form-control' ref='openAtTextField' value={this.state.openAt}
+                    onChange={this.onChangeOpenAt.bind(this)} autoFocus/>
+                */}
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="col-sm-2 control-label">Close at</label>
+                <div className="col-sm-10">
+                  <DateTimeSelect onChange={this.onChangeCloseAt.bind(this)} dateTime={this.state.closeAt} ref='closeAtDateField'/>
+                  {/*
+                    <input type='text' className='form-control' ref='closeAtTextField' value={this.state.closeAt}
+                    onChange={this.onChangeCloseAt.bind(this)} autoFocus/>
+                */}
+                </div>
+              </div>
+
+              <div className="form-group">
+                 <div className="col-sm-offset-2 col-sm-10">
+
+                  {this.state._id ?
                     (
                       <div>
                         <button type='submit' className='btn btn-primary'>Save</button>
@@ -217,12 +217,9 @@ class Auction extends React.Component {
                       </div>
                     )
                   }
-
-                </form>
-
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>

@@ -37,7 +37,6 @@
     "react": "^0.14.2",
     "react-bootstrap": "^0.28.2",
     "react-bootstrap-datetimepicker": "0.0.22",
-    "react-datetime": "^2.0.2",
     "react-dom": "^0.14.2",
     "react-router": "^1.0.0",
     "react-timer-mixin": "^0.13.3",

@@ -151,9 +151,9 @@ var _reactBootstrapDatetimepicker = require('react-bootstrap-datetimepicker');
 
 var _reactBootstrapDatetimepicker2 = _interopRequireDefault(_reactBootstrapDatetimepicker);
 
-var _reactDatetime = require('react-datetime');
+var _DateTimeSelect = require('./common/DateTimeSelect.js');
 
-var _reactDatetime2 = _interopRequireDefault(_reactDatetime);
+var _DateTimeSelect2 = _interopRequireDefault(_DateTimeSelect);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -163,7 +163,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-require('react-datetime');
+//import DateTime from 'react-datetime';
 
 var resetState = {
   _id: "",
@@ -211,7 +211,7 @@ var Auction = function (_React$Component) {
   }, {
     key: 'onChangeCloseAt',
     value: function onChangeCloseAt(e) {
-      this.setState({ closeAt: e });
+      e === 'Invalid date' ? this.setState({ closeAt: '' }) : this.setState({ closeAt: e });
     }
   }, {
     key: 'onClickDelete',
@@ -231,8 +231,7 @@ var Auction = function (_React$Component) {
         }.bind(_this2), 1000);
         _this2.setState(resetState);
       }).fail(function (jqXhr) {
-        console.log('nok ');
-        //   //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
@@ -252,10 +251,7 @@ var Auction = function (_React$Component) {
         dataType: 'json' }).done(function (data) {
         _this3.setState(data);
       }).fail(function (jqXhr) {
-        // this.titleValidationState = 'has-error';
-        // this.helpBlock = errorMessage;
-
-        // this.actions.getVehicleFail(jqXhr);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
@@ -280,7 +276,7 @@ var Auction = function (_React$Component) {
         }.bind(_this4), 1000);
         _this4.setState(resetState);
       }).fail(function (jqXhr) {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
@@ -306,7 +302,7 @@ var Auction = function (_React$Component) {
         }.bind(_this5), 1000);
         _this5.setState(resetState);
       }).fail(function (jqXhr) {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
@@ -325,7 +321,7 @@ var Auction = function (_React$Component) {
       }
 
       if (openAt) {
-        if (this.state.id) {
+        if (this.state._id) {
           this.updateAuction(this.state._id, openAt, closeAt, location);
         } else {
           this.addAuction(openAt, closeAt, location);
@@ -337,156 +333,131 @@ var Auction = function (_React$Component) {
     value: function render() {
       return _react2.default.createElement(
         'div',
-        { className: 'auctionBox' },
+        { className: 'container' },
         _react2.default.createElement(
           'div',
-          { className: 'container' },
+          { className: 'panel panel-default' },
           _react2.default.createElement(
             'div',
-            { className: 'row flipInX animated' },
+            { className: 'panel-heading' },
+            'View/edit/add Auction'
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'panel-body' },
             _react2.default.createElement(
-              'div',
-              { className: 'col-sm-8' },
+              'form',
+              { onSubmit: this.handleSubmit.bind(this), className: 'form-horizontal' },
               _react2.default.createElement(
                 'div',
-                { className: 'panel panel-default' },
+                { className: 'form-group' },
                 _react2.default.createElement(
-                  'div',
-                  { className: 'panel-heading' },
-                  'View/edit/add Auction'
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'ID'
                 ),
                 _react2.default.createElement(
                   'div',
-                  { className: 'panel-body' },
+                  { className: 'col-sm-10' },
                   _react2.default.createElement(
-                    'form',
-                    { onSubmit: this.handleSubmit.bind(this) },
+                    'p',
+                    { className: 'form-control-static' },
+                    this.state._id
+                  )
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'Location'
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-10' },
+                  _react2.default.createElement(
+                    'select',
+                    { value: this.state.location, className: 'form-control', ref: 'locationSelect', onChange: this.onChangeLocation.bind(this) },
+                    _react2.default.createElement('option', { value: '' }),
                     _react2.default.createElement(
-                      'table',
-                      null,
-                      _react2.default.createElement(
-                        'tbody',
-                        null,
-                        _react2.default.createElement(
-                          'tr',
-                          null,
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(
-                              'label',
-                              { className: 'control-label' },
-                              'ID'
-                            )
-                          ),
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            this.state._id
-                          )
-                        ),
-                        _react2.default.createElement(
-                          'tr',
-                          null,
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(
-                              'label',
-                              { className: 'control-label' },
-                              'Location'
-                            )
-                          ),
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'locationTextField', value: this.state.location,
-                              onChange: this.onChangeLocation.bind(this), autoFocus: true })
-                          )
-                        ),
-                        _react2.default.createElement(
-                          'tr',
-                          null,
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(
-                              'label',
-                              { className: 'control-label' },
-                              'Open At'
-                            )
-                          ),
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(_reactDatetime2.default, {
-                              ref: 'openAtDateField',
-                              inputFormat: 'DD/MM/YYYY HHmm',
-                              value: this.state.openAt,
-                              onChange: this.onChangeOpenAt.bind(this)
-                            }),
-                            _react2.default.createElement(
-                              'span',
-                              { className: 'help-block' },
-                              this.state.helpBlock
-                            )
-                          )
-                        ),
-                        _react2.default.createElement(
-                          'tr',
-                          null,
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(
-                              'label',
-                              { className: 'control-label' },
-                              'Close At'
-                            )
-                          ),
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(_reactBootstrapDatetimepicker2.default, {
-                              ref: 'closeAtDateField',
-                              inputFormat: 'DD/MM/YYYY HHmm',
-                              onChange: this.onChangeCloseAt.bind(this)
-                            })
-                          )
-                        )
-                      )
+                      'option',
+                      { value: 'Kaiserslautern' },
+                      'Kaiserslautern'
                     ),
-                    this.state._id ? _react2.default.createElement(
-                      'div',
-                      null,
-                      _react2.default.createElement(
-                        'button',
-                        { type: 'submit', className: 'btn btn-primary' },
-                        'Save'
-                      ),
-                      _react2.default.createElement(
-                        'button',
-                        { className: 'btn btn-secondary', onClick: this.onClickDelete.bind(this) },
-                        'Delete'
-                      ),
-                      _react2.default.createElement(
-                        'button',
-                        { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
-                        'Cancel'
-                      )
-                    ) : _react2.default.createElement(
-                      'div',
-                      null,
-                      _react2.default.createElement(
-                        'button',
-                        { type: 'submit', className: 'btn btn-primary' },
-                        'Add'
-                      ),
-                      _react2.default.createElement(
-                        'button',
-                        { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
-                        'Cancel'
-                      )
+                    _react2.default.createElement(
+                      'option',
+                      { value: 'Nierstein' },
+                      'Nierstein'
+                    )
+                  )
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'Open at'
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-10' },
+                  _react2.default.createElement(_DateTimeSelect2.default, { onChange: this.onChangeOpenAt.bind(this), dateTime: this.state.openAt, ref: 'openAtDateField' })
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'Close at'
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-10' },
+                  _react2.default.createElement(_DateTimeSelect2.default, { onChange: this.onChangeCloseAt.bind(this), dateTime: this.state.closeAt, ref: 'closeAtDateField' })
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-offset-2 col-sm-10' },
+                  this.state._id ? _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(
+                      'button',
+                      { type: 'submit', className: 'btn btn-primary' },
+                      'Save'
+                    ),
+                    _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-secondary', onClick: this.onClickDelete.bind(this) },
+                      'Delete'
+                    ),
+                    _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
+                      'Cancel'
+                    )
+                  ) : _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(
+                      'button',
+                      { type: 'submit', className: 'btn btn-primary' },
+                      'Add'
+                    ),
+                    _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
+                      'Cancel'
                     )
                   )
                 )
@@ -503,7 +474,7 @@ var Auction = function (_React$Component) {
 
 exports.default = Auction;
 
-},{"moment":59,"react":"react","react-bootstrap-datetimepicker":61,"react-datetime":110,"react-router":"react-router"}],5:[function(require,module,exports){
+},{"./common/DateTimeSelect.js":17,"moment":61,"react":"react","react-bootstrap-datetimepicker":63,"react-router":"react-router"}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -591,7 +562,7 @@ var Auctions = _react2.default.createClass({
 
 exports.default = Auctions;
 
-},{"griddle-react":39,"react":"react","react-router":"react-router","underscore":"underscore"}],6:[function(require,module,exports){
+},{"griddle-react":41,"react":"react","react-router":"react-router","underscore":"underscore"}],6:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1085,7 +1056,7 @@ var Navbar = function (_React$Component) {
 
 exports.default = Navbar;
 
-},{"../actions/NavbarActions":1,"../stores/NavbarStore":24,"react":"react","react-router":"react-router"}],9:[function(require,module,exports){
+},{"../actions/NavbarActions":1,"../stores/NavbarStore":26,"react":"react","react-router":"react-router"}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1504,7 +1475,7 @@ var Vehicles = _react2.default.createClass({
 
 exports.default = Vehicles;
 
-},{"griddle-react":39,"react":"react","react-router":"react-router","underscore":"underscore"}],11:[function(require,module,exports){
+},{"griddle-react":41,"react":"react","react-router":"react-router","underscore":"underscore"}],11:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1627,6 +1598,10 @@ var _BidHistory = require('./BidHistory.js');
 
 var _BidHistory2 = _interopRequireDefault(_BidHistory);
 
+var _Participants = require('./Participants.js');
+
+var _Participants2 = _interopRequireDefault(_Participants);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1639,6 +1614,7 @@ var resetState = {
   auctionItem: null,
   vehicle: null,
   auction: null,
+  participants: [],
   recentBids: [],
   // optimization shortcut
   lastestBid: null
@@ -1662,12 +1638,15 @@ var AuctionItem = function (_React$Component) {
       var _this2 = this;
 
       this.getAuctionItem(this.props.id);
-
+      this.getParticipants();
       var socket = io.connect();
       socket.on('auctionAction', function (data) {
         console.log('IO AuctionItem status ' + _this2.state.auctionItem.status);
         _this2.setState({ auctionItem: data['auctionItem'] });
         _this2.setState({ recentBids: data['recentBids'] });
+      });
+      socket.on('participants', function (data) {
+        _this2.setState({ participants: data });
       });
     }
   }, {
@@ -1675,6 +1654,7 @@ var AuctionItem = function (_React$Component) {
     value: function componentWillUnmount() {
       // not sure if this works
       socket.removeListener('auctionAction');
+      socket.removeListener('participants');
     }
   }, {
     key: 'getVehicle',
@@ -1705,18 +1685,32 @@ var AuctionItem = function (_React$Component) {
       });
     }
   }, {
+    key: 'getParticipants',
+    value: function getParticipants() {
+      var _this5 = this;
+
+      $.ajax({
+        url: '/api/participants',
+        dataType: 'json'
+      }).done(function (data) {
+        _this5.setState({ participants: data });
+      }).fail(function (jqXhr) {
+        console.log('ERROR: ' + jqXhr);
+      });
+    }
+  }, {
     key: 'getAuctionItem',
     value: function getAuctionItem(id) {
-      var _this5 = this;
+      var _this6 = this;
 
       $.ajax({
         url: '/api/auctionitems/' + id,
         type: 'GET',
         dataType: 'json'
       }).done(function (data) {
-        _this5.setState({ auctionItem: data });
-        _this5.getVehicle(_this5.state.auctionItem.vehicle);
-        _this5.getRecentBids(_this5.state.auctionItem._id);
+        _this6.setState({ auctionItem: data });
+        _this6.getVehicle(_this6.state.auctionItem.vehicle);
+        _this6.getRecentBids(_this6.state.auctionItem._id);
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
@@ -1724,7 +1718,7 @@ var AuctionItem = function (_React$Component) {
   }, {
     key: 'updateAfterAction',
     value: function updateAfterAction(ai, button) {
-      var _this6 = this;
+      var _this7 = this;
 
       event.preventDefault();
       $.ajax({
@@ -1735,7 +1729,7 @@ var AuctionItem = function (_React$Component) {
           action: button
         }
       }).done(function (data) {
-        _this6.setState(data);
+        _this7.setState(data);
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
@@ -1745,46 +1739,33 @@ var AuctionItem = function (_React$Component) {
     value: function render() {
       return _react2.default.createElement(
         'div',
-        { className: 'container' },
+        { className: 'container-fluid' },
         _react2.default.createElement(
           'div',
-          { className: 'list-group' },
+          { className: 'row' },
           _react2.default.createElement(
-            'table',
-            null,
-            _react2.default.createElement(
-              'tbody',
-              null,
-              _react2.default.createElement(
-                'tr',
-                null,
-                _react2.default.createElement(
-                  'td',
-                  null,
-                  this.state.vehicle ? _react2.default.createElement(_VehicleDetails2.default, { vehicle: this.state.vehicle }) : ''
-                ),
-                _react2.default.createElement(
-                  'td',
-                  null,
-                  this.state.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { status: this.state.auctionItem.status, updateAfterAction: this.updateAfterAction.bind(this) }) : ''
-                )
-              ),
-              _react2.default.createElement(
-                'tr',
-                null,
-                _react2.default.createElement(
-                  'td',
-                  null,
-                  this.state.recentBids ? _react2.default.createElement(_BidHistory2.default, { bids: this.state.recentBids }) : ''
-                ),
-                _react2.default.createElement(
-                  'td',
-                  null,
-                  'Online participants:',
-                  _react2.default.createElement('br', null)
-                )
-              )
-            )
+            'div',
+            { className: 'col-sm-6' },
+            this.state.vehicle ? _react2.default.createElement(_VehicleDetails2.default, { vehicle: this.state.vehicle }) : ''
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'col-sm-6' },
+            this.state.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { status: this.state.auctionItem.status, updateAfterAction: this.updateAfterAction.bind(this) }) : ''
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'row' },
+          _react2.default.createElement(
+            'div',
+            { className: 'col-sm-6' },
+            this.state.recentBids ? _react2.default.createElement(_BidHistory2.default, { bids: this.state.recentBids }) : ''
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'col-sm-6' },
+            this.state.participants ? _react2.default.createElement(_Participants2.default, { participants: this.state.participants }) : ''
           )
         )
       );
@@ -1796,7 +1777,7 @@ var AuctionItem = function (_React$Component) {
 
 exports.default = AuctionItem;
 
-},{"../promoter/VehicleDetails.js":21,"./AuctionStatus.js":13,"./BidHistory.js":14,"react":"react","react-router":"react-router"}],13:[function(require,module,exports){
+},{"../promoter/VehicleDetails.js":23,"./AuctionStatus.js":13,"./BidHistory.js":14,"./Participants.js":15,"react":"react","react-router":"react-router"}],13:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1842,71 +1823,67 @@ var AuctionStatus = function (_React$Component) {
 
       return _react2.default.createElement(
         'div',
-        { className: 'container' },
+        { className: 'list-group' },
         _react2.default.createElement(
           'div',
-          { className: 'list-group' },
+          { className: 'panel-heading' },
+          'Status & actions'
+        ),
+        _react2.default.createElement(
+          'div',
+          { key: 'button', className: 'list-group-item animated fadeIn' },
           _react2.default.createElement(
             'div',
-            { className: 'panel-heading' },
-            'Status & actions'
-          ),
-          _react2.default.createElement(
-            'div',
-            { key: 'button', className: 'list-group-item animated fadeIn' },
-            _react2.default.createElement(
-              'div',
-              { className: 'media' },
-              function () {
-                switch (_this2.props.status) {
-                  case "NOT_OPEN":
-                    return _react2.default.createElement(
-                      'div',
-                      null,
-                      'Wait for auctioneer to open'
-                    );
-                  case "NO_BIDS_YET":
-                    return _react2.default.createElement(
-                      'button',
-                      { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
-                      'Bid'
-                    );
-                  case "WAITING_FOR_BIDS":
-                    return _react2.default.createElement(
-                      'button',
-                      { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
-                      'Bid'
-                    );
-                  case "INCOMING_BID":
-                    return _react2.default.createElement(
-                      'div',
-                      null,
-                      'Please wait; processing bids'
-                    );
-                  case "WAITING_FINAL_CALL":
-                    return _react2.default.createElement(
-                      'button',
-                      { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
-                      'Bid'
-                    );
-                  case "WAITING_FINAL_CALL_EMPTY":
-                    return _react2.default.createElement(
-                      'button',
-                      { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
-                      'Bid'
-                    );
-                  case "SOLD":
-                    return '';
-                  case "CLOSED_EMPTY":
-                    return '';
-                  default:
-                    return "(unknown state)";
-                }
-              }(),
-              '( ',
-              this.props.status,
-              ')'
-            )
+            { className: 'media' },
+            function () {
+              switch (_this2.props.status) {
+                case "NOT_OPEN":
+                  return _react2.default.createElement(
+                    'div',
+                    null,
+                    'Wait for auctioneer to open'
+                  );
+                case "NO_BIDS_YET":
+                  return _react2.default.createElement(
+                    'button',
+                    { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
+                    'Bid'
+                  );
+                case "WAITING_FOR_BIDS":
+                  return _react2.default.createElement(
+                    'button',
+                    { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
+                    'Bid'
+                  );
+                case "INCOMING_BID":
+                  return _react2.default.createElement(
+                    'div',
+                    null,
+                    'Please wait; processing bids'
+                  );
+                case "WAITING_FINAL_CALL":
+                  return _react2.default.createElement(
+                    'button',
+                    { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
+                    'Bid'
+                  );
+                case "WAITING_FINAL_CALL_EMPTY":
+                  return _react2.default.createElement(
+                    'button',
+                    { className: 'btn btn-secondary', onClick: _this2.onClickBid.bind(_this2) },
+                    'Bid'
+                  );
+                case "SOLD":
+                  return '';
+                case "CLOSED_EMPTY":
+                  return '';
+                default:
+                  return "(unknown state)";
+              }
+            }(),
+            '( ',
+            this.props.status,
+            ')'
           )
         )
       );
@@ -1979,17 +1956,13 @@ var BidHistory = function (_React$Component) {
 
       return _react2.default.createElement(
         'div',
-        { className: 'container' },
+        { className: 'list-group' },
         _react2.default.createElement(
           'div',
-          { className: 'list-group' },
-          _react2.default.createElement(
-            'div',
-            { className: 'panel-heading' },
-            'Recent bids'
-          ),
-          bids
-        )
+          { className: 'panel-heading' },
+          'Recent bids'
+        ),
+        bids
       );
     }
   }]);
@@ -2000,6 +1973,75 @@ var BidHistory = function (_React$Component) {
 exports.default = BidHistory;
 
 },{"react":"react","react-router":"react-router"}],15:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = require('react-router');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Participants = function (_React$Component) {
+  _inherits(Participants, _React$Component);
+
+  function Participants() {
+    _classCallCheck(this, Participants);
+
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(Participants).call(this));
+  }
+
+  _createClass(Participants, [{
+    key: 'render',
+    value: function render() {
+      var participants = this.props.participants.map(function (participant, index) {
+        return _react2.default.createElement(
+          'div',
+          { key: participant.id, className: 'list-group-item animated fadeIn' },
+          _react2.default.createElement(
+            'div',
+            { className: 'media' },
+            participant.id,
+            ' - ',
+            participant.ip,
+            ' - ',
+            participant.userAgent
+          )
+        );
+      });
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'list-group' },
+        _react2.default.createElement(
+          'div',
+          { className: 'panel-heading' },
+          'Participants'
+        ),
+        participants
+      );
+    }
+  }]);
+
+  return Participants;
+}(_react2.default.Component);
+
+exports.default = Participants;
+
+},{"react":"react","react-router":"react-router"}],16:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2142,7 +2184,82 @@ var Start = function (_React$Component) {
 
 exports.default = Start;
 
-},{"react":"react","react-router":"react-router"}],16:[function(require,module,exports){
+},{"react":"react","react-router":"react-router"}],17:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = require("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _moment = require("moment");
+
+var _moment2 = _interopRequireDefault(_moment);
+
+var _reactBootstrapDatetimepicker = require("react-bootstrap-datetimepicker");
+
+var _reactBootstrapDatetimepicker2 = _interopRequireDefault(_reactBootstrapDatetimepicker);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DateTimeSelect = function (_React$Component) {
+  _inherits(DateTimeSelect, _React$Component);
+
+  function DateTimeSelect() {
+    _classCallCheck(this, DateTimeSelect);
+
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(DateTimeSelect).call(this));
+  }
+
+  _createClass(DateTimeSelect, [{
+    key: "render",
+    value: function render() {
+      if (this.props.dateTime) {
+        var dt = _react2.default.createElement(_reactBootstrapDatetimepicker2.default, {
+          ref: this.props.ref,
+          format: "YYYY-MM-DDTHH:mm:ss.SSSZZ",
+          inputFormat: "DD.MM.YYYY HH:mm",
+          onChange: this.props.onChange,
+          showToday: true,
+          dateTime: this.props.dateTime
+        });
+      } else {
+        var dt = _react2.default.createElement(_reactBootstrapDatetimepicker2.default, {
+          ref: this.props.ref,
+          inputFormat: "DD.MM.YYYY HH:mm",
+          onChange: this.props.onChange,
+          showToday: true,
+          defaultText: ""
+        });
+      }
+
+      return _react2.default.createElement(
+        "div",
+        null,
+        dt
+      );
+    }
+  }]);
+
+  return DateTimeSelect;
+}(_react2.default.Component);
+
+;
+
+exports.default = DateTimeSelect;
+
+},{"moment":61,"react":"react","react-bootstrap-datetimepicker":63}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2255,7 +2372,7 @@ var Auction = _react2.default.createClass({
 
 exports.default = Auction;
 
-},{"react":"react","react-router":"react-router","underscore":"underscore"}],17:[function(require,module,exports){
+},{"react":"react","react-router":"react-router","underscore":"underscore"}],19:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2453,7 +2570,7 @@ var AuctionItem = function (_React$Component) {
 
 exports.default = AuctionItem;
 
-},{"../bidder/BidHistory.js":14,"./PromoterStatus.js":19,"./VehicleDetails.js":21,"react":"react","react-router":"react-router"}],18:[function(require,module,exports){
+},{"../bidder/BidHistory.js":14,"./PromoterStatus.js":21,"./VehicleDetails.js":23,"react":"react","react-router":"react-router"}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2533,7 +2650,7 @@ var Auctions = _react2.default.createClass({
 
 exports.default = Auctions;
 
-},{"react":"react","react-router":"react-router","underscore":"underscore"}],19:[function(require,module,exports){
+},{"react":"react","react-router":"react-router","underscore":"underscore"}],21:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2696,7 +2813,7 @@ var PromoterStatus = function (_React$Component) {
 
 exports.default = PromoterStatus;
 
-},{"react":"react","react-router":"react-router","underscore":"underscore"}],20:[function(require,module,exports){
+},{"react":"react","react-router":"react-router","underscore":"underscore"}],22:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2835,7 +2952,7 @@ var Vehicle = function (_React$Component) {
 
 exports.default = Vehicle;
 
-},{"./PromoterStatus.js":19,"./VehicleDetails.js":21,"react":"react","react-router":"react-router"}],21:[function(require,module,exports){
+},{"./PromoterStatus.js":21,"./VehicleDetails.js":23,"react":"react","react-router":"react-router"}],23:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2874,29 +2991,25 @@ var VehicleDetails = function (_React$Component) {
     value: function render() {
       return _react2.default.createElement(
         'div',
-        { className: 'container' },
+        { className: 'list-group' },
         _react2.default.createElement(
           'div',
-          { className: 'list-group' },
+          { className: 'panel-heading' },
+          'Vehicle details'
+        ),
+        _react2.default.createElement(
+          'div',
+          { key: this.props.vehicle ? this.props.vehicle._id : '', className: 'list-group-item animated fadeIn' },
           _react2.default.createElement(
             'div',
-            { className: 'panel-heading' },
-            'Vehicle details'
-          ),
-          _react2.default.createElement(
-            'div',
-            { key: this.props.vehicle ? this.props.vehicle._id : '', className: 'list-group-item animated fadeIn' },
-            _react2.default.createElement(
-              'div',
-              { className: 'media' },
-              this.props.vehicle ? this.props.vehicle._id : '',
-              ' ',
-              _react2.default.createElement('br', null),
-              this.props.vehicle ? this.props.vehicle.title : '',
-              ' ',
-              _react2.default.createElement('br', null),
-              this.props.vehicle ? this.props.vehicle.description : ''
-            )
+            { className: 'media' },
+            this.props.vehicle ? this.props.vehicle._id : '',
+            ' ',
+            _react2.default.createElement('br', null),
+            this.props.vehicle ? this.props.vehicle.title : '',
+            ' ',
+            _react2.default.createElement('br', null),
+            this.props.vehicle ? this.props.vehicle.description : ''
           )
         )
       );
@@ -2910,7 +3023,7 @@ var VehicleDetails = function (_React$Component) {
 
 exports.default = VehicleDetails;
 
-},{"react":"react","react-router":"react-router","underscore":"underscore"}],22:[function(require,module,exports){
+},{"react":"react","react-router":"react-router","underscore":"underscore"}],24:[function(require,module,exports){
 'use strict';
 
 var _react = require('react');
@@ -2947,7 +3060,7 @@ _reactDom2.default.render(_react2.default.createElement(
   _routes2.default
 ), document.getElementById('app'));
 
-},{"./components/Navbar":8,"./routes":23,"history/lib/createBrowserHistory":46,"react":"react","react-dom":"react-dom","react-router":"react-router"}],23:[function(require,module,exports){
+},{"./components/Navbar":8,"./routes":25,"history/lib/createBrowserHistory":48,"react":"react","react-dom":"react-dom","react-router":"react-router"}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3028,7 +3141,7 @@ exports.default = _react2.default.createElement(
   _react2.default.createElement(_reactRouter.Route, { path: '/bidder/auction/:id', component: _Auction6.default })
 );
 
-},{"./components/App":3,"./components/Auction":4,"./components/Auctions":5,"./components/Home":7,"./components/Vehicle":9,"./components/Vehicles":10,"./components/bidder/Auction":11,"./components/bidder/Start":15,"./components/promoter/Auction":16,"./components/promoter/AuctionItem":17,"./components/promoter/Auctions":18,"./components/promoter/Vehicle":20,"react":"react","react-router":"react-router"}],24:[function(require,module,exports){
+},{"./components/App":3,"./components/Auction":4,"./components/Auctions":5,"./components/Home":7,"./components/Vehicle":9,"./components/Vehicles":10,"./components/bidder/Auction":11,"./components/bidder/Start":16,"./components/promoter/Auction":18,"./components/promoter/AuctionItem":19,"./components/promoter/Auctions":20,"./components/promoter/Vehicle":22,"react":"react","react-router":"react-router"}],26:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3105,7 +3218,7 @@ var NavbarStore = function () {
 
 exports.default = _alt2.default.createStore(NavbarStore);
 
-},{"../actions/NavbarActions":1,"../alt":2}],25:[function(require,module,exports){
+},{"../actions/NavbarActions":1,"../alt":2}],27:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -3198,7 +3311,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -3298,7 +3411,7 @@ var ColumnProperties = (function () {
 
 module.exports = ColumnProperties;
 
-},{"underscore":"underscore"}],27:[function(require,module,exports){
+},{"underscore":"underscore"}],29:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -3332,7 +3445,7 @@ var CustomFilterContainer = React.createClass({
 
 module.exports = CustomFilterContainer;
 
-},{"react":"react"}],28:[function(require,module,exports){
+},{"react":"react"}],30:[function(require,module,exports){
 /*
    Griddle - Simple Grid Component for React
    https://github.com/DynamicTyped/Griddle
@@ -3370,7 +3483,7 @@ var CustomPaginationContainer = React.createClass({
 
 module.exports = CustomPaginationContainer;
 
-},{"react":"react"}],29:[function(require,module,exports){
+},{"react":"react"}],31:[function(require,module,exports){
 /*
    Griddle - Simple Grid Component for React
    https://github.com/DynamicTyped/Griddle
@@ -3412,7 +3525,7 @@ var CustomRowComponentContainer = React.createClass({
 
 module.exports = CustomRowComponentContainer;
 
-},{"react":"react"}],30:[function(require,module,exports){
+},{"react":"react"}],32:[function(require,module,exports){
 "use strict";
 
 var _ = require('underscore');
@@ -3519,7 +3632,7 @@ module.exports = {
   keys: getKeys
 };
 
-},{"underscore":"underscore"}],31:[function(require,module,exports){
+},{"underscore":"underscore"}],33:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -3545,7 +3658,7 @@ var GridFilter = React.createClass({
 
 module.exports = GridFilter;
 
-},{"react":"react"}],32:[function(require,module,exports){
+},{"react":"react"}],34:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -3570,7 +3683,7 @@ var GridNoData = React.createClass({
 
 module.exports = GridNoData;
 
-},{"react":"react"}],33:[function(require,module,exports){
+},{"react":"react"}],35:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -3639,7 +3752,7 @@ var GridPagination = React.createClass({
 
 module.exports = GridPagination;
 
-},{"react":"react","underscore":"underscore"}],34:[function(require,module,exports){
+},{"react":"react","underscore":"underscore"}],36:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -3771,7 +3884,7 @@ var GridRow = React.createClass({
 
 module.exports = GridRow;
 
-},{"./columnProperties.js":26,"./deep.js":30,"react":"react","underscore":"underscore"}],35:[function(require,module,exports){
+},{"./columnProperties.js":28,"./deep.js":32,"react":"react","underscore":"underscore"}],37:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -3877,7 +3990,7 @@ var GridRowContainer = React.createClass({
 
 module.exports = GridRowContainer;
 
-},{"./columnProperties.js":26,"./griddle.jsx":39,"react":"react"}],36:[function(require,module,exports){
+},{"./columnProperties.js":28,"./griddle.jsx":41,"react":"react"}],38:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -3952,7 +4065,7 @@ var GridSettings = React.createClass({
 
 module.exports = GridSettings;
 
-},{"react":"react","underscore":"underscore"}],37:[function(require,module,exports){
+},{"react":"react","underscore":"underscore"}],39:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -4213,7 +4326,7 @@ var GridTable = React.createClass({
 
 module.exports = GridTable;
 
-},{"./columnProperties.js":26,"./gridRowContainer.jsx":35,"./gridTitle.jsx":38,"./rowProperties.js":40,"react":"react","underscore":"underscore"}],38:[function(require,module,exports){
+},{"./columnProperties.js":28,"./gridRowContainer.jsx":37,"./gridTitle.jsx":40,"./rowProperties.js":42,"react":"react","underscore":"underscore"}],40:[function(require,module,exports){
 /*
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
@@ -4312,7 +4425,7 @@ var GridTitle = React.createClass({
 
 module.exports = GridTitle;
 
-},{"./columnProperties.js":26,"react":"react","underscore":"underscore"}],39:[function(require,module,exports){
+},{"./columnProperties.js":28,"react":"react","underscore":"underscore"}],41:[function(require,module,exports){
 /*
    Griddle - Simple Grid Component for React
    https://github.com/DynamicTyped/Griddle
@@ -5094,7 +5207,7 @@ var Griddle = React.createClass({
 
 module.exports = Griddle;
 
-},{"./columnProperties":26,"./customFilterContainer.jsx":27,"./customPaginationContainer.jsx":28,"./customRowComponentContainer.jsx":29,"./deep":30,"./gridFilter.jsx":31,"./gridNoData.jsx":32,"./gridPagination.jsx":33,"./gridRow.jsx":34,"./gridSettings.jsx":36,"./gridTable.jsx":37,"./rowProperties":40,"react":"react","underscore":"underscore"}],40:[function(require,module,exports){
+},{"./columnProperties":28,"./customFilterContainer.jsx":29,"./customPaginationContainer.jsx":30,"./customRowComponentContainer.jsx":31,"./deep":32,"./gridFilter.jsx":33,"./gridNoData.jsx":34,"./gridPagination.jsx":35,"./gridRow.jsx":36,"./gridSettings.jsx":38,"./gridTable.jsx":39,"./rowProperties":42,"react":"react","underscore":"underscore"}],42:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -5165,7 +5278,7 @@ var RowProperties = (function () {
 
 module.exports = RowProperties;
 
-},{"underscore":"underscore"}],41:[function(require,module,exports){
+},{"underscore":"underscore"}],43:[function(require,module,exports){
 /**
  * Indicates that navigation was caused by a call to history.push.
  */
@@ -5197,7 +5310,7 @@ exports['default'] = {
   REPLACE: REPLACE,
   POP: POP
 };
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -5224,7 +5337,7 @@ function loopAsync(turns, work, callback) {
 
   next();
 }
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (process){
 /*eslint-disable no-empty */
 'use strict';
@@ -5295,7 +5408,7 @@ function readState(key) {
   return null;
 }
 }).call(this,require('_process'))
-},{"_process":25,"warning":58}],44:[function(require,module,exports){
+},{"_process":27,"warning":60}],46:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -5376,13 +5489,13 @@ function supportsGoWithoutReloadUsingHash() {
   var ua = navigator.userAgent;
   return ua.indexOf('Firefox') === -1;
 }
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 exports.canUseDOM = canUseDOM;
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5563,7 +5676,7 @@ function createBrowserHistory() {
 exports['default'] = createBrowserHistory;
 module.exports = exports['default'];
 }).call(this,require('_process'))
-},{"./Actions":41,"./DOMStateStorage":43,"./DOMUtils":44,"./ExecutionEnvironment":45,"./createDOMHistory":47,"./parsePath":52,"_process":25,"invariant":57}],47:[function(require,module,exports){
+},{"./Actions":43,"./DOMStateStorage":45,"./DOMUtils":46,"./ExecutionEnvironment":47,"./createDOMHistory":49,"./parsePath":54,"_process":27,"invariant":59}],49:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5606,7 +5719,7 @@ function createDOMHistory(options) {
 exports['default'] = createDOMHistory;
 module.exports = exports['default'];
 }).call(this,require('_process'))
-},{"./DOMUtils":44,"./ExecutionEnvironment":45,"./createHistory":48,"_process":25,"invariant":57}],48:[function(require,module,exports){
+},{"./DOMUtils":46,"./ExecutionEnvironment":47,"./createHistory":50,"_process":27,"invariant":59}],50:[function(require,module,exports){
 //import warning from 'warning'
 'use strict';
 
@@ -5898,7 +6011,7 @@ function createHistory() {
 
 exports['default'] = createHistory;
 module.exports = exports['default'];
-},{"./Actions":41,"./AsyncUtils":42,"./createLocation":49,"./deprecate":50,"./parsePath":52,"./runTransitionHook":53,"deep-equal":54}],49:[function(require,module,exports){
+},{"./Actions":43,"./AsyncUtils":44,"./createLocation":51,"./deprecate":52,"./parsePath":54,"./runTransitionHook":55,"deep-equal":56}],51:[function(require,module,exports){
 //import warning from 'warning'
 'use strict';
 
@@ -5953,7 +6066,7 @@ function createLocation() {
 
 exports['default'] = createLocation;
 module.exports = exports['default'];
-},{"./Actions":41,"./parsePath":52}],50:[function(require,module,exports){
+},{"./Actions":43,"./parsePath":54}],52:[function(require,module,exports){
 //import warning from 'warning'
 
 "use strict";
@@ -5969,7 +6082,7 @@ function deprecate(fn) {
 
 exports["default"] = deprecate;
 module.exports = exports["default"];
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -5983,7 +6096,7 @@ function extractPath(string) {
 
 exports["default"] = extractPath;
 module.exports = exports["default"];
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -6030,7 +6143,7 @@ function parsePath(path) {
 exports['default'] = parsePath;
 module.exports = exports['default'];
 }).call(this,require('_process'))
-},{"./extractPath":51,"_process":25,"warning":58}],53:[function(require,module,exports){
+},{"./extractPath":53,"_process":27,"warning":60}],55:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -6057,7 +6170,7 @@ function runTransitionHook(hook, location, callback) {
 exports['default'] = runTransitionHook;
 module.exports = exports['default'];
 }).call(this,require('_process'))
-},{"_process":25,"warning":58}],54:[function(require,module,exports){
+},{"_process":27,"warning":60}],56:[function(require,module,exports){
 var pSlice = Array.prototype.slice;
 var objectKeys = require('./lib/keys.js');
 var isArguments = require('./lib/is_arguments.js');
@@ -6153,7 +6266,7 @@ function objEquiv(a, b, opts) {
   return typeof a === typeof b;
 }
 
-},{"./lib/is_arguments.js":55,"./lib/keys.js":56}],55:[function(require,module,exports){
+},{"./lib/is_arguments.js":57,"./lib/keys.js":58}],57:[function(require,module,exports){
 var supportsArgumentsClass = (function(){
   return Object.prototype.toString.call(arguments)
 })() == '[object Arguments]';
@@ -6175,7 +6288,7 @@ function unsupported(object){
     false;
 };
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 exports = module.exports = typeof Object.keys === 'function'
   ? Object.keys : shim;
 
@@ -6186,7 +6299,7 @@ function shim (obj) {
   return keys;
 }
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -6241,7 +6354,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 }).call(this,require('_process'))
-},{"_process":25}],58:[function(require,module,exports){
+},{"_process":27}],60:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -6305,7 +6418,7 @@ if (process.env.NODE_ENV !== 'production') {
 module.exports = warning;
 
 }).call(this,require('_process'))
-},{"_process":25}],59:[function(require,module,exports){
+},{"_process":27}],61:[function(require,module,exports){
 //! moment.js
 //! version : 2.11.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -9912,7 +10025,7 @@ module.exports = warning;
     return _moment;
 
 }));
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -9924,7 +10037,7 @@ module.exports = {
     SIZE_MEDIUM: "md",
     SIZE_LARGE: "lg"
 };
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -10367,7 +10480,7 @@ var DateTimeField = (function (_Component) {
 
 exports["default"] = DateTimeField;
 module.exports = exports["default"];
-},{"./Constants.js":60,"./DateTimePicker.js":62,"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/extends":78,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"classnames":109,"moment":59,"react":"react"}],62:[function(require,module,exports){
+},{"./Constants.js":62,"./DateTimePicker.js":64,"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/extends":80,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"classnames":111,"moment":61,"react":"react"}],64:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -10531,7 +10644,7 @@ var DateTimePicker = (function (_Component) {
 
 exports["default"] = DateTimePicker;
 module.exports = exports["default"];
-},{"./Constants.js":60,"./DateTimePickerDate.js":63,"./DateTimePickerTime.js":68,"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"classnames":109,"react":"react"}],63:[function(require,module,exports){
+},{"./Constants.js":62,"./DateTimePickerDate.js":65,"./DateTimePickerTime.js":70,"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"classnames":111,"react":"react"}],65:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -10715,7 +10828,7 @@ var DateTimePickerDate = (function (_Component) {
 
 exports["default"] = DateTimePickerDate;
 module.exports = exports["default"];
-},{"./DateTimePickerDays":64,"./DateTimePickerMonths":67,"./DateTimePickerYears":69,"babel-runtime/core-js/object/keys":74,"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"react":"react"}],64:[function(require,module,exports){
+},{"./DateTimePickerDays":66,"./DateTimePickerMonths":69,"./DateTimePickerYears":71,"babel-runtime/core-js/object/keys":76,"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"react":"react"}],66:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -10920,7 +11033,7 @@ var DateTimePickerDays = (function (_Component) {
 
 exports["default"] = DateTimePickerDays;
 module.exports = exports["default"];
-},{"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"classnames":109,"moment":59,"react":"react"}],65:[function(require,module,exports){
+},{"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"classnames":111,"moment":61,"react":"react"}],67:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -11148,7 +11261,7 @@ var DateTimePickerHours = (function (_Component) {
 
 exports["default"] = DateTimePickerHours;
 module.exports = exports["default"];
-},{"./Constants.js":60,"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"react":"react"}],66:[function(require,module,exports){
+},{"./Constants.js":62,"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"react":"react"}],68:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -11304,7 +11417,7 @@ var DateTimePickerMinutes = (function (_Component) {
 
 exports["default"] = DateTimePickerMinutes;
 module.exports = exports["default"];
-},{"./Constants.js":60,"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"react":"react"}],67:[function(require,module,exports){
+},{"./Constants.js":62,"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"react":"react"}],69:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -11431,7 +11544,7 @@ var DateTimePickerMonths = (function (_Component) {
 
 exports["default"] = DateTimePickerMonths;
 module.exports = exports["default"];
-},{"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"classnames":109,"moment":59,"react":"react"}],68:[function(require,module,exports){
+},{"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"classnames":111,"moment":61,"react":"react"}],70:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -11656,7 +11769,7 @@ exports["default"] = DateTimePickerTime;
 
 module.exports = DateTimePickerTime;
 module.exports = exports["default"];
-},{"./Constants.js":60,"./DateTimePickerHours":65,"./DateTimePickerMinutes":66,"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/extends":78,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"react":"react"}],69:[function(require,module,exports){
+},{"./Constants.js":62,"./DateTimePickerHours":67,"./DateTimePickerMinutes":68,"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/extends":80,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"react":"react"}],71:[function(require,module,exports){
 "use strict";
 
 var _get = require("babel-runtime/helpers/get")["default"];
@@ -11784,19 +11897,19 @@ var DateTimePickerYears = (function (_Component) {
 
 exports["default"] = DateTimePickerYears;
 module.exports = exports["default"];
-},{"babel-runtime/helpers/class-call-check":76,"babel-runtime/helpers/create-class":77,"babel-runtime/helpers/get":79,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/interop-require-default":81,"classnames":109,"react":"react"}],70:[function(require,module,exports){
+},{"babel-runtime/helpers/class-call-check":78,"babel-runtime/helpers/create-class":79,"babel-runtime/helpers/get":81,"babel-runtime/helpers/inherits":82,"babel-runtime/helpers/interop-require-default":83,"classnames":111,"react":"react"}],72:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/assign"), __esModule: true };
-},{"core-js/library/fn/object/assign":82}],71:[function(require,module,exports){
+},{"core-js/library/fn/object/assign":84}],73:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/create"), __esModule: true };
-},{"core-js/library/fn/object/create":83}],72:[function(require,module,exports){
+},{"core-js/library/fn/object/create":85}],74:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/define-property"), __esModule: true };
-},{"core-js/library/fn/object/define-property":84}],73:[function(require,module,exports){
+},{"core-js/library/fn/object/define-property":86}],75:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/get-own-property-descriptor"), __esModule: true };
-},{"core-js/library/fn/object/get-own-property-descriptor":85}],74:[function(require,module,exports){
+},{"core-js/library/fn/object/get-own-property-descriptor":87}],76:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
-},{"core-js/library/fn/object/keys":86}],75:[function(require,module,exports){
+},{"core-js/library/fn/object/keys":88}],77:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/set-prototype-of"), __esModule: true };
-},{"core-js/library/fn/object/set-prototype-of":87}],76:[function(require,module,exports){
+},{"core-js/library/fn/object/set-prototype-of":89}],78:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (instance, Constructor) {
@@ -11806,7 +11919,7 @@ exports["default"] = function (instance, Constructor) {
 };
 
 exports.__esModule = true;
-},{}],77:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 
 var _Object$defineProperty = require("babel-runtime/core-js/object/define-property")["default"];
@@ -11831,7 +11944,7 @@ exports["default"] = (function () {
 })();
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/define-property":72}],78:[function(require,module,exports){
+},{"babel-runtime/core-js/object/define-property":74}],80:[function(require,module,exports){
 "use strict";
 
 var _Object$assign = require("babel-runtime/core-js/object/assign")["default"];
@@ -11851,7 +11964,7 @@ exports["default"] = _Object$assign || function (target) {
 };
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/assign":70}],79:[function(require,module,exports){
+},{"babel-runtime/core-js/object/assign":72}],81:[function(require,module,exports){
 "use strict";
 
 var _Object$getOwnPropertyDescriptor = require("babel-runtime/core-js/object/get-own-property-descriptor")["default"];
@@ -11896,7 +12009,7 @@ exports["default"] = function get(_x, _x2, _x3) {
 };
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/get-own-property-descriptor":73}],80:[function(require,module,exports){
+},{"babel-runtime/core-js/object/get-own-property-descriptor":75}],82:[function(require,module,exports){
 "use strict";
 
 var _Object$create = require("babel-runtime/core-js/object/create")["default"];
@@ -11920,7 +12033,7 @@ exports["default"] = function (subClass, superClass) {
 };
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/create":71,"babel-runtime/core-js/object/set-prototype-of":75}],81:[function(require,module,exports){
+},{"babel-runtime/core-js/object/create":73,"babel-runtime/core-js/object/set-prototype-of":77}],83:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (obj) {
@@ -11930,52 +12043,52 @@ exports["default"] = function (obj) {
 };
 
 exports.__esModule = true;
-},{}],82:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 require('../../modules/es6.object.assign');
 module.exports = require('../../modules/$.core').Object.assign;
-},{"../../modules/$.core":91,"../../modules/es6.object.assign":105}],83:[function(require,module,exports){
+},{"../../modules/$.core":93,"../../modules/es6.object.assign":107}],85:[function(require,module,exports){
 var $ = require('../../modules/$');
 module.exports = function create(P, D){
   return $.create(P, D);
 };
-},{"../../modules/$":99}],84:[function(require,module,exports){
+},{"../../modules/$":101}],86:[function(require,module,exports){
 var $ = require('../../modules/$');
 module.exports = function defineProperty(it, key, desc){
   return $.setDesc(it, key, desc);
 };
-},{"../../modules/$":99}],85:[function(require,module,exports){
+},{"../../modules/$":101}],87:[function(require,module,exports){
 var $ = require('../../modules/$');
 require('../../modules/es6.object.get-own-property-descriptor');
 module.exports = function getOwnPropertyDescriptor(it, key){
   return $.getDesc(it, key);
 };
-},{"../../modules/$":99,"../../modules/es6.object.get-own-property-descriptor":106}],86:[function(require,module,exports){
+},{"../../modules/$":101,"../../modules/es6.object.get-own-property-descriptor":108}],88:[function(require,module,exports){
 require('../../modules/es6.object.keys');
 module.exports = require('../../modules/$.core').Object.keys;
-},{"../../modules/$.core":91,"../../modules/es6.object.keys":107}],87:[function(require,module,exports){
+},{"../../modules/$.core":93,"../../modules/es6.object.keys":109}],89:[function(require,module,exports){
 require('../../modules/es6.object.set-prototype-of');
 module.exports = require('../../modules/$.core').Object.setPrototypeOf;
-},{"../../modules/$.core":91,"../../modules/es6.object.set-prototype-of":108}],88:[function(require,module,exports){
+},{"../../modules/$.core":93,"../../modules/es6.object.set-prototype-of":110}],90:[function(require,module,exports){
 module.exports = function(it){
   if(typeof it != 'function')throw TypeError(it + ' is not a function!');
   return it;
 };
-},{}],89:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var isObject = require('./$.is-object');
 module.exports = function(it){
   if(!isObject(it))throw TypeError(it + ' is not an object!');
   return it;
 };
-},{"./$.is-object":98}],90:[function(require,module,exports){
+},{"./$.is-object":100}],92:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = function(it){
   return toString.call(it).slice(8, -1);
 };
-},{}],91:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 var core = module.exports = {version: '1.2.6'};
 if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-},{}],92:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 // optional / simple context binding
 var aFunction = require('./$.a-function');
 module.exports = function(fn, that, length){
@@ -11996,13 +12109,13 @@ module.exports = function(fn, that, length){
     return fn.apply(that, arguments);
   };
 };
-},{"./$.a-function":88}],93:[function(require,module,exports){
+},{"./$.a-function":90}],95:[function(require,module,exports){
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function(it){
   if(it == undefined)throw TypeError("Can't call method on  " + it);
   return it;
 };
-},{}],94:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 var global    = require('./$.global')
   , core      = require('./$.core')
   , ctx       = require('./$.ctx')
@@ -12049,7 +12162,7 @@ $export.P = 8;  // proto
 $export.B = 16; // bind
 $export.W = 32; // wrap
 module.exports = $export;
-},{"./$.core":91,"./$.ctx":92,"./$.global":96}],95:[function(require,module,exports){
+},{"./$.core":93,"./$.ctx":94,"./$.global":98}],97:[function(require,module,exports){
 module.exports = function(exec){
   try {
     return !!exec();
@@ -12057,22 +12170,22 @@ module.exports = function(exec){
     return true;
   }
 };
-},{}],96:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
 if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-},{}],97:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 var cof = require('./$.cof');
 module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
-},{"./$.cof":90}],98:[function(require,module,exports){
+},{"./$.cof":92}],100:[function(require,module,exports){
 module.exports = function(it){
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
-},{}],99:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 var $Object = Object;
 module.exports = {
   create:     $Object.create,
@@ -12086,7 +12199,7 @@ module.exports = {
   getSymbols: $Object.getOwnPropertySymbols,
   each:       [].forEach
 };
-},{}],100:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 // 19.1.2.1 Object.assign(target, source, ...)
 var $        = require('./$')
   , toObject = require('./$.to-object')
@@ -12120,7 +12233,7 @@ module.exports = require('./$.fails')(function(){
   }
   return T;
 } : Object.assign;
-},{"./$":99,"./$.fails":95,"./$.iobject":97,"./$.to-object":104}],101:[function(require,module,exports){
+},{"./$":101,"./$.fails":97,"./$.iobject":99,"./$.to-object":106}],103:[function(require,module,exports){
 // most Object methods by ES6 should accept primitives
 var $export = require('./$.export')
   , core    = require('./$.core')
@@ -12131,7 +12244,7 @@ module.exports = function(KEY, exec){
   exp[KEY] = exec(fn);
   $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
 };
-},{"./$.core":91,"./$.export":94,"./$.fails":95}],102:[function(require,module,exports){
+},{"./$.core":93,"./$.export":96,"./$.fails":97}],104:[function(require,module,exports){
 // Works with __proto__ only. Old v8 can't work with null proto objects.
 /* eslint-disable no-proto */
 var getDesc  = require('./$').getDesc
@@ -12158,25 +12271,25 @@ module.exports = {
     }({}, false) : undefined),
   check: check
 };
-},{"./$":99,"./$.an-object":89,"./$.ctx":92,"./$.is-object":98}],103:[function(require,module,exports){
+},{"./$":101,"./$.an-object":91,"./$.ctx":94,"./$.is-object":100}],105:[function(require,module,exports){
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = require('./$.iobject')
   , defined = require('./$.defined');
 module.exports = function(it){
   return IObject(defined(it));
 };
-},{"./$.defined":93,"./$.iobject":97}],104:[function(require,module,exports){
+},{"./$.defined":95,"./$.iobject":99}],106:[function(require,module,exports){
 // 7.1.13 ToObject(argument)
 var defined = require('./$.defined');
 module.exports = function(it){
   return Object(defined(it));
 };
-},{"./$.defined":93}],105:[function(require,module,exports){
+},{"./$.defined":95}],107:[function(require,module,exports){
 // 19.1.3.1 Object.assign(target, source)
 var $export = require('./$.export');
 
 $export($export.S + $export.F, 'Object', {assign: require('./$.object-assign')});
-},{"./$.export":94,"./$.object-assign":100}],106:[function(require,module,exports){
+},{"./$.export":96,"./$.object-assign":102}],108:[function(require,module,exports){
 // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
 var toIObject = require('./$.to-iobject');
 
@@ -12185,7 +12298,7 @@ require('./$.object-sap')('getOwnPropertyDescriptor', function($getOwnPropertyDe
     return $getOwnPropertyDescriptor(toIObject(it), key);
   };
 });
-},{"./$.object-sap":101,"./$.to-iobject":103}],107:[function(require,module,exports){
+},{"./$.object-sap":103,"./$.to-iobject":105}],109:[function(require,module,exports){
 // 19.1.2.14 Object.keys(O)
 var toObject = require('./$.to-object');
 
@@ -12194,11 +12307,11 @@ require('./$.object-sap')('keys', function($keys){
     return $keys(toObject(it));
   };
 });
-},{"./$.object-sap":101,"./$.to-object":104}],108:[function(require,module,exports){
+},{"./$.object-sap":103,"./$.to-object":106}],110:[function(require,module,exports){
 // 19.1.3.19 Object.setPrototypeOf(O, proto)
 var $export = require('./$.export');
 $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
-},{"./$.export":94,"./$.set-proto":102}],109:[function(require,module,exports){
+},{"./$.export":96,"./$.set-proto":104}],111:[function(require,module,exports){
 /*!
   Copyright (c) 2016 Jed Watson.
   Licensed under the MIT License (MIT), see
@@ -12248,894 +12361,4 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
 	}
 }());
 
-},{}],110:[function(require,module,exports){
-'use strict';
-
-var assign = require('object-assign'),
-	React = require('react'),
-	DaysView = require('./src/DaysView'),
-	MonthsView = require('./src/MonthsView'),
-	YearsView = require('./src/YearsView'),
-	TimeView = require('./src/TimeView'),
-	moment = require('moment')
-;
-
-var TYPES = React.PropTypes;
-var Datetime = React.createClass({
-	mixins: [
-		require('./src/onClickOutside')
-	],
-	viewComponents: {
-		days: DaysView,
-		months: MonthsView,
-		years: YearsView,
-		time: TimeView
-	},
-	propTypes: {
-		// value: TYPES.object | TYPES.string,
-		// defaultValue: TYPES.object | TYPES.string,
-		onBlur: TYPES.func,
-		onChange: TYPES.func,
-		locale: TYPES.string,
-		input: TYPES.bool,
-		// dateFormat: TYPES.string | TYPES.bool,
-		// timeFormat: TYPES.string | TYPES.bool,
-		inputProps: TYPES.object,
-		viewMode: TYPES.oneOf(['years', 'months', 'days', 'time']),
-		isValidDate: TYPES.func,
-		open: TYPES.bool,
-		strictParsing: TYPES.bool
-	},
-
-	getDefaultProps: function() {
-		var nof = function(){};
-		return {
-			className: '',
-			defaultValue: '',
-			viewMode: 'days',
-			inputProps: {},
-			input: true,
-			onBlur: nof,
-			onChange: nof,
-			timeFormat: true,
-			dateFormat: true,
-			strictParsing: true
-		};
-	},
-
-	getInitialState: function() {
-		var state = this.getStateFromProps( this.props );
-
-		if( state.open == undefined )
-			state.open = !this.props.input;
-
-		state.currentView = this.props.dateFormat ? this.props.viewMode : 'time';
-
-		return state;
-	},
-
-	getStateFromProps: function( props ){
-		var formats = this.getFormats( props ),
-			date = props.value || props.defaultValue,
-			selectedDate, viewDate
-		;
-
-		if( date && typeof date == 'string' )
-			selectedDate = this.localMoment( date, formats.datetime );
-		else if( date )
-			selectedDate = this.localMoment( date );
-
-		if( selectedDate && !selectedDate.isValid() )
-			selectedDate = null;
-
-		viewDate = selectedDate ?
-			selectedDate.clone().startOf("month") :
-			this.localMoment().startOf("month")
-		;
-
-		return {
-			inputFormat: formats.datetime,
-			viewDate: viewDate,
-			selectedDate: selectedDate,
-			inputValue: selectedDate ? selectedDate.format( formats.datetime ) : (date || ''),
-			open: props.open != undefined ? props.open : this.state && this.state.open
-		};
-	},
-
-	getFormats: function( props ){
-		var formats = {
-				date: props.dateFormat || '',
-				time: props.timeFormat || ''
-			},
-			locale = this.localMoment( props.date ).localeData()
-		;
-
-		if( formats.date === true ){
-			formats.date = locale.longDateFormat('L');
-		}
-		if( formats.time === true ){
-			formats.time = locale.longDateFormat('LT');
-		}
-
-		formats.datetime = formats.date && formats.time ?
-			formats.date + ' ' + formats.time :
-			formats.date || formats.time
-		;
-
-		return formats;
-	},
-
-	componentWillReceiveProps: function(nextProps) {
-		var formats = this.getFormats( nextProps ),
-			update = {}
-		;
-
-		if( nextProps.value != this.props.value ){
-			update = this.getStateFromProps( nextProps );
-		}
-		if ( formats.datetime !== this.getFormats( this.props ).datetime ) {
-			update.inputFormat = formats.datetime;
-		}
-
-		this.setState( update );
-	},
-
-	onInputChange: function( e ) {
-		var value = e.target == null ? e : e.target.value,
-			localMoment = this.localMoment( value, this.state.inputFormat ),
-			update = { inputValue: value }
-		;
-
-		if ( localMoment.isValid() && !this.props.value ) {
-			update.selectedDate = localMoment;
-			update.viewDate = localMoment.clone().startOf("month");
-		}
-		else {
-			update.selectedDate = null;
-		}
-
-		return this.setState( update, function() {
-			return this.props.onChange( localMoment.isValid() ? localMoment : this.state.inputValue );
-		});
-	},
-
-	showView: function( view ){
-		var me = this;
-		return function( e ){
-			me.setState({ currentView: view });
-		};
-	},
-
-	setDate: function( type ){
-		var me = this,
-			nextViews = {
-				month: 'days',
-				year: 'months'
-			}
-		;
-		return function( e ){
-			me.setState({
-				viewDate: me.state.viewDate.clone()[ type ]( parseInt(e.target.getAttribute('data-value')) ).startOf( type ),
-				currentView: nextViews[ type ]
-			});
-		};
-	},
-
-	addTime: function( amount, type, toSelected ){
-		return this.updateTime( 'add', amount, type, toSelected );
-	},
-
-	subtractTime: function( amount, type, toSelected ){
-		return this.updateTime( 'subtract', amount, type, toSelected );
-	},
-
-	updateTime: function( op, amount, type, toSelected ){
-		var me = this;
-
-		return function(){
-			var update = {},
-				date = toSelected ? 'selectedDate' : 'viewDate'
-			;
-
-			update[ date ] = me.state[ date ].clone()[ op ]( amount, type );
-
-			me.setState( update );
-		};
-	},
-
-	allowedSetTime: ['hours','minutes','seconds', 'milliseconds'],
-	setTime: function( type, value ){
-		var index = this.allowedSetTime.indexOf( type ) + 1,
-			state = this.state,
-			date = (state.selectedDate || state.viewDate).clone(),
-			nextType
-		;
-
-		// It is needed to set all the time properties
-		// to not to reset the time
-		date[ type ]( value );
-		for (; index < this.allowedSetTime.length; index++) {
-			nextType = this.allowedSetTime[index];
-			date[ nextType ]( date[nextType]() );
-		}
-
-		if( !this.props.value ){
-			this.setState({
-				selectedDate: date,
-				inputValue: date.format( state.inputFormat )
-			});
-		}
-		this.props.onChange( date );
-	},
-
-	updateSelectedDate: function( e ) {
-		var target = e.target,
-			modifier = 0,
-			viewDate = this.state.viewDate,
-			currentDate = this.state.selectedDate || viewDate,
-			date
-		;
-
-		if(target.className.indexOf("rdtNew") != -1)
-			modifier = 1;
-		else if(target.className.indexOf("rdtOld") != -1)
-			modifier = -1;
-
-		date = viewDate.clone()
-			.month( viewDate.month() + modifier )
-			.date( parseInt( target.getAttribute('data-value') ) )
-			.hours( currentDate.hours() )
-			.minutes( currentDate.minutes() )
-			.seconds( currentDate.seconds() )
-			.milliseconds( currentDate.milliseconds() )
-		;
-
-		if( !this.props.value ){
-			this.setState({
-				selectedDate: date,
-				viewDate: date.clone().startOf('month'),
-				inputValue: date.format( this.state.inputFormat )
-			});
-		}
-
-		this.props.onChange( date );
-	},
-
-	openCalendar: function() {
-		this.setState({ open: true });
-	},
-
-	handleClickOutside: function(){
-		if( this.props.input && this.state.open && !this.props.open ){
-			this.setState({ open: false });
-			this.props.onBlur( this.state.selectedDate || this.state.inputValue );
-		}
-	},
-
-	localMoment: function( date, format ){
-		var m = moment( date, format, this.props.strictParsing );
-		if( this.props.locale )
-			m.locale( this.props.locale );
-		return m;
-	},
-
-	componentProps: {
-		fromProps: ['value', 'isValidDate', 'renderDay', 'renderMonth', 'renderYear'],
-		fromState: ['viewDate', 'selectedDate' ],
-		fromThis: ['setDate', 'setTime', 'showView', 'addTime', 'subtractTime', 'updateSelectedDate', 'localMoment']
-	},
-
-	getComponentProps: function(){
-		var me = this,
-			formats = this.getFormats( this.props ),
-			props = {dateFormat: formats.date, timeFormat: formats.time}
-		;
-
-		this.componentProps.fromProps.forEach( function( name ){
-			props[ name ] = me.props[ name ];
-		});
-		this.componentProps.fromState.forEach( function( name ){
-			props[ name ] = me.state[ name ];
-		});
-		this.componentProps.fromThis.forEach( function( name ){
-			props[ name ] = me[ name ];
-		});
-
-		return props;
-	},
-
-	render: function() {
-		var Component = this.viewComponents[ this.state.currentView ],
-			DOM = React.DOM,
-			className = 'rdt ' + this.props.className,
-			children = []
-		;
-
-		if( this.props.input ){
-			children = [ DOM.input( assign({
-				key: 'i',
-				type:'text',
-				className: 'form-control',
-				onFocus: this.openCalendar,
-				onChange: this.onInputChange,
-				value: this.state.inputValue
-			}, this.props.inputProps ))];
-		}
-		else {
-			className += ' rdtStatic';
-		}
-
-		if( this.state.open )
-			className += ' rdtOpen';
-
-		return DOM.div({className: className}, children.concat(
-			DOM.div(
-				{ key: 'dt', className: 'rdtPicker' },
-				React.createElement( Component, this.getComponentProps())
-			)
-		));
-	}
-});
-
-// Make moment accessible through the Datetime class
-Datetime.moment = moment;
-
-module.exports = Datetime;
-
-},{"./src/DaysView":112,"./src/MonthsView":113,"./src/TimeView":114,"./src/YearsView":115,"./src/onClickOutside":116,"moment":59,"object-assign":111,"react":"react"}],111:[function(require,module,exports){
-'use strict';
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function ToObject(val) {
-	if (val == null) {
-		throw new TypeError('Object.assign cannot be called with null or undefined');
-	}
-
-	return Object(val);
-}
-
-function ownEnumerableKeys(obj) {
-	var keys = Object.getOwnPropertyNames(obj);
-
-	if (Object.getOwnPropertySymbols) {
-		keys = keys.concat(Object.getOwnPropertySymbols(obj));
-	}
-
-	return keys.filter(function (key) {
-		return propIsEnumerable.call(obj, key);
-	});
-}
-
-module.exports = Object.assign || function (target, source) {
-	var from;
-	var keys;
-	var to = ToObject(target);
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = arguments[s];
-		keys = ownEnumerableKeys(Object(from));
-
-		for (var i = 0; i < keys.length; i++) {
-			to[keys[i]] = from[keys[i]];
-		}
-	}
-
-	return to;
-};
-
-},{}],112:[function(require,module,exports){
-var React = require('react'),
-	moment = require('moment')
-;
-
-var DOM = React.DOM;
-var DateTimePickerDays = React.createClass({
-
-	render: function() {
-		var footer = this.renderFooter(),
-			date = this.props.viewDate,
-			locale = date.localeData(),
-			tableChildren
-		;
-
-		tableChildren = [
-			DOM.thead({ key: 'th'}, [
-				DOM.tr({ key: 'h'},[
-					DOM.th({ key: 'p', className: 'rdtPrev' }, DOM.button({onClick: this.props.subtractTime(1, 'months'), type: 'button' }, '‹')),
-					DOM.th({ key: 's', className: 'rdtSwitch', onClick: this.props.showView('months'), colSpan: 5, 'data-value': this.props.viewDate.month() }, locale.months( date ) + ' ' + date.year() ),
-					DOM.th({ key: 'n', className: 'rdtNext' }, DOM.button({onClick: this.props.addTime(1, 'months'), type: 'button' }, '›'))
-				]),
-				DOM.tr({ key: 'd'}, this.getDaysOfWeek( locale ).map( function( day, index ){ return DOM.th({ key: day + index, className: 'dow'}, day ); }) )
-			]),
-			DOM.tbody({key: 'tb'}, this.renderDays())
-		];
-
-		if( footer )
-			tableChildren.push( footer );
-
-		return DOM.div({ className: 'rdtDays' },
-			DOM.table({}, tableChildren )
-		);
-	},
-
-	/**
-	 * Get a list of the days of the week
-	 * depending on the current locale
-	 * @return {array} A list with the shortname of the days
-	 */
-	getDaysOfWeek: function( locale ){
-		var days = locale._weekdaysMin,
-			first = locale.firstDayOfWeek(),
-			dow = [],
-			i = 0
-		;
-
-		days.forEach( function( day ){
-			dow[ (7 + (i++) - first) % 7 ] = day;
-		});
-
-		return dow;
-	},
-
-	renderDays: function() {
-		var date = this.props.viewDate,
-			selected = this.props.selectedDate && this.props.selectedDate.clone(),
-			prevMonth = date.clone().subtract( 1, 'months' ),
-			currentYear = date.year(),
-			currentMonth = date.month(),
-			weeks = [],
-			days = [],
-			renderer = this.props.renderDay || this.renderDay,
-			isValid = this.props.isValidDate || this.isValidDate,
-			classes, disabled, dayProps, currentDate
-		;
-
-		// Go to the last week of the previous month
-		prevMonth.date( prevMonth.daysInMonth() ).startOf('week');
-		var lastDay = prevMonth.clone().add(42, 'd');
-
-		while( prevMonth.isBefore( lastDay ) ){
-			classes = 'rdtDay';
-			currentDate = prevMonth.clone();
-
-			if( ( prevMonth.year() == currentYear && prevMonth.month() < currentMonth ) || ( prevMonth.year() < currentYear ) )
-				classes += ' rdtOld';
-			else if( ( prevMonth.year() == currentYear && prevMonth.month() > currentMonth ) || ( prevMonth.year() > currentYear ) )
-				classes += ' rdtNew';
-
-			if( selected && prevMonth.isSame( {y: selected.year(), M: selected.month(), d: selected.date()} ) )
-				classes += ' rdtActive';
-
-			if (prevMonth.isSame(moment(), 'day') )
-				classes += ' rdtToday';
-
-			disabled = !isValid( currentDate, selected );
-			if( disabled )
-				classes += ' rdtDisabled';
-
-			dayProps = {
-				key: prevMonth.format('M_D'),
-				'data-value': prevMonth.date(),
-				className: classes
-			};
-			if( !disabled )
-				dayProps.onClick = this.props.updateSelectedDate;
-
-			days.push( renderer( dayProps, currentDate, selected ) );
-
-			if( days.length == 7 ){
-				weeks.push( DOM.tr( {key: prevMonth.format('M_D')}, days ) );
-				days = [];
-			}
-
-			prevMonth.add( 1, 'd' );
-		}
-
-		return weeks;
-	},
-
-	renderDay: function( props, currentDate, selectedDate ){
-		return DOM.td( props, currentDate.date() );
-	},
-
-	renderFooter: function(){
-		if( !this.props.timeFormat )
-			return '';
-
-		var date = this.props.selectedDate || this.props.viewDate;
-		return DOM.tfoot({ key: 'tf'},
-			DOM.tr({},
-				DOM.td({ onClick: this.props.showView('time'), colSpan: 7, className: 'rdtTimeToggle'}, date.format( this.props.timeFormat ))
-			)
-		);
-	},
-	isValidDate: function(){ return 1; }
-});
-
-module.exports = DateTimePickerDays;
-
-},{"moment":59,"react":"react"}],113:[function(require,module,exports){
-'use strict';
-
-var React = require('react'),
-moment = require('moment')
-;
-
-var DOM = React.DOM;
-var DateTimePickerMonths = React.createClass({
-	render: function() {
-		return DOM.div({ className: 'rdtMonths' },[
-			DOM.table({ key: 'a'}, DOM.thead({}, DOM.tr({},[
-				DOM.th({ key: 'prev', className: 'rdtPrev' }, DOM.button({onClick: this.props.subtractTime(1, 'years'), type: 'button' }, '‹')),
-				DOM.th({ key: 'year', className: 'rdtSwitch', onClick: this.props.showView('years'), colSpan: 2, 'data-value': this.props.viewDate.year()}, this.props.viewDate.year() ),
-				DOM.th({ key: 'next', className: 'rdtNext' }, DOM.button({onClick: this.props.addTime(1, 'years'), type: 'button' }, '›'))
-			]))),
-			DOM.table({ key: 'months'}, DOM.tbody({ key: 'b'}, this.renderMonths()))
-		]);
-	},
-
-	renderMonths: function() {
-		var date = this.props.selectedDate,
-			month = this.props.viewDate.month(),
-			year = this.props.viewDate.year(),
-			rows = [],
-			i = 0,
-			months = [],
-			renderer = this.props.renderMonth || this.renderMonth,
-			classes, props
-		;
-
-		while (i < 12) {
-			classes = "rdtMonth";
-			if( date && i === month && year === date.year() )
-				classes += " rdtActive";
-
-			props = {
-				key: i,
-				'data-value': i,
-				className: classes,
-				onClick: this.props.setDate('month')
-			};
-
-			months.push( renderer( props, i, year, date && date.clone() ));
-
-			if( months.length == 4 ){
-				rows.push( DOM.tr({ key: month + '_' + rows.length }, months) );
-				months = [];
-			}
-
-			i++;
-		}
-
-		return rows;
-	},
-
-	renderMonth: function( props, month, year, selectedDate ) {
-		return DOM.td( props, this.props.viewDate.localeData()._monthsShort[ month ] );
-	}
-});
-
-module.exports = DateTimePickerMonths;
-
-},{"moment":59,"react":"react"}],114:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-
-var DOM = React.DOM;
-var DateTimePickerTime = React.createClass({
-	getInitialState: function(){
-		return this.calculateState( this.props );
-	},
-	calculateState: function( props ){
-		var date = props.selectedDate || props.viewDate,
-			format = props.timeFormat,
-			counters = []
-		;
-
-		if( format.indexOf('H') != -1 || format.indexOf('h') != -1 ){
-			counters.push('hours');
-			if( format.indexOf('m') != -1 ){
-				counters.push('minutes');
-				if( format.indexOf('s') != -1 ){
-					counters.push('seconds');
-				}
-			}
-		}
-
-		return {
-			hours: date.format('H'),
-			minutes: date.format('mm'),
-			seconds: date.format('ss'),
-			milliseconds: date.format('SSS'),
-			counters: counters
-		};
-	},
-	renderCounter: function( type ){
-		return DOM.div({ key: type, className: 'rdtCounter'}, [
-			DOM.button({ key:'up', className: 'rdtBtn', onMouseDown: this.onStartClicking( 'increase', type ), type: 'button' }, '▲' ),
-			DOM.div({ key:'c', className: 'rdtCount' }, this.state[ type ] ),
-			DOM.button({ key:'do', className: 'rdtBtn', onMouseDown: this.onStartClicking( 'decrease', type ), type: 'button' }, '▼' )
-		]);
-	},
-	render: function() {
-		var me = this,
-			counters = []
-		;
-
-		this.state.counters.forEach( function(c){
-			if( counters.length )
-				counters.push( DOM.div( {key: 'sep' + counters.length, className: 'rdtCounterSeparator' }, ':' ));
-			counters.push( me.renderCounter( c ) );
-		});
-
-		if( this.state.counters.length == 3 && this.props.timeFormat.indexOf('S') != -1 ){
-			counters.push( DOM.div( {className: 'rdtCounterSeparator', key: 'sep5' }, ':' ));
-			counters.push(
-				DOM.div( {className: 'rdtCounter rdtMilli', key:'m'},
-					DOM.input({ value: this.state.milliseconds, type: 'text', onChange: this.updateMilli })
-					)
-				);
-		}
-
-		return DOM.div( {className: 'rdtTime'},
-			DOM.table( {}, [
-				this.renderHeader(),
-				DOM.tbody({key: 'b'}, DOM.tr({}, DOM.td({},
-					DOM.div({ className: 'rdtCounters' }, counters )
-				)))
-			])
-		);
-	},
-	componentWillReceiveProps: function( nextProps, nextState ){
-		this.setState( this.calculateState( nextProps ) );
-	},
-	updateMilli: function( e ){
-		var milli = parseInt( e.target.value );
-		if( milli == e.target.value && milli >= 0 && milli < 1000 ){
-			this.props.setTime( 'milliseconds', milli );
-			this.setState({ milliseconds: milli });
-		}
-	},
-	renderHeader: function(){
-		if( !this.props.dateFormat )
-			return '';
-
-		var date = this.props.selectedDate || this.props.viewDate;
-		return DOM.thead({ key: 'h'}, DOM.tr({},
-			DOM.th( {className: 'rdtSwitch', colSpan: 4, onClick: this.props.showView('days')}, date.format( this.props.dateFormat ) )
-		));
-	},
-	onStartClicking: function( action, type ){
-		var me = this,
-			update = {},
-			value = this.state[ type ]
-		;
-
-
-		return function(){
-			var update = {};
-			update[ type ] = me[ action ]( type );
-			me.setState( update );
-
-			me.timer = setTimeout( function(){
-				me.increaseTimer = setInterval( function(){
-					update[ type ] = me[ action ]( type );
-					me.setState( update );
-				},70);
-			}, 500);
-
-			me.mouseUpListener = function(){
-				clearTimeout( me.timer );
-				clearInterval( me.increaseTimer );
-				me.props.setTime( type, me.state[ type ] );
-				document.body.removeEventListener('mouseup', me.mouseUpListener);
-			};
-
-			document.body.addEventListener('mouseup', me.mouseUpListener);
-		};
-	},
-
-	maxValues: {
-		hours: 23,
-		minutes: 59,
-		seconds: 59,
-		milliseconds: 999
-	},
-	padValues: {
-		hours: 1,
-		minutes: 2,
-		seconds: 2,
-		milliseconds: 3
-	},
-	increase: function( type ){
-		var value = parseInt(this.state[ type ]) + 1;
-		if( value > this.maxValues[ type ] )
-			value = 0;
-		return this.pad( type, value );
-	},
-	decrease: function( type ){
-		var value = parseInt(this.state[ type ]) - 1;
-		if( value < 0 )
-			value = this.maxValues[ type ];
-		return this.pad( type, value );
-	},
-	pad: function( type, value ){
-		var str = value + '';
-		while( str.length < this.padValues[ type ] )
-			str = '0' + str;
-		return str;
-	}
-});
-
-module.exports = DateTimePickerTime;
-
-},{"react":"react"}],115:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-
-var DOM = React.DOM;
-var DateTimePickerYears = React.createClass({
-	render: function() {
-		var year = parseInt(this.props.viewDate.year() / 10, 10) * 10;
-
-		return DOM.div({ className: 'rdtYears' },[
-			DOM.table({ key: 'a'}, DOM.thead({}, DOM.tr({},[
-				DOM.th({ key: 'prev', className: 'rdtPrev' }, DOM.button({onClick: this.props.subtractTime(10, 'years'), type: 'button' }, '‹')),
-				DOM.th({ key: 'year', className: 'rdtSwitch', onClick: this.props.showView('years'), colSpan: 2 }, year + '-' + (year + 9) ),
-				DOM.th({ key: 'next', className: 'rdtNext'}, DOM.button({onClick: this.props.addTime(10, 'years'), type: 'button' }, '›'))
-				]))),
-			DOM.table({ key: 'years'}, DOM.tbody({}, this.renderYears( year )))
-		]);
-	},
-
-	renderYears: function( year ) {
-		var years = [],
-			i = -1,
-			rows = [],
-			renderer = this.props.renderYear || this.renderYear,
-			selectedDate = this.props.selectedDate,
-			classes, props
-		;
-
-		year--;
-		while (i < 11) {
-			classes = 'rdtYear';
-			if( i === -1 | i === 10 )
-				classes += ' rdtOld';
-			if( selectedDate && selectedDate.year() === year )
-				classes += ' rdtActive';
-
-			props = {
-				key: year,
-				'data-value': year,
-				className: classes,
-				onClick: this.props.setDate('year')
-			};
-
-			years.push( renderer( props, year, selectedDate && selectedDate.clone() ));
-
-			if( years.length == 4 ){
-				rows.push( DOM.tr({ key: i }, years ) );
-				years = [];
-			}
-
-			year++;
-			i++;
-		}
-
-		return rows;
-	},
-
-	renderYear: function( props, year, selectedDate ){
-		return DOM.td( props, year );
-	}
-});
-
-module.exports = DateTimePickerYears;
-
-},{"react":"react"}],116:[function(require,module,exports){
-// This is extracted from https://github.com/Pomax/react-onclickoutside
-// And modified to support react 0.13 and react 0.14
-
-var React = require('react'),
-	version = React.version && React.version.split('.')
-;
-
-if( version && ( version[0] > 0 || version[1] > 13 ) )
-	React = require('react-dom');
-
-// Use a parallel array because we can't use
-// objects as keys, they get toString-coerced
-var registeredComponents = [];
-var handlers = [];
-
-var IGNORE_CLASS = 'ignore-react-onclickoutside';
-
-var isSourceFound = function(source, localNode) {
- if (source === localNode) {
-   return true;
- }
- // SVG <use/> elements do not technically reside in the rendered DOM, so
- // they do not have classList directly, but they offer a link to their
- // corresponding element, which can have classList. This extra check is for
- // that case.
- // See: http://www.w3.org/TR/SVG11/struct.html#InterfaceSVGUseElement
- // Discussion: https://github.com/Pomax/react-onclickoutside/pull/17
- if (source.correspondingElement) {
-   return source.correspondingElement.classList.contains(IGNORE_CLASS);
- }
- return source.classList.contains(IGNORE_CLASS);
-};
-
-module.exports = {
- componentDidMount: function() {
-   if(typeof this.handleClickOutside !== "function")
-     throw new Error("Component lacks a handleClickOutside(event) function for processing outside click events.");
-
-   var fn = this.__outsideClickHandler = (function(localNode, eventHandler) {
-     return function(evt) {
-       evt.stopPropagation();
-       var source = evt.target;
-       var found = false;
-       // If source=local then this event came from "somewhere"
-       // inside and should be ignored. We could handle this with
-       // a layered approach, too, but that requires going back to
-       // thinking in terms of Dom node nesting, running counter
-       // to React's "you shouldn't care about the DOM" philosophy.
-       while(source.parentNode) {
-         found = isSourceFound(source, localNode);
-         if(found) return;
-         source = source.parentNode;
-       }
-       eventHandler(evt);
-     }
-   }(React.findDOMNode(this), this.handleClickOutside));
-
-   var pos = registeredComponents.length;
-   registeredComponents.push(this);
-   handlers[pos] = fn;
-
-   // If there is a truthy disableOnClickOutside property for this
-   // component, don't immediately start listening for outside events.
-   if (!this.props.disableOnClickOutside) {
-     this.enableOnClickOutside();
-   }
- },
-
- componentWillUnmount: function() {
-   this.disableOnClickOutside();
-   this.__outsideClickHandler = false;
-   var pos = registeredComponents.indexOf(this);
-   if( pos>-1) {
-     if (handlers[pos]) {
-       // clean up so we don't leak memory
-       handlers.splice(pos, 1);
-       registeredComponents.splice(pos, 1);
-     }
-   }
- },
-
- /**
-  * Can be called to explicitly enable event listening
-  * for clicks and touches outside of this element.
-  */
- enableOnClickOutside: function() {
-   var fn = this.__outsideClickHandler;
-   document.addEventListener("mousedown", fn);
-   document.addEventListener("touchstart", fn);
- },
-
- /**
-  * Can be called to explicitly disable event listening
-  * for clicks and touches outside of this element.
-  */
- disableOnClickOutside: function() {
-   var fn = this.__outsideClickHandler;
-   document.removeEventListener("mousedown", fn);
-   document.removeEventListener("touchstart", fn);
- }
-};
-
-},{"react":"react","react-dom":"react-dom"}]},{},[22]);
+},{}]},{},[24]);

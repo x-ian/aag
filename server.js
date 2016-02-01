@@ -24,6 +24,8 @@ var routes = require('./app/routes');
 
 var app = express();
 
+var clients = new Object();
+
 mongoose.connect(config.database);
 mongoose.connection.on('error', function() {
   console.info('Error: Could not connect to MongoDB. Did you forget to run `mongod`?'.red);
@@ -46,7 +48,7 @@ require('./routes/api-auctionitems')(app);
 require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);
-require('./routes/live-common')(app, io);
+require('./routes/live-common')(app, io, clients);
 require('./routes/live-bidder')(app, io);
 require('./routes/live-promoter')(app, io);
 
@@ -76,63 +78,33 @@ app.use(function(err, req, res, next) {
  * Socket.io stuff.
  */
 io.sockets.on('connection', function(socket) {
-  console.log('socket connected');
-  // Bid.find(function(err, item) {
-  //   if (err || !item) return next(err);
-  //   // return res.send(item);
-  //
-  //   {bid.sequenceNumber} - {bid.amount} - {bid.status} - {bid.timestamp} - {bid.user.name}
-  //
-  //   return res.json({
-  //     _id: item._id;
-  //     amount: item.amount;
-  //     status: item.status;
-  //     timestamp: item.timestamp;
-  //     sequenceNumber:
-  //   });
-  // });
+  console.log('a client connected with id %s', socket.id);
 
-  io.sockets.emit('recentBid', {
-    _id: 123,
-    amount: 200,
-    status: 'accepted',
-    timestamp: new Date(),
-    sequenceNumber: 1,
-    user: { name: 'ichichich'}
+  clients[socket.id] = { id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
+
+  var keys = Object.keys(clients);
+  var values = keys.map(function(v) { return clients[v]; });
+  io.sockets.emit('participants', values);
+
+  // for (key in socket.request.headers) {
+  //   console.log(key);
+  //   console.log(socket.request.headers[key]);
+  // }
+    // var url = 'http://freegeoip.net/json/' + socket.request.connection.remoteAddress
+    // request.get url, (error, response, body) ->
+    //   if !error && response.statusCode == 200
+    //     data = JSON.parse body
+    //     location data
+
+  socket.on('disconnect', function() {
+    console.log('a client disconnected with id %s', socket.id);
+    clients[socket.id] = null;
+    delete(clients[socket.id]);
+    var keys2 = Object.keys(clients);
+    var values2 = keys2.map(function(v) { return clients[v]; });
+    io.sockets.emit('participants', values2);
   });
 
-  // socket.on('disconnect', function() {
-  //   onlineUsers--;
-  //   io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
-  // });
-
-});
-
-// var io  = require('socket.io')(http, { path: '/myapp/socket.io'});
-
-io.of('/my-namespace')
-  .on('connection', function(socket){
-    console.log('a user connected with id %s', socket.id);
-    onlineUsers++;
-    onlineUsers++;
-    onlineUsers++;
-    onlineUsers++;
-
-    io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
-
-    socket.on('disconnect', function() {
-      onlineUsers--;
-      onlineUsers--;
-      onlineUsers--;
-      onlineUsers--;
-      io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
-    });
-
-    // socket.on('my-message', function (data) {
-    //     io.of('my-namespace').emit('my-message', data);
-    //     // or socket.emit(...)
-    //     console.log('broadcasting my-message', data);
-    // });
 });
 
 server.listen(app.get('port'), function() {
