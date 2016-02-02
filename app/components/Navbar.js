@@ -14,12 +14,6 @@ class Navbar extends React.Component {
     NavbarStore.listen(this.onChange);
     NavbarActions.getCharacterCount();
 
-    let socket = io.connect();
-
-    socket.on('onlineUsers', (data) => {
-      NavbarActions.updateOnlineUsers(data);
-    });
-
     $(document).ajaxStart(() => {
       NavbarActions.updateAjaxAnimation('fadeIn');
     });
@@ -76,13 +70,11 @@ class Navbar extends React.Component {
               <div className='tri invert'></div>
             </span>
             auto-auction-germany.de
-            <span className='badge badge-up badge-danger'>{this.state.onlineUsers}</span>
             <br/><p style={{fontWeight: 'normal'}}><small><small><small>Vehicles from Germany. Anywhere. Anytime. Reliable.</small></small></small></p>
           </Link>
         </div>
         <div id='navbar' className='navbar-collapse collapse'>
           <ul className='nav navbar-nav'>
-            <li><Link to='/top'>Live auction</Link></li>
             <li className='dropdown'>
               <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Buyer<span className='caret'></span></a>
               <ul className='dropdown-menu'>
@@ -99,15 +91,17 @@ class Navbar extends React.Component {
             <li className='dropdown'>
               <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Account<span className='caret'></span></a>
               <ul className='dropdown-menu'>
-              <li><Link to='/addVehicle'>Details</Link></li>
-              <li><Link to='/addVehicle'>Create account</Link></li>
-              <li><Link to='/addVehicle'>Log in/out</Link></li>
+              <li><Link to='/'>Details</Link></li>
+              <li><Link to='/'>Create account</Link></li>
+              <li><Link to='/'>Log in/out</Link></li>
               </ul>
             </li>
             <li className='dropdown'>
               <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Promoter<span className='caret'></span></a>
               <ul className='dropdown-menu'>
-                <li><Link to='/addVehicle'>New auction</Link></li>
+                <li><Link to='/auctions/new'>New auction</Link></li>
+                <li><Link to='/auctions'>All auctions</Link></li>
+                <li><Link to='/promoter/auctions'>Start auction</Link></li>
               </ul>
             </li>
           </ul>

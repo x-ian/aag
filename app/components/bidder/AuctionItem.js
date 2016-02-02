@@ -38,8 +38,8 @@ class AuctionItem extends React.Component {
 
   componentWillUnmount() {
     // not sure if this works
-    socket.removeListener('auctionAction');
-    socket.removeListener('participants');
+    // socket.removeListener('auctionAction');
+    // socket.removeListener('participants');
   }
 
   getVehicle(id) {

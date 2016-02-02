@@ -30,24 +30,16 @@ function calcNewAuctionItemStatus(action, prevStatus) {
   }
 }
 
-
 module.exports = function (app, io) {
 
-  /**
-   * GET next current or future auction
-   */
-   app.get('/api/nextauction', function(req, res, next) {
-     Auction.findById('56a15d8cc5cabb091a24bd6b', function(err, item) {
-       if (err || !item) return next(err);
-       return res.json({
-         _id: item._id,
-         location: item.location,
-         openAt: item.openAt,
-         closeAt: item.closeAt,
-         currentlyActive: true
-       });
-     });
-   });
+  app.post('/api/startauction/:id', function(req, res, next) {
+    Auction.findByIdAndUpdate(req.params.id, { closedAt: null, active: true }, function(err, item) {
+      if (err || !item) return next(err);
+      // simply take first vehicle for now and create/overwrite an auctionitem
+      Vehicle.findOne
+      return res.json({ message: 'Auction started' });
+    });
+  });
 
    app.post('/api/getorcreateauctionitem/:id', function(req, res, next) {
      AuctionItem.findOne({'vehicle': req.params.id }, function(err, item) {
@@ -99,7 +91,7 @@ module.exports = function (app, io) {
          }
          Bid.findByIdAndUpdate(currentBidId, {status: bidStatus}).exec();
        } else if (action === 'ACCEPT' || action === 'REJECTED' || action === 'SELL') {
-         console.log('Unknown combination of action and currentbid');         
+         console.log('Unknown combination of action and currentbid');
        }
 
        item.save(function (err) {

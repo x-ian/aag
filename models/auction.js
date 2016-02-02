@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
 
 var auctionSchema = new mongoose.Schema({
-  openAt: Date,
-  closeAt: Date,
-  location: String
+  scheduledAt: Date,
+  closedAt: Date,
+  location: String,
+  active: { type: Boolean, default: false }
 });
 
 module.exports = mongoose.model('Auction', auctionSchema);

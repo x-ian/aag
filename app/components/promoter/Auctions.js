@@ -26,8 +26,7 @@ var Auctions = React.createClass({
       return (
         <div key={auction._id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {auction._id} - {auction.openAt} - {auction.closeAt} -
-            <Link to={'/promoter/auctions/' + auction._id}>Activate</Link>
+            {auction._id} - {auction.scheduledAt} - {auction.active ? 'active' : ''} - {auction.closedAt} - {auction.location} - <Link to={'/promoter/auctions/' + auction._id}>Activate/start</Link>
           </div>
         </div>
       );

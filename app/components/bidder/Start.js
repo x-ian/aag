@@ -3,9 +3,10 @@ import {Link} from 'react-router';
 
 const resetState = {
   _id: null,
-  openAt: null,
-  closeAt: null,
-  currentlyActive: false
+  location: null,
+  scheduledAt: null,
+  closedAt: null,
+  active: false
 }
 
 class Start extends React.Component {
@@ -35,7 +36,11 @@ class Start extends React.Component {
       url: '/api/nextauction/',
       dataType: 'json'
     }).done((data) => {
-      this.setState(data);
+      if (data) {
+        this.setState(data);
+      } else {
+        this.setState(resetState);
+      }
     }).fail((jqXhr) => {
       console.log("ERROR " + jqXhr);
     });
@@ -46,24 +51,24 @@ class Start extends React.Component {
     this.props.history.pushState(null, '/bidder/auction/' + this.state._id);
   }
 
-
   render() {
-    var auction = <p>No auction active or scheduled.</p>;
-      if (this.state.currentlyActive) {
-        auction = <p>Active auction since {this.state.openAt}. <button className='btn btn-secondary' onClick={this.onClickJoin.bind(this)}>Join</button></p>
-      } else {
-        auction = <p>No active auction.<br/>Next scheduled auction starts at {this.state.openAt}</p>
-      }
+    var auction = <h3 className='text-center'>No current or scheduled auction</h3>;
+    if (this.state.active) {
+      auction = <div>
+        <h3 className='text-center'>Active auction in {this.state.location} since {this.state.scheduledAt}</h3>
+        <p className='text-center'><button className='btn btn-primary' onClick={this.onClickJoin.bind(this)}>Join</button></p>
+      </div>;
+    } else if (this.state._id ){
+      auction = <div>
+        <h3 className='text-center'>Currently no active auction</h3>
+        <p className='text-center'>Next scheduled auction starts in {this.state.location} at {this.state.scheduledAt}</p>
+      </div>;
+    }
 
     return (
       <div className='container'>
-        <div className='list-group'>
-          <br/><br/><br/><br/><br/>
-          <div style={{textAlign: 'center'}}>
-            <br/><br/><br/>
-            {auction}
-          </div>
-        </div>
+        <br/><br/><br/><br/><br/>
+        {auction}
       </div>
     );
   }

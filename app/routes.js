@@ -18,7 +18,7 @@ import BidderAuction from './components/bidder/Auction';
 
 export default (
   <Route component={App}>
-    <Route path='/' component={Home} />
+    <Route path='/' component={BidderStart} />
 
     <Route path='/vehicles/new' component={Vehicle} />
     <Route path='/vehicles/:id' component={Vehicle} />

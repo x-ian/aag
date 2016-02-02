@@ -4,7 +4,9 @@ import {Link} from 'react-router';
 const resetState = {
     _id: "",
     title: "",
-    description: ""
+    description: "",
+    auctionItemStartAmount: "",
+    auctionItemIncrementBy: ""
 }
 
 class Vehicle extends React.Component {
@@ -30,27 +32,27 @@ class Vehicle extends React.Component {
 
   onChangeDescription(e) { this.setState({description: e.target.value}) }
 
+  onChangeStartAmount(e) { this.setState({auctionItemStartAmount: e.target.value}) }
+
+  onChangeIncrementBy(e) { this.setState({auctionItemIncrementBy: e.target.value}) }
+
   onClickDelete(event) {
     event.preventDefault();
 
     $.ajax({
       url: '/api/vehicles/' + this.state._id,
       dataType: 'json',
-      type: 'DELETE'})
-      .done((data) => {
-         console.log('ok');
-        //  this.actions.addVehicleSuccess(data.message);
-         // doesnt seem right, but dont know how else to get back to the list after successful add
-           setTimeout(function(){
-             this.props.history.pushState(null, '/vehicles');
-           }.bind(this), 1000);
-           this.setState(resetState);
-       })
-       .fail((jqXhr) => {
-         console.log('nok ');
-      //   //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
-      });
-
+      type: 'DELETE'
+    }).done((data) => {
+      //  this.actions.addVehicleSuccess(data.message);
+      // doesnt seem right, but dont know how else to get back to the list after successful add
+      setTimeout(function(){
+        this.props.history.pushState(null, '/vehicles');
+      }.bind(this), 1000);
+      this.setState(resetState);
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
   }
 
   onClickCancel(event) {
@@ -62,39 +64,35 @@ class Vehicle extends React.Component {
   setVehicle(id) {
     $.ajax({
       url: '/api/vehicles/' + id,
-      dataType: 'json' })
-      .done((data) => {
+      dataType: 'json'
+    }).done((data) => {
         this.setState(data);
-      })
-      .fail((jqXhr) => {
-        // this.titleValidationState = 'has-error';
-        // this.helpBlock = errorMessage;
-
-        // this.actions.getVehicleFail(jqXhr);
-      });
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
   }
 
-  addVehicle(title, description) {
+  addVehicle(title, description, startAmount, incrementBy) {
     $.ajax({
       url: '/api/vehicles',
       dataType: 'json',
       type: 'POST',
       data: {
           title: title,
-          description: description
-        }
-       })
-       .done((data) => {
+          description: description,
+          auctionItemStartAmount: startAmount,
+          auctionItemIncrementBy: incrementBy
+      }
+    }).done((data) => {
         //  this.actions.addVehicleSuccess(data.message);
          // doesnt seem right, but dont know how else to get back to the list after successful add
-           setTimeout(function(){
-             this.props.history.pushState(null, '/vehicles');
-           }.bind(this), 1000);
-           this.setState(resetState);
-       })
-       .fail((jqXhr) => {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
-       });
+      setTimeout(function(){
+        this.props.history.pushState(null, '/vehicles');
+      }.bind(this), 1000);
+      this.setState(resetState);
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
   }
 
   updateVehicle(id, title, description) {
@@ -105,19 +103,19 @@ class Vehicle extends React.Component {
       data: {
           id: id,
           title: title,
-          description: description
+          description: description,
+          auctionItemStartAmount: startAmount,
+          auctionItemIncrementBy: incrementBy
         }
-       })
-       .done((data) => {
+       }).done((data) => {
         //  this.actions.addVehicleSuccess(data.message);
          // doesnt seem right, but dont know how else to get back to the list after successful add
            setTimeout(function(){
              this.props.history.pushState(null, '/vehicles');
            }.bind(this), 1000);
            this.setState(resetState);
-       })
-       .fail((jqXhr) => {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+       }).fail((jqXhr) => {
+         console.log('ERROR: ' + jqXhr);
        });
   }
 
@@ -126,6 +124,8 @@ class Vehicle extends React.Component {
 
     var title = this.state.title.trim();
     var description = this.state.description.trim();
+    var startAmount = this.state.auctionItemStartAmount.trim();
+    var incrementBy = this.state.auctionItemIncrementBy.trim();
 
     if (!title) {
       this.titleValidationState = 'has-error';
@@ -135,73 +135,86 @@ class Vehicle extends React.Component {
 
     if (title) {
       if (this.state._id) {
-        this.updateVehicle(this.state._id, title, description)
+        this.updateVehicle(this.state._id, title, description, startAmount, incrementBy)
       } else {
-        this.addVehicle(title, description);
+        this.addVehicle(title, description, startAmount, incrementBy);
       }
     }
   }
 
   render() {
     return (
-      <div className="vehicleBox">
         <div className='container'>
-          <div className='row flipInX animated'>
-            <div className='col-sm-8'>
-              <div className='panel panel-default'>
-                <div className='panel-heading'>View/edit/add Vehicle</div>
-                <div className='panel-body'>
-                <form onSubmit={this.handleSubmit.bind(this)}>
-                  <table><tbody>
-                <tr>
-                    <td>
-                      <label className='control-label'>ID</label>
-                    </td><td>
-                      {this.state._id}
-                    </td>
-                  </tr><tr>
-                    <td>
-                      <label className='control-label'>Title</label>
-                    </td><td>
-                      <input type='text' className='form-control' ref='titleTextField' value={this.state.title}
-                          onChange={this.onChangeTitle.bind(this)} autoFocus/>
-                      <span className='help-block'>{this.state.helpBlock}</span>
-                    </td>
-                  </tr><tr>
-                    <td>
-                      <label className='control-label'>Description</label>
-                    </td><td>
-                      <input type='text' className='form-control' ref='descriptionTextField' value={this.state.description}
-                           onChange={this.onChangeDescription.bind(this)} autoFocus/>
-                   </td>
-                  </tr>
-                  </tbody></table>
-
-                {this.state._id ?
-                    (
-                      <div>
-                        <button type='submit' className='btn btn-primary'>Save</button>
-                        <button className='btn btn-secondary' onClick={this.onClickDelete.bind(this)}>Delete</button>
-                        <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
-                      </div>
-                    )
-                  :
-                    (
-                      <div>
-                        <button type='submit' className='btn btn-primary'>Add</button>
-                        <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
-                      </div>
-                    )
-                  }
-
-                </form>
-
+          <div className='panel panel-default'>
+            <div className='panel-heading'>View/edit/add Vehicle</div>
+            <div className='panel-body'>
+              <form onSubmit={this.handleSubmit.bind(this)} className='form-horizontal'>
+                <div className="form-group">
+                  <label className="col-sm-2 control-label">ID</label>
+                  <div className="col-sm-10">
+                    <p className="form-control-static">{this.state._id}</p>
+                  </div>
                 </div>
-              </div>
+                <div className="form-group">
+                  <label className="col-sm-2 control-label">Title</label>
+                  <div className="col-sm-10">
+                    <input type='text' className='form-control' ref='titleTextField' value={this.state.title}
+                        onChange={this.onChangeTitle.bind(this)} autoFocus/>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="col-sm-2 control-label">Description</label>
+                  <div className="col-sm-10">
+                    <input type='text' className='form-control' ref='descriptionTextField' value={this.state.description}
+                         onChange={this.onChangeDescription.bind(this)} autoFocus/>
+                  </div>
+                </div>
+
+                <div className="panel panel-default">
+                  <div className='panel-heading'>Auction Item</div>
+                  <div className='panel-body'>
+                    <div className="form-group">
+                      <label className="col-sm-2 control-label">Start amount</label>
+                      <div className="col-sm-10">
+                        <input type='text' className='form-control' ref='startAmountTextField' value={this.state.startAmount}
+                             onChange={this.onChangeStartAmount.bind(this)} autoFocus/>
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label className="col-sm-2 control-label">Increment by</label>
+                      <div className="col-sm-10">
+                        <input type='text' className='form-control' ref='incrementByTextField' value={this.state.incrementBy}
+                             onChange={this.onChangeIncrementBy.bind(this)} autoFocus/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                   <div className="col-sm-offset-2 col-sm-10">
+
+                    {this.state._id ?
+                        (
+                          <div>
+                            <button type='submit' className='btn btn-primary'>Save</button>
+                            <button className='btn btn-secondary' onClick={this.onClickDelete.bind(this)}>Delete</button>
+                            <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
+                          </div>
+                        )
+                      :
+                        (
+                          <div>
+                            <button type='submit' className='btn btn-primary'>Add</button>
+                            <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
+                          </div>
+                        )
+                      }
+                    </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
-      </div>
     );
   }
 }

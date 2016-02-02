@@ -1,17 +1,14 @@
 import React from 'react';
 import {Link} from 'react-router';
 
-import moment from "moment";
-import DateTimeField from "react-bootstrap-datetimepicker";
-
 import DateTimeSelect from './common/DateTimeSelect.js'
-//import DateTime from 'react-datetime';
 
 const resetState = {
   _id: "",
-  openAt: null,
-  closeAt: null,
-  location: null
+  scheduledAt: null,
+  closedAt: null,
+  location: null,
+  active: null
 }
 
 class Auction extends React.Component {
@@ -35,9 +32,13 @@ class Auction extends React.Component {
 
   onChangeLocation(e) { this.setState({location: e.target.value}) }
 
-  onChangeOpenAt(e) { this.setState({openAt: e}) }
+  onChangeActive(e) {
+    this.setState({active: e.target.checked});
+   }
 
-  onChangeCloseAt(e) { (e === 'Invalid date') ? this.setState({closeAt: ''}) : this.setState({closeAt: e}); }
+  onChangeScheduledAt(e) { (e === 'Invalid date') ? this.setState({closedAt: ''}) : this.setState({scheduledAt: e}) }
+
+  onChangeClosedAt(e) { (e === 'Invalid date') ? this.setState({closedAt: ''}) : this.setState({closedAt: e}); }
 
   onClickDelete(event) {
     event.preventDefault();
@@ -47,7 +48,6 @@ class Auction extends React.Component {
       dataType: 'json',
       type: 'DELETE'})
       .done((data) => {
-         console.log('ok');
          // doesnt seem right, but dont know how else to get back to the list after successful add
            setTimeout(function(){
              this.props.history.pushState(null, '/auctions');
@@ -57,13 +57,31 @@ class Auction extends React.Component {
        .fail((jqXhr) => {
          console.log('ERROR: ' + jqXhr);
       });
-
   }
 
   onClickCancel(event) {
     event.preventDefault();
     this.setState(resetState);
     this.props.history.pushState(null, '/auctions');
+  }
+
+  onClickStart(event) {
+    event.preventDefault();
+
+    $.ajax({
+      url: '/api/auctions/' + this.state._id,
+      dataType: 'json',
+      type: 'DELETE'})
+      .done((data) => {
+         // doesnt seem right, but dont know how else to get back to the list after successful add
+           setTimeout(function(){
+             this.props.history.pushState(null, '/auctions');
+           }.bind(this), 1000);
+           this.setState(resetState);
+       })
+       .fail((jqXhr) => {
+         console.log('ERROR: ' + jqXhr);
+      });
   }
 
   setAuction(id) {
@@ -78,14 +96,15 @@ class Auction extends React.Component {
       });
   }
 
-  addAuction(openAt, closeAt, location) {
+  addAuction(scheduledAt, closedAt, location, active) {
     $.ajax({
       url: '/api/auctions',
       dataType: 'json',
       type: 'POST',
       data: {
-          openAt: openAt,
-          closeAt: closeAt,
+          scheduledAt: scheduledAt,
+          closedAt: closedAt,
+          active: active,
           location: location
         }
        })
@@ -102,15 +121,16 @@ class Auction extends React.Component {
        });
   }
 
-  updateAuction(id, openAt, closeAt, location) {
+  updateAuction(id, scheduledAt, closedAt, location, active) {
     $.ajax({id,
       url: '/api/auctions/' + id,
       dataType: 'json',
       type: 'PUT',
       data: {
           id: id,
-          openAt: openAt,
-          closeAt: closeAt,
+          scheduledAt: scheduledAt,
+          closedAt: closedAt,
+          active: active,
           location: location
         }
        })
@@ -130,21 +150,22 @@ class Auction extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    var openAt = this.state.openAt;
-    var closeAt = this.state.closeAt;
+    var scheduledAt = this.state.scheduledAt;
+    var closedAt = this.state.closedAt;
+    var active = this.state.active;
     var location = this.state.location;
 
-    if (!openAt) {
-      this.openAtValidationState = 'has-error';
+    if (!scheduledAt) {
+      this.scheduledAtValidationState = 'has-error';
       this.helpBlock = 'Please enter a start date.';
       //this.refs.openAtTextField.focus();
     }
 
-    if (openAt) {
+    if (scheduledAt) {
       if (this.state._id) {
-        this.updateAuction(this.state._id, openAt, closeAt, location)
+        this.updateAuction(this.state._id, scheduledAt, closedAt, location, active)
       } else {
-        this.addAuction(openAt, closeAt, location);
+        this.addAuction(scheduledAt, closedAt, location, active);
       }
     }
   }
@@ -178,9 +199,9 @@ class Auction extends React.Component {
                 </div>
               </div>
               <div className="form-group">
-                <label className="col-sm-2 control-label">Open at</label>
+                <label className="col-sm-2 control-label">Scheduled at</label>
                 <div className="col-sm-10">
-                  <DateTimeSelect onChange={this.onChangeOpenAt.bind(this)} dateTime={this.state.openAt} ref='openAtDateField'/>
+                  <DateTimeSelect onChange={this.onChangeScheduledAt.bind(this)} dateTime={this.state.scheduledAt} ref='scheduledAtDateField'/>
                 {/*
                   <input type='text' className='form-control' ref='openAtTextField' value={this.state.openAt}
                     onChange={this.onChangeOpenAt.bind(this)} autoFocus/>
@@ -188,9 +209,19 @@ class Auction extends React.Component {
                 </div>
               </div>
               <div className="form-group">
-                <label className="col-sm-2 control-label">Close at</label>
+                <label className="col-sm-2 control-label">Currently active</label>
                 <div className="col-sm-10">
-                  <DateTimeSelect onChange={this.onChangeCloseAt.bind(this)} dateTime={this.state.closeAt} ref='closeAtDateField'/>
+                  <div className="checkbox">
+                    <label>
+                      <input type="checkbox" onChange={this.onChangeActive.bind(this)} checked={this.state.active}/>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="col-sm-2 control-label">Closed at</label>
+                <div className="col-sm-10">
+                  <DateTimeSelect onChange={this.onChangeClosedAt.bind(this)} dateTime={this.state.closedAt} ref='closedAtDateField'/>
                   {/*
                     <input type='text' className='form-control' ref='closeAtTextField' value={this.state.closeAt}
                     onChange={this.onChangeCloseAt.bind(this)} autoFocus/>

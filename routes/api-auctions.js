@@ -46,7 +46,8 @@ module.exports = function (app) {
   });
 
   /**
-   * auction   */
+   * POST new auction 
+   */
   app.post('/api/auctions', function(req, res, next) {
     Auction.create(req.body, function (err, item) {
       if (err || !item) return next(err);

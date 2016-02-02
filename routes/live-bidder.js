@@ -28,15 +28,26 @@ module.exports = function(app, io) {
    * GET next current or future auction
    */
   app.get('/api/nextauction', function(req, res, next) {
-    Auction.findById('56a15d8cc5cabb091a24bd6b', function(err, item) {
-      if (err || !item) return next(err);
-      return res.json({
-        _id: item._id,
-        location: item.location,
-        openAt: item.openAt,
-        closeAt: item.closeAt,
-        currentlyActive: true
-      });
+    // find active one
+    // active == true, closedAt == null, (scheduledAt == past)
+    Auction.findOne({'active':true, 'closedAt':null}, function(err, item) {
+      if (err) return next(err);
+      if (!item) {
+        // find next scheduled one
+        // active == false, closedAt == null, (scheduledAt == future)
+        // sort by scheduledAt, limit 1
+        Auction.findOne({'active': false, 'closedAt': null})
+          .sort('-scheduledAt').limit(1).exec(function(err2, item2) {
+          if (err2) return next(err2);
+          if (item2) {
+            return res.json(item2);
+          }
+          // return empty result
+          return res.json(null);
+        });
+      } else {
+        return res.json(item);
+      }
     });
   });
 

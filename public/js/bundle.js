@@ -143,14 +143,6 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRouter = require('react-router');
 
-var _moment = require('moment');
-
-var _moment2 = _interopRequireDefault(_moment);
-
-var _reactBootstrapDatetimepicker = require('react-bootstrap-datetimepicker');
-
-var _reactBootstrapDatetimepicker2 = _interopRequireDefault(_reactBootstrapDatetimepicker);
-
 var _DateTimeSelect = require('./common/DateTimeSelect.js');
 
 var _DateTimeSelect2 = _interopRequireDefault(_DateTimeSelect);
@@ -163,13 +155,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-//import DateTime from 'react-datetime';
-
 var resetState = {
   _id: "",
-  openAt: null,
-  closeAt: null,
-  location: null
+  scheduledAt: null,
+  closedAt: null,
+  location: null,
+  active: null
 };
 
 var Auction = function (_React$Component) {
@@ -204,14 +195,19 @@ var Auction = function (_React$Component) {
       this.setState({ location: e.target.value });
     }
   }, {
-    key: 'onChangeOpenAt',
-    value: function onChangeOpenAt(e) {
-      this.setState({ openAt: e });
+    key: 'onChangeActive',
+    value: function onChangeActive(e) {
+      this.setState({ active: e.target.checked });
     }
   }, {
-    key: 'onChangeCloseAt',
-    value: function onChangeCloseAt(e) {
-      e === 'Invalid date' ? this.setState({ closeAt: '' }) : this.setState({ closeAt: e });
+    key: 'onChangeScheduledAt',
+    value: function onChangeScheduledAt(e) {
+      e === 'Invalid date' ? this.setState({ closedAt: '' }) : this.setState({ scheduledAt: e });
+    }
+  }, {
+    key: 'onChangeClosedAt',
+    value: function onChangeClosedAt(e) {
+      e === 'Invalid date' ? this.setState({ closedAt: '' }) : this.setState({ closedAt: e });
     }
   }, {
     key: 'onClickDelete',
@@ -224,7 +220,6 @@ var Auction = function (_React$Component) {
         url: '/api/auctions/' + this.state._id,
         dataType: 'json',
         type: 'DELETE' }).done(function (data) {
-        console.log('ok');
         // doesnt seem right, but dont know how else to get back to the list after successful add
         setTimeout(function () {
           this.props.history.pushState(null, '/auctions');
@@ -242,56 +237,51 @@ var Auction = function (_React$Component) {
       this.props.history.pushState(null, '/auctions');
     }
   }, {
+    key: 'onClickStart',
+    value: function onClickStart(event) {
+      var _this3 = this;
+
+      event.preventDefault();
+
+      $.ajax({
+        url: '/api/auctions/' + this.state._id,
+        dataType: 'json',
+        type: 'DELETE' }).done(function (data) {
+        // doesnt seem right, but dont know how else to get back to the list after successful add
+        setTimeout(function () {
+          this.props.history.pushState(null, '/auctions');
+        }.bind(_this3), 1000);
+        _this3.setState(resetState);
+      }).fail(function (jqXhr) {
+        console.log('ERROR: ' + jqXhr);
+      });
+    }
+  }, {
     key: 'setAuction',
     value: function setAuction(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       $.ajax({
         url: '/api/auctions/' + id,
         dataType: 'json' }).done(function (data) {
-        _this3.setState(data);
+        _this4.setState(data);
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
     key: 'addAuction',
-    value: function addAuction(openAt, closeAt, location) {
-      var _this4 = this;
+    value: function addAuction(scheduledAt, closedAt, location, active) {
+      var _this5 = this;
 
       $.ajax({
         url: '/api/auctions',
         dataType: 'json',
         type: 'POST',
         data: {
-          openAt: openAt,
-          closeAt: closeAt,
-          location: location
-        }
-      }).done(function (data) {
-        //  this.actions.addVehicleSuccess(data.message);
-        // doesnt seem right, but dont know how else to get back to the list after successful add
-        setTimeout(function () {
-          this.props.history.pushState(null, '/auctions');
-        }.bind(_this4), 1000);
-        _this4.setState(resetState);
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
-    }
-  }, {
-    key: 'updateAuction',
-    value: function updateAuction(id, openAt, closeAt, location) {
-      var _this5 = this;
-
-      $.ajax({ id: id,
-        url: '/api/auctions/' + id,
-        dataType: 'json',
-        type: 'PUT',
-        data: {
-          id: id,
-          openAt: openAt,
-          closeAt: closeAt,
+          scheduledAt: scheduledAt,
+          closedAt: closedAt,
+          active: active,
           location: location
         }
       }).done(function (data) {
@@ -306,25 +296,53 @@ var Auction = function (_React$Component) {
       });
     }
   }, {
+    key: 'updateAuction',
+    value: function updateAuction(id, scheduledAt, closedAt, location, active) {
+      var _this6 = this;
+
+      $.ajax({ id: id,
+        url: '/api/auctions/' + id,
+        dataType: 'json',
+        type: 'PUT',
+        data: {
+          id: id,
+          scheduledAt: scheduledAt,
+          closedAt: closedAt,
+          active: active,
+          location: location
+        }
+      }).done(function (data) {
+        //  this.actions.addVehicleSuccess(data.message);
+        // doesnt seem right, but dont know how else to get back to the list after successful add
+        setTimeout(function () {
+          this.props.history.pushState(null, '/auctions');
+        }.bind(_this6), 1000);
+        _this6.setState(resetState);
+      }).fail(function (jqXhr) {
+        console.log('ERROR: ' + jqXhr);
+      });
+    }
+  }, {
     key: 'handleSubmit',
     value: function handleSubmit(event) {
       event.preventDefault();
 
-      var openAt = this.state.openAt;
-      var closeAt = this.state.closeAt;
+      var scheduledAt = this.state.scheduledAt;
+      var closedAt = this.state.closedAt;
+      var active = this.state.active;
       var location = this.state.location;
 
-      if (!openAt) {
-        this.openAtValidationState = 'has-error';
+      if (!scheduledAt) {
+        this.scheduledAtValidationState = 'has-error';
         this.helpBlock = 'Please enter a start date.';
         //this.refs.openAtTextField.focus();
       }
 
-      if (openAt) {
+      if (scheduledAt) {
         if (this.state._id) {
-          this.updateAuction(this.state._id, openAt, closeAt, location);
+          this.updateAuction(this.state._id, scheduledAt, closedAt, location, active);
         } else {
-          this.addAuction(openAt, closeAt, location);
+          this.addAuction(scheduledAt, closedAt, location, active);
         }
       }
     }
@@ -400,12 +418,12 @@ var Auction = function (_React$Component) {
                 _react2.default.createElement(
                   'label',
                   { className: 'col-sm-2 control-label' },
-                  'Open at'
+                  'Scheduled at'
                 ),
                 _react2.default.createElement(
                   'div',
                   { className: 'col-sm-10' },
-                  _react2.default.createElement(_DateTimeSelect2.default, { onChange: this.onChangeOpenAt.bind(this), dateTime: this.state.openAt, ref: 'openAtDateField' })
+                  _react2.default.createElement(_DateTimeSelect2.default, { onChange: this.onChangeScheduledAt.bind(this), dateTime: this.state.scheduledAt, ref: 'scheduledAtDateField' })
                 )
               ),
               _react2.default.createElement(
@@ -414,12 +432,34 @@ var Auction = function (_React$Component) {
                 _react2.default.createElement(
                   'label',
                   { className: 'col-sm-2 control-label' },
-                  'Close at'
+                  'Currently active'
                 ),
                 _react2.default.createElement(
                   'div',
                   { className: 'col-sm-10' },
-                  _react2.default.createElement(_DateTimeSelect2.default, { onChange: this.onChangeCloseAt.bind(this), dateTime: this.state.closeAt, ref: 'closeAtDateField' })
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'checkbox' },
+                    _react2.default.createElement(
+                      'label',
+                      null,
+                      _react2.default.createElement('input', { type: 'checkbox', onChange: this.onChangeActive.bind(this), checked: this.state.active })
+                    )
+                  )
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'Closed at'
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-10' },
+                  _react2.default.createElement(_DateTimeSelect2.default, { onChange: this.onChangeClosedAt.bind(this), dateTime: this.state.closedAt, ref: 'closedAtDateField' })
                 )
               ),
               _react2.default.createElement(
@@ -474,7 +514,7 @@ var Auction = function (_React$Component) {
 
 exports.default = Auction;
 
-},{"./common/DateTimeSelect.js":17,"moment":61,"react":"react","react-bootstrap-datetimepicker":63,"react-router":"react-router"}],5:[function(require,module,exports){
+},{"./common/DateTimeSelect.js":17,"react":"react","react-router":"react-router"}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -519,19 +559,23 @@ var Auctions = _react2.default.createClass({
   },
 
   render: function render() {
-    var columns = ['location', 'openAt', 'closeAt'];
+    var columns = ['location', 'scheduledAt', 'closedAt', 'active'];
     var columnMetadata = [{
       'columnName': "location",
       'displayName': "Location",
       'order': 1
     }, {
-      'columnName': "openAt",
-      'displayName': "Open at",
+      'columnName': "scheduledAt",
+      'displayName': "Scheduled at",
       'order': 2
     }, {
-      'columnName': "closeAt",
-      'displayName': "Close at",
+      'columnName': "closedAt",
+      'displayName': "Closed at",
       'order': 3
+    }, {
+      'columnName': "active",
+      'displayName': "active",
+      'order': 4
     }];
 
     return _react2.default.createElement(
@@ -807,12 +851,6 @@ var Navbar = function (_React$Component) {
       _NavbarStore2.default.listen(this.onChange);
       _NavbarActions2.default.getCharacterCount();
 
-      var socket = io.connect();
-
-      socket.on('onlineUsers', function (data) {
-        _NavbarActions2.default.updateOnlineUsers(data);
-      });
-
       $(document).ajaxStart(function () {
         _NavbarActions2.default.updateAjaxAnimation('fadeIn');
       });
@@ -886,11 +924,6 @@ var Navbar = function (_React$Component) {
               _react2.default.createElement('div', { className: 'tri invert' })
             ),
             'auto-auction-germany.de',
-            _react2.default.createElement(
-              'span',
-              { className: 'badge badge-up badge-danger' },
-              this.state.onlineUsers
-            ),
             _react2.default.createElement('br', null),
             _react2.default.createElement(
               'p',
@@ -917,15 +950,6 @@ var Navbar = function (_React$Component) {
           _react2.default.createElement(
             'ul',
             { className: 'nav navbar-nav' },
-            _react2.default.createElement(
-              'li',
-              null,
-              _react2.default.createElement(
-                _reactRouter.Link,
-                { to: '/top' },
-                'Live auction'
-              )
-            ),
             _react2.default.createElement(
               'li',
               { className: 'dropdown' },
@@ -998,7 +1022,7 @@ var Navbar = function (_React$Component) {
                   null,
                   _react2.default.createElement(
                     _reactRouter.Link,
-                    { to: '/addVehicle' },
+                    { to: '/' },
                     'Details'
                   )
                 ),
@@ -1007,7 +1031,7 @@ var Navbar = function (_React$Component) {
                   null,
                   _react2.default.createElement(
                     _reactRouter.Link,
-                    { to: '/addVehicle' },
+                    { to: '/' },
                     'Create account'
                   )
                 ),
@@ -1016,7 +1040,7 @@ var Navbar = function (_React$Component) {
                   null,
                   _react2.default.createElement(
                     _reactRouter.Link,
-                    { to: '/addVehicle' },
+                    { to: '/' },
                     'Log in/out'
                   )
                 )
@@ -1039,8 +1063,26 @@ var Navbar = function (_React$Component) {
                   null,
                   _react2.default.createElement(
                     _reactRouter.Link,
-                    { to: '/addVehicle' },
+                    { to: '/auctions/new' },
                     'New auction'
+                  )
+                ),
+                _react2.default.createElement(
+                  'li',
+                  null,
+                  _react2.default.createElement(
+                    _reactRouter.Link,
+                    { to: '/auctions' },
+                    'All auctions'
+                  )
+                ),
+                _react2.default.createElement(
+                  'li',
+                  null,
+                  _react2.default.createElement(
+                    _reactRouter.Link,
+                    { to: '/promoter/auctions' },
+                    'Start auction'
                   )
                 )
               )
@@ -1082,7 +1124,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var resetState = {
   _id: "",
   title: "",
-  description: ""
+  description: "",
+  auctionItemStartAmount: "",
+  auctionItemIncrementBy: ""
 };
 
 var Vehicle = function (_React$Component) {
@@ -1122,6 +1166,16 @@ var Vehicle = function (_React$Component) {
       this.setState({ description: e.target.value });
     }
   }, {
+    key: 'onChangeStartAmount',
+    value: function onChangeStartAmount(e) {
+      this.setState({ auctionItemStartAmount: e.target.value });
+    }
+  }, {
+    key: 'onChangeIncrementBy',
+    value: function onChangeIncrementBy(e) {
+      this.setState({ auctionItemIncrementBy: e.target.value });
+    }
+  }, {
     key: 'onClickDelete',
     value: function onClickDelete(event) {
       var _this2 = this;
@@ -1131,8 +1185,8 @@ var Vehicle = function (_React$Component) {
       $.ajax({
         url: '/api/vehicles/' + this.state._id,
         dataType: 'json',
-        type: 'DELETE' }).done(function (data) {
-        console.log('ok');
+        type: 'DELETE'
+      }).done(function (data) {
         //  this.actions.addVehicleSuccess(data.message);
         // doesnt seem right, but dont know how else to get back to the list after successful add
         setTimeout(function () {
@@ -1140,8 +1194,7 @@ var Vehicle = function (_React$Component) {
         }.bind(_this2), 1000);
         _this2.setState(resetState);
       }).fail(function (jqXhr) {
-        console.log('nok ');
-        //   //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
@@ -1158,18 +1211,16 @@ var Vehicle = function (_React$Component) {
 
       $.ajax({
         url: '/api/vehicles/' + id,
-        dataType: 'json' }).done(function (data) {
+        dataType: 'json'
+      }).done(function (data) {
         _this3.setState(data);
       }).fail(function (jqXhr) {
-        // this.titleValidationState = 'has-error';
-        // this.helpBlock = errorMessage;
-
-        // this.actions.getVehicleFail(jqXhr);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
     key: 'addVehicle',
-    value: function addVehicle(title, description) {
+    value: function addVehicle(title, description, startAmount, incrementBy) {
       var _this4 = this;
 
       $.ajax({
@@ -1178,7 +1229,9 @@ var Vehicle = function (_React$Component) {
         type: 'POST',
         data: {
           title: title,
-          description: description
+          description: description,
+          auctionItemStartAmount: startAmount,
+          auctionItemIncrementBy: incrementBy
         }
       }).done(function (data) {
         //  this.actions.addVehicleSuccess(data.message);
@@ -1188,7 +1241,7 @@ var Vehicle = function (_React$Component) {
         }.bind(_this4), 1000);
         _this4.setState(resetState);
       }).fail(function (jqXhr) {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
@@ -1203,7 +1256,9 @@ var Vehicle = function (_React$Component) {
         data: {
           id: id,
           title: title,
-          description: description
+          description: description,
+          auctionItemStartAmount: startAmount,
+          auctionItemIncrementBy: incrementBy
         }
       }).done(function (data) {
         //  this.actions.addVehicleSuccess(data.message);
@@ -1213,7 +1268,7 @@ var Vehicle = function (_React$Component) {
         }.bind(_this5), 1000);
         _this5.setState(resetState);
       }).fail(function (jqXhr) {
-        //  this.actions.addVehicleFail(jqXhr.responseJSON.message);
+        console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
@@ -1223,6 +1278,8 @@ var Vehicle = function (_React$Component) {
 
       var title = this.state.title.trim();
       var description = this.state.description.trim();
+      var startAmount = this.state.auctionItemStartAmount.trim();
+      var incrementBy = this.state.auctionItemIncrementBy.trim();
 
       if (!title) {
         this.titleValidationState = 'has-error';
@@ -1232,9 +1289,9 @@ var Vehicle = function (_React$Component) {
 
       if (title) {
         if (this.state._id) {
-          this.updateVehicle(this.state._id, title, description);
+          this.updateVehicle(this.state._id, title, description, startAmount, incrementBy);
         } else {
-          this.addVehicle(title, description);
+          this.addVehicle(title, description, startAmount, incrementBy);
         }
       }
     }
@@ -1243,130 +1300,148 @@ var Vehicle = function (_React$Component) {
     value: function render() {
       return _react2.default.createElement(
         'div',
-        { className: 'vehicleBox' },
+        { className: 'container' },
         _react2.default.createElement(
           'div',
-          { className: 'container' },
+          { className: 'panel panel-default' },
           _react2.default.createElement(
             'div',
-            { className: 'row flipInX animated' },
+            { className: 'panel-heading' },
+            'View/edit/add Vehicle'
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'panel-body' },
             _react2.default.createElement(
-              'div',
-              { className: 'col-sm-8' },
+              'form',
+              { onSubmit: this.handleSubmit.bind(this), className: 'form-horizontal' },
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'ID'
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-10' },
+                  _react2.default.createElement(
+                    'p',
+                    { className: 'form-control-static' },
+                    this.state._id
+                  )
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'Title'
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-10' },
+                  _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'titleTextField', value: this.state.title,
+                    onChange: this.onChangeTitle.bind(this), autoFocus: true })
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { className: 'col-sm-2 control-label' },
+                  'Description'
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-10' },
+                  _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'descriptionTextField', value: this.state.description,
+                    onChange: this.onChangeDescription.bind(this), autoFocus: true })
+                )
+              ),
               _react2.default.createElement(
                 'div',
                 { className: 'panel panel-default' },
                 _react2.default.createElement(
                   'div',
                   { className: 'panel-heading' },
-                  'View/edit/add Vehicle'
+                  'Auction Item'
                 ),
                 _react2.default.createElement(
                   'div',
                   { className: 'panel-body' },
                   _react2.default.createElement(
-                    'form',
-                    { onSubmit: this.handleSubmit.bind(this) },
+                    'div',
+                    { className: 'form-group' },
                     _react2.default.createElement(
-                      'table',
-                      null,
-                      _react2.default.createElement(
-                        'tbody',
-                        null,
-                        _react2.default.createElement(
-                          'tr',
-                          null,
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(
-                              'label',
-                              { className: 'control-label' },
-                              'ID'
-                            )
-                          ),
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            this.state._id
-                          )
-                        ),
-                        _react2.default.createElement(
-                          'tr',
-                          null,
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(
-                              'label',
-                              { className: 'control-label' },
-                              'Title'
-                            )
-                          ),
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'titleTextField', value: this.state.title,
-                              onChange: this.onChangeTitle.bind(this), autoFocus: true }),
-                            _react2.default.createElement(
-                              'span',
-                              { className: 'help-block' },
-                              this.state.helpBlock
-                            )
-                          )
-                        ),
-                        _react2.default.createElement(
-                          'tr',
-                          null,
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement(
-                              'label',
-                              { className: 'control-label' },
-                              'Description'
-                            )
-                          ),
-                          _react2.default.createElement(
-                            'td',
-                            null,
-                            _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'descriptionTextField', value: this.state.description,
-                              onChange: this.onChangeDescription.bind(this), autoFocus: true })
-                          )
-                        )
-                      )
+                      'label',
+                      { className: 'col-sm-2 control-label' },
+                      'Start amount'
                     ),
-                    this.state._id ? _react2.default.createElement(
+                    _react2.default.createElement(
                       'div',
-                      null,
-                      _react2.default.createElement(
-                        'button',
-                        { type: 'submit', className: 'btn btn-primary' },
-                        'Save'
-                      ),
-                      _react2.default.createElement(
-                        'button',
-                        { className: 'btn btn-secondary', onClick: this.onClickDelete.bind(this) },
-                        'Delete'
-                      ),
-                      _react2.default.createElement(
-                        'button',
-                        { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
-                        'Cancel'
-                      )
-                    ) : _react2.default.createElement(
+                      { className: 'col-sm-10' },
+                      _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'startAmountTextField', value: this.state.startAmount,
+                        onChange: this.onChangeStartAmount.bind(this), autoFocus: true })
+                    )
+                  ),
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'form-group' },
+                    _react2.default.createElement(
+                      'label',
+                      { className: 'col-sm-2 control-label' },
+                      'Increment by'
+                    ),
+                    _react2.default.createElement(
                       'div',
-                      null,
-                      _react2.default.createElement(
-                        'button',
-                        { type: 'submit', className: 'btn btn-primary' },
-                        'Add'
-                      ),
-                      _react2.default.createElement(
-                        'button',
-                        { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
-                        'Cancel'
-                      )
+                      { className: 'col-sm-10' },
+                      _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'incrementByTextField', value: this.state.incrementBy,
+                        onChange: this.onChangeIncrementBy.bind(this), autoFocus: true })
+                    )
+                  )
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-offset-2 col-sm-10' },
+                  this.state._id ? _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(
+                      'button',
+                      { type: 'submit', className: 'btn btn-primary' },
+                      'Save'
+                    ),
+                    _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-secondary', onClick: this.onClickDelete.bind(this) },
+                      'Delete'
+                    ),
+                    _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
+                      'Cancel'
+                    )
+                  ) : _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(
+                      'button',
+                      { type: 'submit', className: 'btn btn-primary' },
+                      'Add'
+                    ),
+                    _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
+                      'Cancel'
                     )
                   )
                 )
@@ -1653,8 +1728,8 @@ var AuctionItem = function (_React$Component) {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       // not sure if this works
-      socket.removeListener('auctionAction');
-      socket.removeListener('participants');
+      // socket.removeListener('auctionAction');
+      // socket.removeListener('participants');
     }
   }, {
     key: 'getVehicle',
@@ -2066,9 +2141,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var resetState = {
   _id: null,
-  openAt: null,
-  closeAt: null,
-  currentlyActive: false
+  location: null,
+  scheduledAt: null,
+  closedAt: null,
+  active: false
 };
 
 var Start = function (_React$Component) {
@@ -2112,7 +2188,11 @@ var Start = function (_React$Component) {
         url: '/api/nextauction/',
         dataType: 'json'
       }).done(function (data) {
-        _this2.setState(data);
+        if (data) {
+          _this2.setState(data);
+        } else {
+          _this2.setState(resetState);
+        }
       }).fail(function (jqXhr) {
         console.log("ERROR " + jqXhr);
       });
@@ -2127,54 +2207,61 @@ var Start = function (_React$Component) {
     key: 'render',
     value: function render() {
       var auction = _react2.default.createElement(
-        'p',
-        null,
-        'No auction active or scheduled.'
+        'h3',
+        { className: 'text-center' },
+        'No current or scheduled auction'
       );
-      if (this.state.currentlyActive) {
+      if (this.state.active) {
         auction = _react2.default.createElement(
-          'p',
+          'div',
           null,
-          'Active auction since ',
-          this.state.openAt,
-          '. ',
           _react2.default.createElement(
-            'button',
-            { className: 'btn btn-secondary', onClick: this.onClickJoin.bind(this) },
-            'Join'
+            'h3',
+            { className: 'text-center' },
+            'Active auction in ',
+            this.state.location,
+            ' since ',
+            this.state.scheduledAt
+          ),
+          _react2.default.createElement(
+            'p',
+            { className: 'text-center' },
+            _react2.default.createElement(
+              'button',
+              { className: 'btn btn-primary', onClick: this.onClickJoin.bind(this) },
+              'Join'
+            )
           )
         );
-      } else {
+      } else if (this.state._id) {
         auction = _react2.default.createElement(
-          'p',
+          'div',
           null,
-          'No active auction.',
-          _react2.default.createElement('br', null),
-          'Next scheduled auction starts at ',
-          this.state.openAt
+          _react2.default.createElement(
+            'h3',
+            { className: 'text-center' },
+            'Currently no active auction'
+          ),
+          _react2.default.createElement(
+            'p',
+            { className: 'text-center' },
+            'Next scheduled auction starts in ',
+            this.state.location,
+            ' at ',
+            this.state.scheduledAt
+          )
         );
       }
 
       return _react2.default.createElement(
         'div',
         { className: 'container' },
-        _react2.default.createElement(
-          'div',
-          { className: 'list-group' },
-          _react2.default.createElement('br', null),
-          _react2.default.createElement('br', null),
-          _react2.default.createElement('br', null),
-          _react2.default.createElement('br', null),
-          _react2.default.createElement('br', null),
-          _react2.default.createElement(
-            'div',
-            { style: { textAlign: 'center' } },
-            _react2.default.createElement('br', null),
-            _react2.default.createElement('br', null),
-            _react2.default.createElement('br', null),
-            auction
-          )
-        )
+        _react2.default.createElement('br', null),
+        _react2.default.createElement('br', null),
+        _react2.default.createElement('br', null),
+        _react2.default.createElement('br', null),
+        _react2.default.createElement('br', null),
+        auction
       );
     }
   }]);
@@ -2618,14 +2705,18 @@ var Auctions = _react2.default.createClass({
           { className: 'media' },
           auction._id,
           ' - ',
-          auction.openAt,
+          auction.scheduledAt,
           ' - ',
-          auction.closeAt,
-          ' -',
+          auction.active ? 'active' : '',
+          ' - ',
+          auction.closedAt,
+          ' - ',
+          auction.location,
+          ' - ',
           _react2.default.createElement(
             _reactRouter.Link,
             { to: '/promoter/auctions/' + auction._id },
-            'Activate'
+            'Activate/start'
           )
         )
       );
@@ -3126,7 +3217,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = _react2.default.createElement(
   _reactRouter.Route,
   { component: _App2.default },
-  _react2.default.createElement(_reactRouter.Route, { path: '/', component: _Home2.default }),
+  _react2.default.createElement(_reactRouter.Route, { path: '/', component: _Start2.default }),
   _react2.default.createElement(_reactRouter.Route, { path: '/vehicles/new', component: _Vehicle2.default }),
   _react2.default.createElement(_reactRouter.Route, { path: '/vehicles/:id', component: _Vehicle2.default }),
   _react2.default.createElement(_reactRouter.Route, { path: '/vehicles', component: _Vehicles2.default }),
