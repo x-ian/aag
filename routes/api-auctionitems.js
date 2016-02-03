@@ -55,4 +55,7 @@ module.exports = function (app) {
       return res.json({ message: 'Item added' });
     });
   });
+
+  // ---------------------------------------------------------------------------
+
 }

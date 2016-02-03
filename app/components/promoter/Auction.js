@@ -1,30 +1,29 @@
 import React from 'react';
 import {Link} from 'react-router';
-import {isEqual} from 'underscore';
 
 var Auction = React.createClass({
   getInitialState: function() {
-    return {upcomingVehicles: [], closedVehicles: []};
+    return {upcomingAuctionItems: [], closedAuctionItems: []};
   },
 
   componentDidMount: function() {
     $.ajax({
-      url: '/api/vehicles',
+      url: '/api/openauctionitems',
       dataType: 'json',
       cache: false,
       success: function(data) {
-        this.setState({upcomingVehicles: data});
+        this.setState({upcomingAuctionItems: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
     $.ajax({
-      url: '/api/vehicles',
+      url: '/api/closedauctionitems',
       dataType: 'json',
       cache: false,
       success: function(data) {
-        this.setState({closedVehicles: data});
+        this.setState({closedAuctionItems: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -34,21 +33,22 @@ var Auction = React.createClass({
   },
 
   render: function () {
-    let upcomingVehicleList = this.state.upcomingVehicles.map((vehicle, index) => {
+    let upcomingAuctionItemList = this.state.upcomingAuctionItems.map((ai, index) => {
       return (
-        <div key={vehicle._id} className='list-group-item animated fadeIn'>
+        <div key={ai._id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {vehicle._id} - {vehicle.title} - {vehicle.classification} -
-            <Link to={'/promoter/auctionitem/' + vehicle._id}>Activate</Link>
+            {ai._id} - {ai.vehicle.title} - {ai.vehicle.classification} -
+            <Link
+              to={'/promoter/auctionitem/' + ai._id + '?auctionId=' + this.props.params.id}>Activate</Link>
           </div>
         </div>
       );
     });
-    let closedVehicleList = this.state.closedVehicles.map((vehicle, index) => {
+    let closedAuctionItemList = this.state.closedAuctionItems.map((ai, index) => {
       return (
-        <div key={vehicle._id} className='list-group-item animated fadeIn'>
+        <div key={ai._id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {vehicle._id} - {vehicle.title} - {vehicle.classification} -
+            {ai._id} - {ai.vehicle.title} - {ai.vehicle.classification} -
           </div>
         </div>
       );
@@ -57,11 +57,11 @@ var Auction = React.createClass({
     return (
       <div className='container'>
         <div className='list-group'>
-          <div className='panel-heading'>Upcoming Vehicles</div>
-          {upcomingVehicleList}
+          <div className='panel-heading'>Upcoming Auction Items</div>
+          {upcomingAuctionItemList}
 
-          <div className='panel-heading'>Closed Vehicles</div>
-          {closedVehicleList}
+          <div className='panel-heading'>Closed Auction Items</div>
+          {closedAuctionItemList}
         </div>
       </div>
     );

@@ -32,12 +32,52 @@ function calcNewAuctionItemStatus(action, prevStatus) {
 
 module.exports = function (app, io) {
 
+
+    app.get('/api/openauctionitems', function(req, res, next) {
+      var auctionId = req.query['auctionId'];
+      // auctionId AND (SOLD or CLOSE_EMPTY)
+      AuctionItem.find({
+          $or: [ { status: 'NOT_OPEN' }, { status: null } ]
+        }).populate('vehicle').exec(function(err, item) {
+          if (err) return next(err);
+          return res.json(item);
+        });
+    });
+
+
+    app.get('/api/closedauctionitems', function(req, res, next) {
+      var auctionId = req.query['auctionId'];
+      // auctionId AND (SOLD or CLOSE_EMPTY)
+      AuctionItem.find(
+        {
+          $and: [
+            { auction: auctionId},
+            { $or: [ { status: 'SOLD' }, { status: 'CLOSED_EMPTY' } ] }
+          ]
+        }, function(err, item) {
+        if (err) return next(err);
+        return res.json(item);
+      });
+    });
+
   app.post('/api/startauction/:id', function(req, res, next) {
     Auction.findByIdAndUpdate(req.params.id, { closedAt: null, active: true }, function(err, item) {
       if (err || !item) return next(err);
       // simply take first vehicle for now and create/overwrite an auctionitem
       Vehicle.findOne
       return res.json({ message: 'Auction started' });
+    });
+  });
+
+  app.post('/api/activateauctionitem/:id', function(req, res, next) {
+    var auctionId = req.query.auctionId;
+    AuctionItem.findByIdAndUpdate(req.params.id, {
+        status: 'NOT_OPEN',
+        startTimestamp: new Date(),
+        auction: auctionId},
+      function(err, item) {
+        if (err || !item) return next(err);
+        return res.json(item);
     });
   });
 

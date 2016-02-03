@@ -4,7 +4,8 @@ import AuctionItem from './AuctionItem.js';
 
 const resetState = {
   currentAuctionItem: null,
-  auction: null
+  auction: null,
+  socket: null
 }
 
 class Auction extends React.Component {
@@ -15,6 +16,8 @@ class Auction extends React.Component {
   }
 
   componentDidMount() {
+    // let socket = io.connect();
+    // this.setState({socket: socket});
     this.getAuction(this.props.params.id);
   }
 
@@ -46,7 +49,7 @@ class Auction extends React.Component {
   render() {
     return (
       <div>
-        { this.state.currentAuctionItem ? <AuctionItem id={this.state.currentAuctionItem._id}/> : 'nothing active' }
+        { this.state.currentAuctionItem ? <AuctionItem id={this.state.currentAuctionItem._id} socket={this.props.socket}/> : 'nothing active' }
       </div>
     );
   }

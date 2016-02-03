@@ -27,19 +27,21 @@ class AuctionItem extends React.Component {
     this.getParticipants();
     let socket = io.connect();
     socket.on('auctionAction', (data) => {
+    // this.props.socket.on('auctionAction', (data) => {
       console.log('IO AuctionItem status ' + this.state.auctionItem.status);
       this.setState({auctionItem: data['auctionItem'] });
       this.setState({recentBids: data['recentBids'] });
     });
     socket.on('participants', (data) => {
+    // this.props.socket.on('participants', (data) => {
       this.setState({participants: data });
     });
   }
 
   componentWillUnmount() {
     // not sure if this works
-    // socket.removeListener('auctionAction');
-    // socket.removeListener('participants');
+    // this.props.socket.removeListener('auctionAction');
+    // this.props.socket.removeListener('participants');
   }
 
   getVehicle(id) {

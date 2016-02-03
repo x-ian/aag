@@ -38,7 +38,6 @@ class PromoterStatus extends React.Component {
 
   render() {
     return (
-      <div className='container'>
         <div className='list-group'>
           <div className='panel-heading'>Status &amp; actions</div>
           <div key='button' className='list-group-item animated fadeIn'>
@@ -68,11 +67,10 @@ class PromoterStatus extends React.Component {
                 }
               })()}
 
-              (&nbsp;{this.props.status})
+              &nbsp;({this.props.status})
             </div>
           </div>
         </div>
-      </div>
     );
   }
 };

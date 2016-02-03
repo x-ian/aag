@@ -42,7 +42,7 @@ class AuctionStatus extends React.Component {
                 }
               })()}
 
-              (&nbsp;{this.props.status})
+              &nbsp;({this.props.status})
             </div>
           </div>
         </div>

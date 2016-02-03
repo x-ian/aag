@@ -4,11 +4,13 @@ import VehicleDetails from './VehicleDetails.js';
 import PromoterStatus from './PromoterStatus.js';
 
 import BidHistory from '../bidder/BidHistory.js';
+import Participants from '../bidder/Participants.js';
 
 const resetState = {
   auctionItem: null,
   vehicle: null,
   auction: null,
+  participants: [],
   recentBids: [],
   currentBidId: null,
   // optimization shortcut
@@ -24,7 +26,7 @@ class AuctionItem extends React.Component {
 
   componentDidMount() {
     if (this.props.params.id) {
-      this.getOrCreateAuctionItem(this.props.params.id);
+      this.activateAuctionItem(this.props.params.id, this.props.location.query.auctionId);
     };
 
     let socket = io.connect();
@@ -36,6 +38,10 @@ class AuctionItem extends React.Component {
       this.setState({currentBidId: null});
       if (data['currentBidId']) this.setState({currentBidId: data['currentBidId'] });
     });
+    socket.on('participants', (data) => {
+      this.setState({participants: data });
+    });
+
   }
 
   getVehicle(id) {
@@ -60,9 +66,9 @@ class AuctionItem extends React.Component {
     });
   }
 
-  getOrCreateAuctionItem(vehicleId) {
+  activateAuctionItem(auctionItemId, auctionId) {
     $.ajax({
-      url: '/api/getorcreateauctionitem/' + vehicleId,
+      url: '/api/activateauctionitem/' + auctionItemId + '?auctionId=' + auctionId,
       type: 'POST',
       dataType: 'json'
     }).done((data) => {
@@ -94,30 +100,24 @@ class AuctionItem extends React.Component {
 
   render() {
     return (
-      <div className='container'>
-        <div className='list-group'>
-          <table>
-            <tbody>
-              <tr>
-                <td>
+      <div className='container-fluid'>
+        <div className='row'>
+           <div className='col-sm-6'>
                   { this.state.vehicle ? <VehicleDetails vehicle={this.state.vehicle}/> : '' }
-                </td>
-                <td>
+                </div>
+                <div className='col-sm-6'>
                   { this.state.auctionItem ? <PromoterStatus status={this.state.auctionItem.status} updateAfterAction={this.updateAfterAction.bind(this)}/> : '' }
-                </td>
-              </tr>
-              <tr>
-                <td>
+                </div>
+              </div>
+              <div className='row'>
+                 <div className='col-sm-6'>
                   { this.state.recentBids ? <BidHistory bids={this.state.recentBids}/> : '' }
-                </td>
-                <td>
-                  Online participants:<br/>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </div>
+                <div className='col-sm-6'>
+                  { this.state.participants ? <Participants participants={this.state.participants}/> : '' }
+                </div>
+              </div>
+          </div>
     );
   }
 }

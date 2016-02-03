@@ -1,12 +1,19 @@
 import React from 'react';
 import {Link} from 'react-router';
+import _ from "underscore";
 
 const resetState = {
-    _id: "",
+  vehicle: {
+    _id: null,
     title: "",
-    description: "",
-    auctionItemStartAmount: "",
-    auctionItemIncrementBy: ""
+    description: ""
+  },
+  auctionItem: {
+    _id: null,
+    startAmount: "",
+    incrementBy: "",
+    vehicle: ""
+  }
 }
 
 class Vehicle extends React.Component {
@@ -28,23 +35,30 @@ class Vehicle extends React.Component {
     }
   }
 
-  onChangeTitle(e) { this.setState({title: e.target.value}) }
+  onChangeTitle(e) {
+    this.setState({vehicle: _.extend(this.state.vehicle, { title: e.target.value})});
+   }
 
-  onChangeDescription(e) { this.setState({description: e.target.value}) }
+  onChangeDescription(e) {
+    this.setState({vehicle: _.extend(this.state.vehicle, { description: e.target.value})});
+   }
 
-  onChangeStartAmount(e) { this.setState({auctionItemStartAmount: e.target.value}) }
+  onChangeStartAmount(e) {
+    this.setState({auctionItem: _.extend(this.state.auctionItem, { startAmount: e.target.value})});
+ }
 
-  onChangeIncrementBy(e) { this.setState({auctionItemIncrementBy: e.target.value}) }
+  onChangeIncrementBy(e) {
+    this.setState({auctionItem: _.extend(this.state.auctionItem, { incrementBy: e.target.value})});
+  }
 
   onClickDelete(event) {
     event.preventDefault();
 
     $.ajax({
-      url: '/api/vehicles/' + this.state._id,
+      url: '/api/vehiclesfull/' + this.state.vehicle._id,
       dataType: 'json',
       type: 'DELETE'
     }).done((data) => {
-      //  this.actions.addVehicleSuccess(data.message);
       // doesnt seem right, but dont know how else to get back to the list after successful add
       setTimeout(function(){
         this.props.history.pushState(null, '/vehicles');
@@ -62,30 +76,49 @@ class Vehicle extends React.Component {
   }
 
   setVehicle(id) {
+    this.setState(resetState);
     $.ajax({
-      url: '/api/vehicles/' + id,
+      url: '/api/vehiclesfull/' + id,
       dataType: 'json'
     }).done((data) => {
-        this.setState(data);
+      this.setState({vehicle: data.vehicle});
+      if (data.auctionItem) this.setState({auctionItem: data.auctionItem});
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
   }
 
-  addVehicle(title, description, startAmount, incrementBy) {
+  addVehicle(vehicle, auctionItem) {
     $.ajax({
-      url: '/api/vehicles',
+      url: '/api/vehiclesfull',
       dataType: 'json',
       type: 'POST',
       data: {
-          title: title,
-          description: description,
-          auctionItemStartAmount: startAmount,
-          auctionItemIncrementBy: incrementBy
+        vehicle: vehicle,
+        auctionItem: auctionItem
       }
     }).done((data) => {
-        //  this.actions.addVehicleSuccess(data.message);
-         // doesnt seem right, but dont know how else to get back to the list after successful add
+        // doesnt seem right, but dont know how else to get back to the list after successful add
+        setTimeout(function(){
+          this.props.history.pushState(null, '/vehicles');
+        }.bind(this), 1000);
+        this.setState(resetState);
+      }).fail((jqXhr) => {
+        console.log('ERROR: ' + jqXhr);
+      });
+  }
+
+  updateVehicle(vehicle, auctionItem) {
+    $.ajax({
+      url: '/api/vehiclesfull/' + vehicle._id,
+      dataType: 'json',
+      type: 'PUT',
+      data: {
+        vehicle: vehicle,
+        auctionItem: auctionItem
+      }
+    }).done((data) => {
+      // doesnt seem right, but dont know how else to get back to the list after successful add
       setTimeout(function(){
         this.props.history.pushState(null, '/vehicles');
       }.bind(this), 1000);
@@ -95,37 +128,10 @@ class Vehicle extends React.Component {
     });
   }
 
-  updateVehicle(id, title, description) {
-    $.ajax({id,
-      url: '/api/vehicles/' + id,
-      dataType: 'json',
-      type: 'PUT',
-      data: {
-          id: id,
-          title: title,
-          description: description,
-          auctionItemStartAmount: startAmount,
-          auctionItemIncrementBy: incrementBy
-        }
-       }).done((data) => {
-        //  this.actions.addVehicleSuccess(data.message);
-         // doesnt seem right, but dont know how else to get back to the list after successful add
-           setTimeout(function(){
-             this.props.history.pushState(null, '/vehicles');
-           }.bind(this), 1000);
-           this.setState(resetState);
-       }).fail((jqXhr) => {
-         console.log('ERROR: ' + jqXhr);
-       });
-  }
-
   handleSubmit(event) {
     event.preventDefault();
 
-    var title = this.state.title.trim();
-    var description = this.state.description.trim();
-    var startAmount = this.state.auctionItemStartAmount.trim();
-    var incrementBy = this.state.auctionItemIncrementBy.trim();
+    var title = this.state.vehicle.title.trim();
 
     if (!title) {
       this.titleValidationState = 'has-error';
@@ -134,10 +140,10 @@ class Vehicle extends React.Component {
     }
 
     if (title) {
-      if (this.state._id) {
-        this.updateVehicle(this.state._id, title, description, startAmount, incrementBy)
+      if (this.state.vehicle._id) {
+        this.updateVehicle(this.state.vehicle, this.state.auctionItem)
       } else {
-        this.addVehicle(title, description, startAmount, incrementBy);
+        this.addVehicle(this.state.vehicle, this.state.auctionItem);
       }
     }
   }
@@ -152,20 +158,20 @@ class Vehicle extends React.Component {
                 <div className="form-group">
                   <label className="col-sm-2 control-label">ID</label>
                   <div className="col-sm-10">
-                    <p className="form-control-static">{this.state._id}</p>
+                    <p className="form-control-static">{this.state.vehicle._id}</p>
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="col-sm-2 control-label">Title</label>
                   <div className="col-sm-10">
-                    <input type='text' className='form-control' ref='titleTextField' value={this.state.title}
+                    <input type='text' className='form-control' ref='titleTextField' value={this.state.vehicle.title}
                         onChange={this.onChangeTitle.bind(this)} autoFocus/>
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="col-sm-2 control-label">Description</label>
                   <div className="col-sm-10">
-                    <input type='text' className='form-control' ref='descriptionTextField' value={this.state.description}
+                    <input type='text' className='form-control' ref='descriptionTextField' value={this.state.vehicle.description}
                          onChange={this.onChangeDescription.bind(this)} autoFocus/>
                   </div>
                 </div>
@@ -174,16 +180,22 @@ class Vehicle extends React.Component {
                   <div className='panel-heading'>Auction Item</div>
                   <div className='panel-body'>
                     <div className="form-group">
+                      <label className="col-sm-2 control-label">ID</label>
+                      <div className="col-sm-10">
+                        <p className="form-control-static">{this.state.auctionItem._id}</p>
+                      </div>
+                    </div>
+                    <div className="form-group">
                       <label className="col-sm-2 control-label">Start amount</label>
                       <div className="col-sm-10">
-                        <input type='text' className='form-control' ref='startAmountTextField' value={this.state.startAmount}
+                        <input type='text' className='form-control' ref='startAmountTextField' value={this.state.auctionItem.startAmount}
                              onChange={this.onChangeStartAmount.bind(this)} autoFocus/>
                       </div>
                     </div>
                     <div className="form-group">
                       <label className="col-sm-2 control-label">Increment by</label>
                       <div className="col-sm-10">
-                        <input type='text' className='form-control' ref='incrementByTextField' value={this.state.incrementBy}
+                        <input type='text' className='form-control' ref='incrementByTextField' value={this.state.auctionItem.incrementBy}
                              onChange={this.onChangeIncrementBy.bind(this)} autoFocus/>
                       </div>
                     </div>
@@ -193,7 +205,7 @@ class Vehicle extends React.Component {
                 <div className="form-group">
                    <div className="col-sm-offset-2 col-sm-10">
 
-                    {this.state._id ?
+                    {this.state.vehicle._id ?
                         (
                           <div>
                             <button type='submit' className='btn btn-primary'>Save</button>
