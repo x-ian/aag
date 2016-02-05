@@ -39,3 +39,6 @@ bower_components
 # packaging stuff
 public/css
 public/js
+
+# vehicle images
+public/vehicles
