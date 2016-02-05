@@ -1,11 +1,30 @@
 var Vehicle = require('../models/vehicle');
 var AuctionItem = require('../models/auctionitem');
 var Bid = require('../models/bid');
+var multiparty = require('multiparty');
+var fs = require('fs');
+var rmdir = require('rimraf');
+
+const vehicleImagePathLocal = '/Users/xian/projects/auto-auction-germany.com/aag/public/';
+const vehicleImagePathPublic = '/vehicles/';
+const vehicleImagePath = vehicleImagePathLocal + vehicleImagePathPublic;
 
 function mapVehicleReqBody(reqBody, withId) {
   var o = {
     title: reqBody['vehicle[title]'],
-    description: reqBody['vehicle[description]']
+    description: reqBody['vehicle[description]'],
+    brand: reqBody['vehicle[brand]'],
+    classification: reqBody['vehicle[classification]'],
+    model: reqBody['vehicle[model]'],
+    transmission: reqBody['vehicle[transmission]'],
+    fuelType: reqBody['vehicle[fuelType]'],
+    powerOutputPs: reqBody['vehicle[powerOutputPs]'],
+    cubicCapacity: reqBody['vehicle[cubicCapacity]'],
+    registrationDate: reqBody['vehicle[registrationDate]'],
+    odometerKm: reqBody['vehicle[odometerKm]'],
+    features: reqBody['vehicle[features]'],
+    damages: reqBody['vehicle[damages]'],
+    images: reqBody['vehicle[images]']
   };
   if (withId) o._id = reqBody['vehicle[_id]'];
   return o;
@@ -89,6 +108,7 @@ module.exports = function (app) {
       AuctionItem.find({vehicle: req.params.id}).remove().exec();
       Vehicle.findById(req.params.id).remove().exec();
     });
+    rmdir(vehicleImagePath + '/' + req.params.id, function(error){});
     return res.json({ message: 'Item(s) deleted' });
   });
 
@@ -123,6 +143,37 @@ module.exports = function (app) {
       AuctionItem.create(mapAuctionItemReqBody(req.body, false, item._id));
       return res.json({ message: 'Item added' });
     });
+  });
+
+  app.post('/api/vehiclesfull/:id/addimages', function(req, res, next) { 
+    var vehicleId = req.params.id;
+
+    var form = new multiparty.Form();
+    form.parse(req, function (err, fields, files) {
+      Object.keys(files).forEach(function(key){
+        console.log(files[key]);
+
+        var vehiclePath = vehicleImagePath + vehicleId;
+        fs.existsSync(vehiclePath) || fs.mkdirSync(vehiclePath);
+        // if (!fs.statSync(vehiclePath)) {
+          // fs.mkdirSync(vehiclePath, );
+        // }
+        var tempPath = files[key][0].path + '';
+        var copyToPath = vehiclePath + '/' + files[key][0].originalFilename;
+        fs.readFile(tempPath, (err, data) => {
+          // make copy of image to new location
+          fs.writeFile(copyToPath, data, (err) => {
+            // delete temp image
+            fs.unlink(tempPath, () => {
+              // res.send("Files uploaded to: " + copyToPath);
+            });
+            Vehicle.findByIdAndUpdate(req.params.id, {$push: {"images": vehicleImagePathPublic + vehicleId + '/' + files[key][0].originalFilename}}).exec();
+          });
+        });
+      });
+    });
+
+    return res.json({message: 'yo'});
   });
 
 

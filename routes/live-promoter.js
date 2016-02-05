@@ -51,12 +51,12 @@ module.exports = function (app, io) {
       AuctionItem.find(
         {
           $and: [
-            { auction: auctionId},
+            // { auction: auctionId},
             { $or: [ { status: 'SOLD' }, { status: 'CLOSED_EMPTY' } ] }
           ]
-        }, function(err, item) {
-        if (err) return next(err);
-        return res.json(item);
+        }).populate('vehicle').exec(function(err, item) {
+          if (err) return next(err);
+          return res.json(item);
       });
     });
 
@@ -81,38 +81,13 @@ module.exports = function (app, io) {
     });
   });
 
-   app.post('/api/getorcreateauctionitem/:id', function(req, res, next) {
-     AuctionItem.findOne({'vehicle': req.params.id }, function(err, item) {
-       if (err) return next(err);
-       if (!item) {
-         console.log('no matching auction item');
-         // does not exist, create new one
-         AuctionItem.create({
-           startAmount: 200,
-           incrementBy: 50,
-           status: 'NOT_OPEN',
-           startTimestamp: new Date(),
-           endTimestamp: null,
-           vehicle: req.params.id,
-           auction: '56a15d8cc5cabb091a24bd6b'
-         }, function (err2, item2) {
-           if (err2 || !item2) return next(err2);
-           // return res.json(item);
-           return res.json(item2);
-         });
-       } else {
-         // already there, assume for now we want to (re)use this
-         console.log('auction item already there');
-         return res.json(item);
-      }
-     });
-   });
-
    app.post('/api/promoteraction/:id', function(req, res, next) {
 
      var auctionItemId = req.params.id;
      var currentBidId = req.body.currentBidId;
      var action = req.body.action;
+
+     console.log('PromoterAction ' + auctionItemId + ' ' + currentBidId + ' ' + action);
 
      AuctionItem.findById(auctionItemId, function(err, item) {
        if (err || !item) return next(err);
@@ -135,6 +110,7 @@ module.exports = function (app, io) {
        }
 
        item.save(function (err) {
+         console.log('AuctionItem updated ' + item._id);
          if (err) return next(err);
 
          // 3. get new recent 5 bids

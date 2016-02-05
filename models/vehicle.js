@@ -3,18 +3,22 @@ var mongoose = require('mongoose');
 var vehicleSchema = new mongoose.Schema({
   title: String,
   description: String,
+  brand: String,
   classification: String,
-  vehicleData: {
+  model: String,
+  // modelData: {
+    gear: String,
+    fuelType: String,
+    powerOutputPs: Number,
+    cubicCapacity: Number,
+  // },
+  // vehicleData: {
     registrationDate: String,
-    condition: String,
-    numberPreviousOwners: Number,
-    hu: String,
-    schadstoffklasse: String,
-    umweltplakette: String
-  },
-  //features: [{ feature: String }],
-  pictures: String,
-  damages: String
+    odometerKm: Number,
+  // },
+  features: String,
+  damages: String,
+  images: []
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);

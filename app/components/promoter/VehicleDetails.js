@@ -12,7 +12,9 @@ class VehicleDetails extends React.Component {
             <div className='media'>
               {this.props.vehicle ? this.props.vehicle._id : ''} <br/>
               {this.props.vehicle ? this.props.vehicle.title : ''} <br/>
-              {this.props.vehicle ? this.props.vehicle.description : ''}
+              {this.props.vehicle ? this.props.vehicle.description : ''} <br/>
+              {this.props.vehicle ? this.props.vehicle.classification : ''}
+              {this.props.vehicle ? this.props.vehicle.registrationDate : ''}
             </div>
           </div>
         </div>

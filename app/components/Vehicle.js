@@ -1,19 +1,35 @@
 import React from 'react';
 import {Link} from 'react-router';
 import _ from "underscore";
+import InputFormRow from './common/InputFormRow.js';
+import TextareaFormRow from './common/TextareaFormRow.js';
+import ImageManager from './common/ImageManager.js';
 
 const resetState = {
   vehicle: {
     _id: null,
     title: "",
-    description: ""
+    description: "",
+    brand: "",
+    model: "",
+    classification: "",
+    features: "",
+    damages: "",
+    images: [],
+    powerOutputPs: "",
+    cubicCapacity: "",
+    transmission: "",
+    fuelType: "",
+    registrationDate: "",
+    odometerKm: ""
   },
   auctionItem: {
     _id: null,
     startAmount: "",
     incrementBy: "",
     vehicle: ""
-  }
+  },
+  files: null
 }
 
 class Vehicle extends React.Component {
@@ -35,13 +51,25 @@ class Vehicle extends React.Component {
     }
   }
 
-  onChangeTitle(e) {
-    this.setState({vehicle: _.extend(this.state.vehicle, { title: e.target.value})});
-   }
+  onChange(key, e) {
+    // uses computed property names (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Computed_property_names)
+    this.setState({[key]: e.target.value});
+  }
 
-  onChangeDescription(e) {
-    this.setState({vehicle: _.extend(this.state.vehicle, { description: e.target.value})});
-   }
+  onChangeTitle(e) { this.setState({vehicle: _.extend(this.state.vehicle, { title: e.target.value})}); }
+  onChangeDescription(e) { this.setState({vehicle: _.extend(this.state.vehicle, { description: e.target.value})}); }
+  onChangeBrand(e) { this.setState({vehicle: _.extend(this.state.vehicle, { brand: e.target.value})}); }
+  onChangeModel(e) { this.setState({vehicle: _.extend(this.state.vehicle, { model: e.target.value})}); }
+  onChangeClassification(e) { this.setState({vehicle: _.extend(this.state.vehicle, { classification: e.target.value})}); }
+  onChangeFeatures(e) { this.setState({vehicle: _.extend(this.state.vehicle, { features: e.target.value})}); }
+  onChangeDamages(e) { this.setState({vehicle: _.extend(this.state.vehicle, { damages: e.target.value})}); }
+  // pictures
+  onChangePowerOutputPs(e) { this.setState({vehicle: _.extend(this.state.vehicle, { powerOutputPs: e.target.value})}); }
+  onChangeCubicCapacity(e) { this.setState({vehicle: _.extend(this.state.vehicle, { cubicCapacity: e.target.value})}); }
+  onChangeTransmission(e) { this.setState({vehicle: _.extend(this.state.vehicle, { transmission: e.target.value})}); }
+  onChangeFuelType(e) { this.setState({vehicle: _.extend(this.state.vehicle, { fuelType: e.target.value})}); }
+  onChangeRegistrationDate(e) { this.setState({vehicle: _.extend(this.state.vehicle, { registrationDate: e.target.value})}); }
+  onChangeOdometerKm(e) { this.setState({vehicle: _.extend(this.state.vehicle, { odometerKm: e.target.value})}); }
 
   onChangeStartAmount(e) {
     this.setState({auctionItem: _.extend(this.state.auctionItem, { startAmount: e.target.value})});
@@ -83,6 +111,7 @@ class Vehicle extends React.Component {
     }).done((data) => {
       this.setState({vehicle: data.vehicle});
       if (data.auctionItem) this.setState({auctionItem: data.auctionItem});
+      this.setState({brand: data.vehicle.brand});
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
@@ -149,6 +178,7 @@ class Vehicle extends React.Component {
   }
 
   render() {
+
     return (
         <div className='container'>
           <div className='panel panel-default'>
@@ -161,20 +191,83 @@ class Vehicle extends React.Component {
                     <p className="form-control-static">{this.state.vehicle._id}</p>
                   </div>
                 </div>
-                <div className="form-group">
-                  <label className="col-sm-2 control-label">Title</label>
-                  <div className="col-sm-10">
-                    <input type='text' className='form-control' ref='titleTextField' value={this.state.vehicle.title}
-                        onChange={this.onChangeTitle.bind(this)} autoFocus/>
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="col-sm-2 control-label">Description</label>
-                  <div className="col-sm-10">
-                    <input type='text' className='form-control' ref='descriptionTextField' value={this.state.vehicle.description}
-                         onChange={this.onChangeDescription.bind(this)} autoFocus/>
-                  </div>
-                </div>
+
+                <InputFormRow
+                  label='Title'
+                  type='text'
+                  value={this.state.vehicle.title}
+                  onChange={this.onChangeTitle.bind(this)}/>
+
+                <TextareaFormRow
+                  label='Description'
+                  value={this.state.vehicle.description}
+                  onChange={this.onChangeDescription.bind(this)}/>
+
+              <InputFormRow
+                  label='Brand'
+                  type='text'
+                  value={this.state.vehicle.brand}
+                  onChange={this.onChangeBrand.bind(this)}/>
+
+                <InputFormRow
+                  label='Classification'
+                  type='text'
+                  value={this.state.vehicle.classification}
+                  onChange={this.onChangeClassification.bind(this)}/>
+
+                <InputFormRow
+                  label='Model'
+                  type='text'
+                  value={this.state.vehicle.model}
+                  onChange={this.onChangeModel.bind(this)}/>
+
+                <InputFormRow
+                  label='Transmission'
+                  type='text'
+                  value={this.state.vehicle.transmission}
+                  onChange={this.onChangeTransmission.bind(this)}/>
+
+                <InputFormRow
+                  label='Fuel type'
+                  type='text'
+                  value={this.state.vehicle.fuelType}
+                  onChange={this.onChangeFuelType.bind(this)}/>
+
+                <InputFormRow
+                  label='Power Output (PS)'
+                  type='number'
+                  value={this.state.vehicle.powerOutputPs}
+                  onChange={this.onChangePowerOutputPs.bind(this)}/>
+
+                <InputFormRow
+                  label='Cubic capacity'
+                  type='number'
+                  value={this.state.vehicle.cubicCapacity}
+                  onChange={this.onChangeCubicCapacity.bind(this)}/>
+
+                <InputFormRow
+                  label='Registration date'
+                  type='text'
+                  value={this.state.vehicle.registrationDate}
+                  onChange={this.onChangeRegistrationDate.bind(this)}/>
+
+                <InputFormRow
+                  label='Odometer (KM)'
+                  type='number'
+                  value={this.state.vehicle.odometerKm}
+                  onChange={this.onChangeOdometerKm.bind(this)}/>
+
+                <TextareaFormRow
+                  label='Features'
+                  value={this.state.vehicle.features}
+                  onChange={this.onChangeFeatures.bind(this)}/>
+
+                <TextareaFormRow
+                  label='Damages'
+                  value={this.state.vehicle.damages}
+                  onChange={this.onChangeDamages.bind(this)}/>
+
+                <ImageManager vehicleId={this.state.vehicle._id} images={this.state.vehicle.images}/>
 
                 <div className="panel panel-default">
                   <div className='panel-heading'>Auction Item</div>
@@ -208,15 +301,15 @@ class Vehicle extends React.Component {
                     {this.state.vehicle._id ?
                         (
                           <div>
-                            <button type='submit' className='btn btn-primary'>Save</button>
-                            <button className='btn btn-secondary' onClick={this.onClickDelete.bind(this)}>Delete</button>
+                            <button type='submit' className='btn btn-primary'>Save</button>&nbsp;
+                            <button className='btn btn-secondary' onClick={this.onClickDelete.bind(this)}>Delete</button>&nbsp;
                             <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
                           </div>
                         )
                       :
                         (
                           <div>
-                            <button type='submit' className='btn btn-primary'>Add</button>
+                            <button type='submit' className='btn btn-primary'>Add</button>&nbsp;
                             <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
                           </div>
                         )

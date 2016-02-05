@@ -48,7 +48,7 @@ var Auction = React.createClass({
       return (
         <div key={ai._id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {ai._id} - {ai.vehicle.title} - {ai.vehicle.classification} -
+            {ai._id} - {ai.vehicle.title} - {ai.vehicle.classification}
           </div>
         </div>
       );

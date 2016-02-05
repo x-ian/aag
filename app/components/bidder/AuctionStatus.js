@@ -24,15 +24,15 @@ class AuctionStatus extends React.Component {
                   case "NOT_OPEN":
                     return <div>Wait for auctioneer to open</div>;
                   case "NO_BIDS_YET":
-                    return <button className='btn btn-secondary' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid</button>;
                   case "WAITING_FOR_BIDS":
-                    return <button className='btn btn-secondary' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid</button>;
                   case "INCOMING_BID":
                     return <div>Please wait; processing bids</div>;
                   case "WAITING_FINAL_CALL":
-                    return <button className='btn btn-secondary' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid</button>;
                   case "WAITING_FINAL_CALL_EMPTY":
-                    return <button className='btn btn-secondary' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid</button>;
                   case "SOLD":
                     return '';
                   case "CLOSED_EMPTY":

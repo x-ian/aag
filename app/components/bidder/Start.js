@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router';
+import VehiclesViewShort from '../VehiclesViewShort.js';
 
 const resetState = {
   _id: null,
@@ -66,9 +67,15 @@ class Start extends React.Component {
     }
 
     return (
-      <div className='container'>
-        <br/><br/><br/><br/><br/>
-        {auction}
+      <div>
+        <div className='container'>
+          <br/><br/><br/>
+          {auction}
+          <br/><br/>
+        </div>
+        <div className='container'>
+          <VehiclesViewShort/>
+        </div>
       </div>
     );
   }
