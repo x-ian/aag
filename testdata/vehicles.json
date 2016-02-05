@@ -1,0 +1,80 @@
+{
+  "title": "Renault Clio",
+  "description": "Abnutzungserscheinungen gemaess Alter",
+  "brand": "Renault",
+  "classification": "Compact car",
+  "model": "Clio",
+    "transmission": "manual",
+    "fuelType": "gas",
+    "powerOutputPs": 65,
+    "cubicCapacityCcm": 1150,
+    "registrationDate": "01/2009",
+    "odometerKm": 62010,
+  "features": "Air condition",
+  "damages": "geringe Lackschaeden",
+  "images": [ ]
+}
+{
+  "title": "2012 BMW 328i",
+  "description": "",
+  "brand": "BMW",
+  "classification": "Sedan",
+  "model": "328i",
+    "transmission": "unknown",
+    "fuelType": "gas",
+    "powerOutputPs": 165,
+    "cubicCapacityCcm": 3800,
+    "registrationDate": "01/2012",
+    "odometerKm": 45000,
+  "features": "",
+  "damages": "",
+  "images": [ ]
+}
+{
+  "title": "Classical Datsun",
+  "description": "",
+  "brand": "Datsun",
+  "classification": "Coupe",
+  "model": "240z",
+    "transmission": "unknown",
+    "fuelType": "gas",
+    "powerOutputPs": 95,
+    "cubicCapacityCcm": 2200,
+    "registrationDate": "01/1973",
+    "odometerKm": 122000,
+  "features": "",
+  "damages": "",
+  "images": [ ]
+}
+{
+  "title": "Ford Super Duty F250",
+  "description": "",
+  "brand": "Ford",
+  "classification": "Pick-Up",
+  "model": "F250",
+    "transmission": "unknown",
+    "fuelType": "diesel",
+    "powerOutputPs": 165,
+    "cubicCapacity": 4800,
+    "registrationDate": "01/2003",
+    "odometerKm": 45000,
+  "features": "",
+  "damages": "",
+  "images": [ ]
+}
+{
+  "title": "Hyundai",
+  "description": "",
+  "brand": "Hyundai",
+  "classification": "Compact",
+  "model": "Tuscon",
+    "transmission": "manual",
+    "fuelType": "gas",
+    "powerOutputPs": 65,
+    "cubicCapacity": 1800,
+    "registrationDate": "01/2016",
+    "odometerKm": 400,
+  "features": "",
+  "damages": "",
+  "images": [ ]
+}
