@@ -43,13 +43,15 @@ class VehiclesViewShort extends React.Component {
       return (
         <div className="row" key={vehicle._id}>
           <div className="col-sm-3">
-            { vehicle.images[0] ?
-              (
-                <img src={vehicle.images[0]} style={{width: '150px'}}/>
-              ) : (
-                <img src='/img/no-image.png' style={{width: '150px'}}/>
-              )
-            }
+            <Link to={'/vehicles/view/' + vehicle._id}>
+              { vehicle.images[0] ?
+                (
+                  <img src={vehicle.images[0].thumbnail} style={{width: '150px'}}/>
+                ) : (
+                  <img src='/img/no-image.png' style={{width: '150px'}}/>
+                )
+              }
+            </Link>
           </div>
           <div className="col-sm-9">
             {vehicle.title}<br/>{vehicle.registrationDate}<br/>{vehicle.powerOutputPs} PS<br/>{vehicle.odometerKm} KM

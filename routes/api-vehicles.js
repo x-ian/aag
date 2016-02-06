@@ -163,11 +163,16 @@ module.exports = function (app) {
         fs.readFile(tempPath, (err, data) => {
           // make copy of image to new location
           fs.writeFile(copyToPath, data, (err) => {
+            var image = {
+              thumbnail: vehicleImagePathPublic + vehicleId + '/' + files[key][0].originalFilename,
+              original: vehicleImagePathPublic + vehicleId + '/' + files[key][0].originalFilename
+            }
+            console.log(image);
             // delete temp image
             fs.unlink(tempPath, () => {
               // res.send("Files uploaded to: " + copyToPath);
             });
-            Vehicle.findByIdAndUpdate(req.params.id, {$push: {"images": vehicleImagePathPublic + vehicleId + '/' + files[key][0].originalFilename}}).exec();
+            Vehicle.findByIdAndUpdate(req.params.id, {$push: {"images": image}}).exec();
           });
         });
       });

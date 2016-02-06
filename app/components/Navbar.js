@@ -69,8 +69,7 @@ class Navbar extends React.Component {
               <div className='tri'></div>
               <div className='tri invert'></div>
             </span>
-            auto-auction-germany.de
-            <br/><p style={{fontWeight: 'normal'}}><small><small><small>Vehicles from Germany. Anywhere. Anytime. Reliable.</small></small></small></p>
+            <img src="/img/aag.jpg"/>
           </Link>
         </div>
         <div id='navbar' className='navbar-collapse collapse'>

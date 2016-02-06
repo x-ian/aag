@@ -15,7 +15,7 @@ const resetState = {
     classification: "",
     features: "",
     damages: "",
-    images: [],
+    images: [{original: "", thumbnail: ""}],
     powerOutputPs: "",
     cubicCapacity: "",
     transmission: "",
@@ -32,7 +32,7 @@ const resetState = {
   files: null
 }
 
-class Vehicle extends React.Component {
+class VehicleEdit extends React.Component {
 
   constructor() {
     super();
@@ -111,7 +111,6 @@ class Vehicle extends React.Component {
     }).done((data) => {
       this.setState({vehicle: data.vehicle});
       if (data.auctionItem) this.setState({auctionItem: data.auctionItem});
-      this.setState({brand: data.vehicle.brand});
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
@@ -182,7 +181,7 @@ class Vehicle extends React.Component {
     return (
         <div className='container'>
           <div className='panel panel-default'>
-            <div className='panel-heading'>View/edit/add Vehicle</div>
+            <div className='panel-heading'>Edit/add Vehicle</div>
             <div className='panel-body'>
               <form onSubmit={this.handleSubmit.bind(this)} className='form-horizontal'>
                 <div className="form-group">
@@ -324,4 +323,4 @@ class Vehicle extends React.Component {
   }
 }
 
-export default Vehicle;
+export default VehicleEdit;

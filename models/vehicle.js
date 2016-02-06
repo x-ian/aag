@@ -18,7 +18,7 @@ var vehicleSchema = new mongoose.Schema({
   // },
   features: String,
   damages: String,
-  images: []
+  images: [ {original: String, thumbnail: String} ]
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);

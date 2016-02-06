@@ -4,7 +4,8 @@ import App from './components/App';
 import Home from './components/Home';
 
 import Vehicles from './components/Vehicles';
-import Vehicle from './components/Vehicle';
+import VehicleEdit from './components/VehicleEdit';
+import VehicleView from './components/VehicleView';
 import Auctions from './components/Auctions';
 import Auction from './components/Auction';
 
@@ -20,9 +21,10 @@ export default (
   <Route component={App}>
     <Route path='/' component={BidderStart} />
 
-    <Route path='/vehicles/new' component={Vehicle} />
-    <Route path='/vehicles/:id' component={Vehicle} />
+    <Route path='/vehicles/new' component={VehicleEdit} />
+    <Route path='/vehicles/:id' component={VehicleEdit} />
     <Route path='/vehicles' component={Vehicles} />
+    <Route path='/vehicles/view/:id' component={VehicleView} />
 
     <Route path='/auctions/new' component={Auction} />
     <Route path='/auctions/:id' component={Auction} />

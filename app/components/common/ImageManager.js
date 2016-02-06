@@ -22,7 +22,7 @@ class ImageManager extends React.Component {
   render() {
     let images = this.props.images.map((image, index) => {
       return (
-        <span key={index}><img src={image} style={{width: '150px'}}/>&nbsp;</span>
+        <span key={index}><img src={image.thumbnail} style={{width: '150px'}}/>&nbsp;</span>
       );
     });
 
