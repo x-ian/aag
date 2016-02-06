@@ -3,16 +3,16 @@ import {Link} from 'react-router';
 
 var Auction = React.createClass({
   getInitialState: function() {
-    return {upcomingAuctionItems: [], closedAuctionItems: []};
+    return {upcomingVehicles: [], closedAuctionItems: []};
   },
 
   componentDidMount: function() {
     $.ajax({
-      url: '/api/openauctionitems',
+      url: '/api/upcomingvehicles',
       dataType: 'json',
       cache: false,
       success: function(data) {
-        this.setState({upcomingAuctionItems: data});
+        this.setState({upcomingVehicles: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -33,13 +33,13 @@ var Auction = React.createClass({
   },
 
   render: function () {
-    let upcomingAuctionItemList = this.state.upcomingAuctionItems.map((ai, index) => {
+    let upcomingVehicleList = this.state.upcomingVehicles.map((sd, index) => {
       return (
-        <div key={ai._id} className='list-group-item animated fadeIn'>
+        <div key={sd._id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {ai._id} - {ai.vehicle.title} - {ai.vehicle.classification} -
+            {sd._id} - {sd.vehicle.title} - {sd.vehicle.classification} -
             <Link
-              to={'/promoter/auctionitem/' + ai._id + '?auctionId=' + this.props.params.id}>Activate</Link>
+              to={'/promoter/auctionitem?salesDocumentId=' + sd._id + '&auctionId=' + this.props.params.id}>Activate</Link>
           </div>
         </div>
       );
@@ -48,7 +48,7 @@ var Auction = React.createClass({
       return (
         <div key={ai._id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {ai._id} - {ai.vehicle.title} - {ai.vehicle.classification}
+            {ai._id} - {ai.salesDocument.vehicle.title} - {ai.salesDocument.vehicle.classification}
           </div>
         </div>
       );
@@ -58,7 +58,7 @@ var Auction = React.createClass({
       <div className='container'>
         <div className='list-group'>
           <div className='panel-heading'>Upcoming Auction Items</div>
-          {upcomingAuctionItemList}
+          {upcomingVehicleList}
 
           <div className='panel-heading'>Closed Auction Items</div>
           {closedAuctionItemList}

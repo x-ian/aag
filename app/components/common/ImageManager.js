@@ -20,11 +20,14 @@ class ImageManager extends React.Component {
   }
 
   render() {
-    let images = this.props.images.map((image, index) => {
-      return (
-        <span key={index}><img src={image.thumbnail} style={{width: '150px'}}/>&nbsp;</span>
-      );
-    });
+    let images = '';
+    if (this.props.images) {
+      images = this.props.images.map((image, index) => {
+        return (
+          <span key={index}><img src={image.thumbnail} style={{width: '150px'}}/>&nbsp;</span>
+        );
+      });
+    }
 
     return (
       <div className="form-group">

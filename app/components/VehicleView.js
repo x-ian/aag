@@ -15,7 +15,7 @@ const resetState = {
     damages: "",
     images: [{original: "", thumbnail: ""}],
     powerOutputPs: "",
-    cubicCapacity: "",
+    cubicCapacityCcm: "",
     transmission: "",
     fuelType: "",
     registrationDate: "",
@@ -92,12 +92,19 @@ class VehicleView extends React.Component {
             <div className='panel-body'>
               <div className="row">
                 <div className="col-sm-6">
-                  <ImageGallery
-                    items={this.state.vehicle.images}
-                    autoPlay={true}
-                    slideInterval={5000}
-                    onSlide={this.handleSlide}
-                  />
+                  { this.state.vehicle.images && this.state.vehicle.images[0] ?
+                    (
+
+                      <ImageGallery
+                        items={this.state.vehicle.images}
+                        autoPlay={true}
+                        slideInterval={5000}
+                        onSlide={this.handleSlide}
+                      />
+                    ) : (
+                      <img src='/img/no-image.png' style={{width: '300px'}}/>
+                    )
+                  }
                 </div>
                 <div className="col-sm-6">
                   {this.state.vehicle.title}<br/>
@@ -115,7 +122,7 @@ class VehicleView extends React.Component {
                   {this.state.vehicle.model}<br/>
                   {this.state.vehicle.transmission}<br/>
                   {this.state.vehicle.fuelType}<br/>
-                  {this.state.vehicle.cubicCapacity}
+                {this.state.vehicle.cubicCapacityCcm}
                 </div>
               </div>
               <div className="row">

@@ -1133,19 +1133,22 @@ var resetState = {
     damages: "",
     images: [{ original: "", thumbnail: "" }],
     powerOutputPs: "",
-    cubicCapacity: "",
+    cubicCapacityCcm: "",
     transmission: "",
     fuelType: "",
     registrationDate: "",
     odometerKm: ""
   },
-  auctionItem: {
+
+  salesDocument: {
     _id: null,
-    startAmount: "",
-    incrementBy: "",
-    vehicle: ""
-  },
-  files: null
+    buyNowAmount: "",
+    auctionStartAmount: "",
+    auctionIncrement: "",
+    auctionExpectedAmount: "",
+    status: "",
+    auctionItem: ""
+  }
 };
 
 var VehicleEdit = function (_React$Component) {
@@ -1215,17 +1218,15 @@ var VehicleEdit = function (_React$Component) {
     value: function onChangeDamages(e) {
       this.setState({ vehicle: _underscore2.default.extend(this.state.vehicle, { damages: e.target.value }) });
     }
-    // pictures
-
   }, {
     key: 'onChangePowerOutputPs',
     value: function onChangePowerOutputPs(e) {
       this.setState({ vehicle: _underscore2.default.extend(this.state.vehicle, { powerOutputPs: e.target.value }) });
     }
   }, {
-    key: 'onChangeCubicCapacity',
-    value: function onChangeCubicCapacity(e) {
-      this.setState({ vehicle: _underscore2.default.extend(this.state.vehicle, { cubicCapacity: e.target.value }) });
+    key: 'onChangeCubicCapacityCcm',
+    value: function onChangeCubicCapacityCcm(e) {
+      this.setState({ vehicle: _underscore2.default.extend(this.state.vehicle, { cubicCapacityCcm: e.target.value }) });
     }
   }, {
     key: 'onChangeTransmission',
@@ -1248,14 +1249,24 @@ var VehicleEdit = function (_React$Component) {
       this.setState({ vehicle: _underscore2.default.extend(this.state.vehicle, { odometerKm: e.target.value }) });
     }
   }, {
-    key: 'onChangeStartAmount',
-    value: function onChangeStartAmount(e) {
-      this.setState({ auctionItem: _underscore2.default.extend(this.state.auctionItem, { startAmount: e.target.value }) });
+    key: 'onChangeBuyNowAmount',
+    value: function onChangeBuyNowAmount(e) {
+      this.setState({ salesDocument: _underscore2.default.extend(this.state.salesDocument, { buyNowAmount: e.target.value }) });
     }
   }, {
-    key: 'onChangeIncrementBy',
-    value: function onChangeIncrementBy(e) {
-      this.setState({ auctionItem: _underscore2.default.extend(this.state.auctionItem, { incrementBy: e.target.value }) });
+    key: 'onChangeAuctionStartAmount',
+    value: function onChangeAuctionStartAmount(e) {
+      this.setState({ salesDocument: _underscore2.default.extend(this.state.salesDocument, { auctionStartAmount: e.target.value }) });
+    }
+  }, {
+    key: 'onChangeAuctionIncrement',
+    value: function onChangeAuctionIncrement(e) {
+      this.setState({ salesDocument: _underscore2.default.extend(this.state.salesDocument, { auctionIncrement: e.target.value }) });
+    }
+  }, {
+    key: 'onChangeAuctionExpectedAmount',
+    value: function onChangeAuctionExpectedAmount(e) {
+      this.setState({ salesDocument: _underscore2.default.extend(this.state.salesDocument, { auctionExpectedAmount: e.target.value }) });
     }
   }, {
     key: 'onClickDelete',
@@ -1296,14 +1307,14 @@ var VehicleEdit = function (_React$Component) {
         dataType: 'json'
       }).done(function (data) {
         _this3.setState({ vehicle: data.vehicle });
-        if (data.auctionItem) _this3.setState({ auctionItem: data.auctionItem });
+        if (data.salesDocument) _this3.setState({ salesDocument: data.salesDocument });
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
     key: 'addVehicle',
-    value: function addVehicle(vehicle, auctionItem) {
+    value: function addVehicle(vehicle, salesDocument) {
       var _this4 = this;
 
       $.ajax({
@@ -1312,7 +1323,7 @@ var VehicleEdit = function (_React$Component) {
         type: 'POST',
         data: {
           vehicle: vehicle,
-          auctionItem: auctionItem
+          salesDocument: salesDocument
         }
       }).done(function (data) {
         // doesnt seem right, but dont know how else to get back to the list after successful add
@@ -1326,7 +1337,7 @@ var VehicleEdit = function (_React$Component) {
     }
   }, {
     key: 'updateVehicle',
-    value: function updateVehicle(vehicle, auctionItem) {
+    value: function updateVehicle(vehicle, salesDocument) {
       var _this5 = this;
 
       $.ajax({
@@ -1335,7 +1346,7 @@ var VehicleEdit = function (_React$Component) {
         type: 'PUT',
         data: {
           vehicle: vehicle,
-          auctionItem: auctionItem
+          salesDocument: salesDocument
         }
       }).done(function (data) {
         // doesnt seem right, but dont know how else to get back to the list after successful add
@@ -1362,9 +1373,9 @@ var VehicleEdit = function (_React$Component) {
 
       if (title) {
         if (this.state.vehicle._id) {
-          this.updateVehicle(this.state.vehicle, this.state.auctionItem);
+          this.updateVehicle(this.state.vehicle, this.state.salesDocument);
         } else {
-          this.addVehicle(this.state.vehicle, this.state.auctionItem);
+          this.addVehicle(this.state.vehicle, this.state.salesDocument);
         }
       }
     }
@@ -1449,8 +1460,8 @@ var VehicleEdit = function (_React$Component) {
               _react2.default.createElement(_InputFormRow2.default, {
                 label: 'Cubic capacity',
                 type: 'number',
-                value: this.state.vehicle.cubicCapacity,
-                onChange: this.onChangeCubicCapacity.bind(this) }),
+                value: this.state.vehicle.cubicCapacityCcm,
+                onChange: this.onChangeCubicCapacityCcm.bind(this) }),
               _react2.default.createElement(_InputFormRow2.default, {
                 label: 'Registration date',
                 type: 'text',
@@ -1476,18 +1487,38 @@ var VehicleEdit = function (_React$Component) {
                 _react2.default.createElement(
                   'div',
                   { className: 'panel-heading' },
-                  'Auction Item'
+                  'Sales document'
                 ),
                 _react2.default.createElement(
                   'div',
                   { className: 'panel-body' },
+                  _react2.default.createElement(_InputFormRow2.default, {
+                    label: 'Buy Now Amount',
+                    type: 'number',
+                    value: this.state.salesDocument.buyNowAmount,
+                    onChange: this.onChangeBuyNowAmount.bind(this) }),
+                  _react2.default.createElement(_InputFormRow2.default, {
+                    label: 'Start amount',
+                    type: 'number',
+                    value: this.state.salesDocument.auctionStartAmount,
+                    onChange: this.onChangeAuctionStartAmount.bind(this) }),
+                  _react2.default.createElement(_InputFormRow2.default, {
+                    label: 'Increment by',
+                    type: 'number',
+                    value: this.state.salesDocument.auctionIncrement,
+                    onChange: this.onChangeAuctionIncrement.bind(this) }),
+                  _react2.default.createElement(_InputFormRow2.default, {
+                    label: 'Minimum expected amount',
+                    type: 'number',
+                    value: this.state.salesDocument.auctionExpectedAmount,
+                    onChange: this.onChangeAuctionExpectedAmount.bind(this) }),
                   _react2.default.createElement(
                     'div',
                     { className: 'form-group' },
                     _react2.default.createElement(
                       'label',
                       { className: 'col-sm-2 control-label' },
-                      'ID'
+                      'Status'
                     ),
                     _react2.default.createElement(
                       'div',
@@ -1495,38 +1526,8 @@ var VehicleEdit = function (_React$Component) {
                       _react2.default.createElement(
                         'p',
                         { className: 'form-control-static' },
-                        this.state.auctionItem._id
+                        this.state.salesDocument._id
                       )
-                    )
-                  ),
-                  _react2.default.createElement(
-                    'div',
-                    { className: 'form-group' },
-                    _react2.default.createElement(
-                      'label',
-                      { className: 'col-sm-2 control-label' },
-                      'Start amount'
-                    ),
-                    _react2.default.createElement(
-                      'div',
-                      { className: 'col-sm-10' },
-                      _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'startAmountTextField', value: this.state.auctionItem.startAmount,
-                        onChange: this.onChangeStartAmount.bind(this), autoFocus: true })
-                    )
-                  ),
-                  _react2.default.createElement(
-                    'div',
-                    { className: 'form-group' },
-                    _react2.default.createElement(
-                      'label',
-                      { className: 'col-sm-2 control-label' },
-                      'Increment by'
-                    ),
-                    _react2.default.createElement(
-                      'div',
-                      { className: 'col-sm-10' },
-                      _react2.default.createElement('input', { type: 'text', className: 'form-control', ref: 'incrementByTextField', value: this.state.auctionItem.incrementBy,
-                        onChange: this.onChangeIncrementBy.bind(this), autoFocus: true })
                     )
                   )
                 )
@@ -1627,7 +1628,7 @@ var resetState = {
     damages: "",
     images: [{ original: "", thumbnail: "" }],
     powerOutputPs: "",
-    cubicCapacity: "",
+    cubicCapacityCcm: "",
     transmission: "",
     fuelType: "",
     registrationDate: "",
@@ -1733,12 +1734,12 @@ var VehicleView = function (_React$Component) {
               _react2.default.createElement(
                 'div',
                 { className: 'col-sm-6' },
-                _react2.default.createElement(ImageGallery, {
+                this.state.vehicle.images && this.state.vehicle.images[0] ? _react2.default.createElement(ImageGallery, {
                   items: this.state.vehicle.images,
                   autoPlay: true,
                   slideInterval: 5000,
                   onSlide: this.handleSlide
-                })
+                }) : _react2.default.createElement('img', { src: '/img/no-image.png', style: { width: '300px' } })
               ),
               _react2.default.createElement(
                 'div',
@@ -1777,7 +1778,7 @@ var VehicleView = function (_React$Component) {
                 _react2.default.createElement('br', null),
                 this.state.vehicle.fuelType,
                 _react2.default.createElement('br', null),
-                this.state.vehicle.cubicCapacity
+                this.state.vehicle.cubicCapacityCcm
               )
             ),
             _react2.default.createElement(
@@ -1995,7 +1996,7 @@ var VehiclesViewShort = function (_React$Component) {
             _react2.default.createElement(
               _reactRouter.Link,
               { to: '/vehicles/view/' + vehicle._id },
-              vehicle.images[0] ? _react2.default.createElement('img', { src: vehicle.images[0].thumbnail, style: { width: '150px' } }) : _react2.default.createElement('img', { src: '/img/no-image.png', style: { width: '150px' } })
+              vehicle.images && vehicle.images[0] ? _react2.default.createElement('img', { src: vehicle.images[0].thumbnail, style: { width: '150px' } }) : _react2.default.createElement('img', { src: '/img/no-image.png', style: { width: '150px' } })
             )
           ),
           _react2.default.createElement(
@@ -2067,10 +2068,15 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var socket;
+
 var resetState = {
-  currentAuctionItem: null,
   auction: null,
-  socket: null
+  auctionItem: null,
+  salesDocument: null,
+  vehicle: null,
+  recentBids: [],
+  participants: []
 };
 
 var Auction = function (_React$Component) {
@@ -2088,48 +2094,89 @@ var Auction = function (_React$Component) {
   _createClass(Auction, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      // let socket = io.connect();
-      // this.setState({socket: socket});
-      this.getAuction(this.props.params.id);
-    }
-  }, {
-    key: 'getAuction',
-    value: function getAuction(id) {
       var _this2 = this;
 
+      socket = io.connect();
+
+      this.getCurrentAuction();
+      socket.on('auctionAction', function (data) {
+        console.log('IO AuctionItem status ' + data);
+        _this2.setState({ auctionItem: data['auctionItem'] });
+        _this2.setState({ recentBids: data['recentBids'] });
+      });
+      socket.on('participants', function (data) {
+        console.log('IO participants ' + data);
+        _this2.setState({ participants: data });
+      });
+      socket.on('newAuctionItem', function (data) {
+        console.log('IO newAuctionItem ' + data);
+        _this2.setState({ vehicle: data['vehicle'] });
+        _this2.setState({ auctionItem: data['auctionItem'] });
+        _this2.setState({ recentBids: null });
+      });
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      socket.removeListener('auctionAction');
+      socket.removeListener('participants');
+      socket.removeListener('newAuctionItem');
+      // socket.close();
+    }
+  }, {
+    key: 'getCurrentAuction',
+    value: function getCurrentAuction(id) {
+      var _this3 = this;
+
       $.ajax({
-        url: '/api/auctions/' + id,
+        url: '/api/currentauction',
         type: 'GET',
         dataType: 'json'
       }).done(function (data) {
-        _this2.setState({ auction: data });
-        _this2.getCurrentAuctionItem();
+        _this3.setState({ auction: data });
+        _this3.getCurrentAuctionItem(_this3.state.auction._id);
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
     key: 'getCurrentAuctionItem',
-    value: function getCurrentAuctionItem() {
-      var _this3 = this;
+    value: function getCurrentAuctionItem(auctionId) {
+      var _this4 = this;
 
       $.ajax({
-        url: '/api/currentauctionitem',
+        url: '/api/currentauctionitem?auctionId=' + auctionId,
         type: 'GET',
         dataType: 'json'
       }).done(function (data) {
-        _this3.setState({ currentAuctionItem: data });
+        _this4.setState({ auctionItem: data.auctionItem });
+        _this4.setState({ vehicle: data.vehicle });
+        _this4.setState({ salesDocument: data.salesDocument });
       }).fail(function (jqXhr) {
+        console.log('ERROR: ' + jqXhr);
+      });
+    }
+  }, {
+    key: 'getVehicle',
+    value: function getVehicle(id) {
+      $.ajax({
+        url: '/api/vehiclesfull/' + id,
+        dataType: 'json'
+      }).done(function (data) {}).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
     }
   }, {
     key: 'render',
     value: function render() {
+      var auction = 'No active auction';
+      if (this.state.auction && !this.state.auctionItem) auction = 'Active auction, but waiting for next AuctionItem';
+      if (this.state.auctionItem) auction = _react2.default.createElement(_AuctionItem2.default, { auctionItem: this.state.auctionItem, vehicle: this.state.vehicle, participants: this.state.participants, recentBids: this.state.recentBids });
+
       return _react2.default.createElement(
         'div',
         null,
-        this.state.currentAuctionItem ? _react2.default.createElement(_AuctionItem2.default, { id: this.state.currentAuctionItem._id, socket: this.props.socket }) : 'nothing active'
+        auction
       );
     }
   }]);
@@ -2202,23 +2249,7 @@ var AuctionItem = function (_React$Component) {
 
   _createClass(AuctionItem, [{
     key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _this2 = this;
-
-      this.getAuctionItem(this.props.id);
-      this.getParticipants();
-      var socket = io.connect();
-      socket.on('auctionAction', function (data) {
-        // this.props.socket.on('auctionAction', (data) => {
-        console.log('IO AuctionItem status ' + _this2.state.auctionItem.status);
-        _this2.setState({ auctionItem: data['auctionItem'] });
-        _this2.setState({ recentBids: data['recentBids'] });
-      });
-      socket.on('participants', function (data) {
-        // this.props.socket.on('participants', (data) => {
-        _this2.setState({ participants: data });
-      });
-    }
+    value: function componentDidMount() {}
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
@@ -2227,79 +2258,20 @@ var AuctionItem = function (_React$Component) {
       // this.props.socket.removeListener('participants');
     }
   }, {
-    key: 'getVehicle',
-    value: function getVehicle(id) {
-      var _this3 = this;
-
-      $.ajax({
-        url: '/api/vehicles/' + id,
-        dataType: 'json'
-      }).done(function (data) {
-        _this3.setState({ vehicle: data });
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
-    }
-  }, {
-    key: 'getRecentBids',
-    value: function getRecentBids(auctionItemId) {
-      var _this4 = this;
-
-      $.ajax({
-        url: '/api/recentBids/' + auctionItemId,
-        dataType: 'json'
-      }).done(function (data) {
-        _this4.setState({ recentBids: data });
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
-    }
-  }, {
-    key: 'getParticipants',
-    value: function getParticipants() {
-      var _this5 = this;
-
-      $.ajax({
-        url: '/api/participants',
-        dataType: 'json'
-      }).done(function (data) {
-        _this5.setState({ participants: data });
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
-    }
-  }, {
-    key: 'getAuctionItem',
-    value: function getAuctionItem(id) {
-      var _this6 = this;
-
-      $.ajax({
-        url: '/api/auctionitems/' + id,
-        type: 'GET',
-        dataType: 'json'
-      }).done(function (data) {
-        _this6.setState({ auctionItem: data });
-        _this6.getVehicle(_this6.state.auctionItem.vehicle);
-        _this6.getRecentBids(_this6.state.auctionItem._id);
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
-    }
-  }, {
     key: 'updateAfterAction',
     value: function updateAfterAction(ai, button) {
-      var _this7 = this;
+      var _this2 = this;
 
       event.preventDefault();
       $.ajax({
-        url: '/api/bidderaction/' + this.state.auctionItem._id,
+        url: '/api/bidderaction/' + this.props.auctionItem._id,
         dataType: 'json',
         type: 'POST',
         data: {
           action: button
         }
       }).done(function (data) {
-        _this7.setState(data);
+        _this2.setState(data);
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
@@ -2316,12 +2288,12 @@ var AuctionItem = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'col-sm-6' },
-            this.state.vehicle ? _react2.default.createElement(_VehicleDetails2.default, { vehicle: this.state.vehicle }) : ''
+            this.props.vehicle ? _react2.default.createElement(_VehicleDetails2.default, { vehicle: this.props.vehicle }) : ''
           ),
           _react2.default.createElement(
             'div',
             { className: 'col-sm-6' },
-            this.state.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { status: this.state.auctionItem.status, updateAfterAction: this.updateAfterAction.bind(this) }) : ''
+            this.props.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { status: this.props.auctionItem.status, updateAfterAction: this.updateAfterAction.bind(this) }) : ''
           )
         ),
         _react2.default.createElement(
@@ -2330,12 +2302,12 @@ var AuctionItem = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'col-sm-6' },
-            this.state.recentBids ? _react2.default.createElement(_BidHistory2.default, { bids: this.state.recentBids }) : ''
+            this.props.recentBids ? _react2.default.createElement(_BidHistory2.default, { bids: this.props.recentBids }) : ''
           ),
           _react2.default.createElement(
             'div',
             { className: 'col-sm-6' },
-            this.state.participants ? _react2.default.createElement(_Participants2.default, { participants: this.state.participants }) : ''
+            this.props.participants ? _react2.default.createElement(_Participants2.default, { participants: this.props.participants }) : ''
           )
         )
       );
@@ -2700,7 +2672,7 @@ var Start = function (_React$Component) {
     key: 'onClickJoin',
     value: function onClickJoin(event) {
       event.preventDefault();
-      this.props.history.pushState(null, '/bidder/auction/' + this.state._id);
+      this.props.history.pushState(null, '/bidder/auction');
     }
   }, {
     key: 'render',
@@ -2907,14 +2879,17 @@ var ImageManager = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var images = this.props.images.map(function (image, index) {
-        return _react2.default.createElement(
-          'span',
-          { key: index },
-          _react2.default.createElement('img', { src: image.thumbnail, style: { width: '150px' } }),
-          ' '
-        );
-      });
+      var images = '';
+      if (this.props.images) {
+        images = this.props.images.map(function (image, index) {
+          return _react2.default.createElement(
+            'span',
+            { key: index },
+            _react2.default.createElement('img', { src: image.thumbnail, style: { width: '150px' } }),
+            ' '
+          );
+        });
+      }
 
       return _react2.default.createElement(
         'div',
@@ -3112,16 +3087,16 @@ var Auction = _react2.default.createClass({
   displayName: 'Auction',
 
   getInitialState: function getInitialState() {
-    return { upcomingAuctionItems: [], closedAuctionItems: [] };
+    return { upcomingVehicles: [], closedAuctionItems: [] };
   },
 
   componentDidMount: function componentDidMount() {
     $.ajax({
-      url: '/api/openauctionitems',
+      url: '/api/upcomingvehicles',
       dataType: 'json',
       cache: false,
       success: function (data) {
-        this.setState({ upcomingAuctionItems: data });
+        this.setState({ upcomingVehicles: data });
       }.bind(this),
       error: function (xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -3143,23 +3118,23 @@ var Auction = _react2.default.createClass({
   render: function render() {
     var _this = this;
 
-    var upcomingAuctionItemList = this.state.upcomingAuctionItems.map(function (ai, index) {
+    var upcomingVehicleList = this.state.upcomingVehicles.map(function (sd, index) {
       return _react2.default.createElement(
         'div',
-        { key: ai._id, className: 'list-group-item animated fadeIn' },
+        { key: sd._id, className: 'list-group-item animated fadeIn' },
         _react2.default.createElement(
           'div',
           { className: 'media' },
-          ai._id,
+          sd._id,
           ' - ',
-          ai.vehicle.title,
+          sd.vehicle.title,
           ' - ',
-          ai.vehicle.classification,
+          sd.vehicle.classification,
           ' -',
           _react2.default.createElement(
             _reactRouter.Link,
             {
-              to: '/promoter/auctionitem/' + ai._id + '?auctionId=' + _this.props.params.id },
+              to: '/promoter/auctionitem?salesDocumentId=' + sd._id + '&auctionId=' + _this.props.params.id },
             'Activate'
           )
         )
@@ -3174,9 +3149,9 @@ var Auction = _react2.default.createClass({
           { className: 'media' },
           ai._id,
           ' - ',
-          ai.vehicle.title,
+          ai.salesDocument.vehicle.title,
           ' - ',
-          ai.vehicle.classification
+          ai.salesDocument.vehicle.classification
         )
       );
     });
@@ -3192,7 +3167,7 @@ var Auction = _react2.default.createClass({
           { className: 'panel-heading' },
           'Upcoming Auction Items'
         ),
-        upcomingAuctionItemList,
+        upcomingVehicleList,
         _react2.default.createElement(
           'div',
           { className: 'panel-heading' },
@@ -3249,6 +3224,7 @@ var resetState = {
   auctionItem: null,
   vehicle: null,
   auction: null,
+  salesDocument: null,
   participants: [],
   recentBids: [],
   currentBidId: null,
@@ -3273,8 +3249,8 @@ var AuctionItem = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      if (this.props.params.id) {
-        this.activateAuctionItem(this.props.params.id, this.props.location.query.auctionId);
+      if (this.props.location.query.salesDocumentId && this.props.location.query.auctionId) {
+        this.activateAuctionItem(this.props.location.query.salesDocumentId, this.props.location.query.auctionId);
       };
 
       var socket = io.connect();
@@ -3291,47 +3267,19 @@ var AuctionItem = function (_React$Component) {
       });
     }
   }, {
-    key: 'getVehicle',
-    value: function getVehicle(id) {
+    key: 'activateAuctionItem',
+    value: function activateAuctionItem(salesDocumentId, auctionId) {
       var _this3 = this;
 
       $.ajax({
-        url: '/api/vehicles/' + id,
-        dataType: 'json'
-      }).done(function (data) {
-        _this3.setState({ vehicle: data });
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
-    }
-  }, {
-    key: 'getRecentBids',
-    value: function getRecentBids(auctionItemId) {
-      var _this4 = this;
-
-      $.ajax({
-        url: '/api/recentBids/' + auctionItemId,
-        dataType: 'json'
-      }).done(function (data) {
-        _this4.setState({ recentBids: data });
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
-    }
-  }, {
-    key: 'activateAuctionItem',
-    value: function activateAuctionItem(auctionItemId, auctionId) {
-      var _this5 = this;
-
-      $.ajax({
-        url: '/api/activateauctionitem/' + auctionItemId + '?auctionId=' + auctionId,
+        url: '/api/activateauctionitem?salesDocumentId=' + salesDocumentId + '&auctionId=' + auctionId,
         type: 'POST',
         dataType: 'json'
       }).done(function (data) {
         console.log(data);
-        _this5.setState({ auctionItem: data });
-        _this5.getVehicle(_this5.state.auctionItem.vehicle);
-        _this5.getRecentBids(_this5.state.auctionItem._id);
+        _this3.setState({ auctionItem: data['auctionItem'] });
+        _this3.setState({ recentBids: data['recentBids'] });
+        _this3.setState({ vehicle: data['vehicle'] });
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
@@ -3339,7 +3287,7 @@ var AuctionItem = function (_React$Component) {
   }, {
     key: 'updateAfterAction',
     value: function updateAfterAction(ai, button) {
-      var _this6 = this;
+      var _this4 = this;
 
       event.preventDefault();
       $.ajax({
@@ -3351,10 +3299,16 @@ var AuctionItem = function (_React$Component) {
           currentBidId: this.state.currentBidId
         }
       }).done(function (data) {
-        _this6.setState(data);
+        _this4.setState(data);
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
+      if (button === 'SELL' || button === 'CLOSE') {
+        console.log('JAAAAAA');
+        setTimeout(function () {
+          this.props.history.pushState(null, '/promoter/auctions/' + this.props.location.query.auctionId);
+        }.bind(this), 1000);
+      }
     }
   }, {
     key: 'render',
@@ -3975,9 +3929,9 @@ exports.default = _react2.default.createElement(
   _react2.default.createElement(_reactRouter.Route, { path: '/promoter/auctions', component: _Auctions4.default }),
   _react2.default.createElement(_reactRouter.Route, { path: '/promoter/auctions/:id', component: _Auction4.default }),
   _react2.default.createElement(_reactRouter.Route, { path: '/promoter/vehicles/:id', component: _Vehicle2.default }),
-  _react2.default.createElement(_reactRouter.Route, { path: '/promoter/auctionitem/:id', component: _AuctionItem2.default }),
+  _react2.default.createElement(_reactRouter.Route, { path: '/promoter/auctionitem', component: _AuctionItem2.default }),
   _react2.default.createElement(_reactRouter.Route, { path: '/bidder/start', component: _Start2.default }),
-  _react2.default.createElement(_reactRouter.Route, { path: '/bidder/auction/:id', component: _Auction6.default })
+  _react2.default.createElement(_reactRouter.Route, { path: '/bidder/auction', component: _Auction6.default })
 );
 
 },{"./components/App":3,"./components/Auction":4,"./components/Auctions":5,"./components/Home":7,"./components/VehicleEdit":9,"./components/VehicleView":10,"./components/Vehicles":11,"./components/bidder/Auction":13,"./components/bidder/Start":18,"./components/promoter/Auction":23,"./components/promoter/AuctionItem":24,"./components/promoter/Auctions":25,"./components/promoter/Vehicle":27,"react":"react","react-router":"react-router"}],31:[function(require,module,exports){

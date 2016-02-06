@@ -23,19 +23,6 @@ class AuctionItem extends React.Component {
   }
 
   componentDidMount() {
-    this.getAuctionItem(this.props.id);
-    this.getParticipants();
-    let socket = io.connect();
-    socket.on('auctionAction', (data) => {
-    // this.props.socket.on('auctionAction', (data) => {
-      console.log('IO AuctionItem status ' + this.state.auctionItem.status);
-      this.setState({auctionItem: data['auctionItem'] });
-      this.setState({recentBids: data['recentBids'] });
-    });
-    socket.on('participants', (data) => {
-    // this.props.socket.on('participants', (data) => {
-      this.setState({participants: data });
-    });
   }
 
   componentWillUnmount() {
@@ -44,57 +31,10 @@ class AuctionItem extends React.Component {
     // this.props.socket.removeListener('participants');
   }
 
-  getVehicle(id) {
-    $.ajax({
-      url: '/api/vehicles/' + id,
-      dataType: 'json'
-    }).done((data) => {
-        this.setState({vehicle: data});
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
-  }
-
-  getRecentBids(auctionItemId) {
-    $.ajax({
-      url: '/api/recentBids/' + auctionItemId,
-      dataType: 'json'
-    }).done((data) => {
-        this.setState({recentBids: data});
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
-  }
-
-  getParticipants() {
-    $.ajax({
-      url: '/api/participants',
-      dataType: 'json'
-    }).done((data) => {
-      this.setState({participants: data});
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
-  }
-
-  getAuctionItem(id) {
-    $.ajax({
-      url: '/api/auctionitems/' + id,
-      type: 'GET',
-      dataType: 'json'
-    }).done((data) => {
-      this.setState({auctionItem: data});
-      this.getVehicle(this.state.auctionItem.vehicle);
-      this.getRecentBids(this.state.auctionItem._id);
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
-  }
-
   updateAfterAction(ai, button) {
       event.preventDefault();
       $.ajax({
-        url: '/api/bidderaction/' + this.state.auctionItem._id,
+        url: '/api/bidderaction/' + this.props.auctionItem._id,
         dataType: 'json',
         type: 'POST',
         data: {
@@ -112,18 +52,18 @@ class AuctionItem extends React.Component {
       <div className='container-fluid'>
         <div className='row'>
            <div className='col-sm-6'>
-             { this.state.vehicle ? <VehicleDetails vehicle={this.state.vehicle}/> : '' }
+             { this.props.vehicle ? <VehicleDetails vehicle={this.props.vehicle}/> : '' }
            </div>
            <div className='col-sm-6'>
-             { this.state.auctionItem ? <AuctionStatus status={this.state.auctionItem.status} updateAfterAction={this.updateAfterAction.bind(this)}/> : '' }
+             { this.props.auctionItem ? <AuctionStatus status={this.props.auctionItem.status} updateAfterAction={this.updateAfterAction.bind(this)}/> : '' }
            </div>
          </div>
          <div className='row'>
             <div className='col-sm-6'>
-              { this.state.recentBids ? <BidHistory bids={this.state.recentBids}/> : '' }
+              { this.props.recentBids ? <BidHistory bids={this.props.recentBids}/> : '' }
             </div>
             <div className='col-sm-6'>
-              { this.state.participants ? <Participants participants={this.state.participants}/> : '' }
+              { this.props.participants ? <Participants participants={this.props.participants}/> : '' }
             </div>
           </div>
       </div>

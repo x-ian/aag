@@ -17,19 +17,22 @@ const resetState = {
     damages: "",
     images: [{original: "", thumbnail: ""}],
     powerOutputPs: "",
-    cubicCapacity: "",
+    cubicCapacityCcm: "",
     transmission: "",
     fuelType: "",
     registrationDate: "",
     odometerKm: ""
   },
-  auctionItem: {
+
+  salesDocument: {
     _id: null,
-    startAmount: "",
-    incrementBy: "",
-    vehicle: ""
-  },
-  files: null
+    buyNowAmount: "",
+    auctionStartAmount: "",
+    auctionIncrement: "",
+    auctionExpectedAmount: "",
+    status: "",
+    auctionItem: ""
+  }
 }
 
 class VehicleEdit extends React.Component {
@@ -63,21 +66,17 @@ class VehicleEdit extends React.Component {
   onChangeClassification(e) { this.setState({vehicle: _.extend(this.state.vehicle, { classification: e.target.value})}); }
   onChangeFeatures(e) { this.setState({vehicle: _.extend(this.state.vehicle, { features: e.target.value})}); }
   onChangeDamages(e) { this.setState({vehicle: _.extend(this.state.vehicle, { damages: e.target.value})}); }
-  // pictures
   onChangePowerOutputPs(e) { this.setState({vehicle: _.extend(this.state.vehicle, { powerOutputPs: e.target.value})}); }
-  onChangeCubicCapacity(e) { this.setState({vehicle: _.extend(this.state.vehicle, { cubicCapacity: e.target.value})}); }
+  onChangeCubicCapacityCcm(e) { this.setState({vehicle: _.extend(this.state.vehicle, { cubicCapacityCcm: e.target.value})}); }
   onChangeTransmission(e) { this.setState({vehicle: _.extend(this.state.vehicle, { transmission: e.target.value})}); }
   onChangeFuelType(e) { this.setState({vehicle: _.extend(this.state.vehicle, { fuelType: e.target.value})}); }
   onChangeRegistrationDate(e) { this.setState({vehicle: _.extend(this.state.vehicle, { registrationDate: e.target.value})}); }
   onChangeOdometerKm(e) { this.setState({vehicle: _.extend(this.state.vehicle, { odometerKm: e.target.value})}); }
 
-  onChangeStartAmount(e) {
-    this.setState({auctionItem: _.extend(this.state.auctionItem, { startAmount: e.target.value})});
- }
-
-  onChangeIncrementBy(e) {
-    this.setState({auctionItem: _.extend(this.state.auctionItem, { incrementBy: e.target.value})});
-  }
+  onChangeBuyNowAmount(e) { this.setState({salesDocument: _.extend(this.state.salesDocument, { buyNowAmount: e.target.value})}); }
+  onChangeAuctionStartAmount(e) { this.setState({salesDocument: _.extend(this.state.salesDocument, { auctionStartAmount: e.target.value})}); }
+  onChangeAuctionIncrement(e) { this.setState({salesDocument: _.extend(this.state.salesDocument, { auctionIncrement: e.target.value})}); }
+  onChangeAuctionExpectedAmount(e) { this.setState({salesDocument: _.extend(this.state.salesDocument, { auctionExpectedAmount: e.target.value})}); }
 
   onClickDelete(event) {
     event.preventDefault();
@@ -110,20 +109,20 @@ class VehicleEdit extends React.Component {
       dataType: 'json'
     }).done((data) => {
       this.setState({vehicle: data.vehicle});
-      if (data.auctionItem) this.setState({auctionItem: data.auctionItem});
+      if (data.salesDocument) this.setState({salesDocument: data.salesDocument});
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
   }
 
-  addVehicle(vehicle, auctionItem) {
+  addVehicle(vehicle, salesDocument) {
     $.ajax({
       url: '/api/vehiclesfull',
       dataType: 'json',
       type: 'POST',
       data: {
         vehicle: vehicle,
-        auctionItem: auctionItem
+        salesDocument: salesDocument
       }
     }).done((data) => {
         // doesnt seem right, but dont know how else to get back to the list after successful add
@@ -136,14 +135,14 @@ class VehicleEdit extends React.Component {
       });
   }
 
-  updateVehicle(vehicle, auctionItem) {
+  updateVehicle(vehicle, salesDocument) {
     $.ajax({
       url: '/api/vehiclesfull/' + vehicle._id,
       dataType: 'json',
       type: 'PUT',
       data: {
         vehicle: vehicle,
-        auctionItem: auctionItem
+        salesDocument: salesDocument
       }
     }).done((data) => {
       // doesnt seem right, but dont know how else to get back to the list after successful add
@@ -169,9 +168,9 @@ class VehicleEdit extends React.Component {
 
     if (title) {
       if (this.state.vehicle._id) {
-        this.updateVehicle(this.state.vehicle, this.state.auctionItem)
+        this.updateVehicle(this.state.vehicle, this.state.salesDocument)
       } else {
-        this.addVehicle(this.state.vehicle, this.state.auctionItem);
+        this.addVehicle(this.state.vehicle, this.state.salesDocument);
       }
     }
   }
@@ -202,7 +201,7 @@ class VehicleEdit extends React.Component {
                   value={this.state.vehicle.description}
                   onChange={this.onChangeDescription.bind(this)}/>
 
-              <InputFormRow
+                <InputFormRow
                   label='Brand'
                   type='text'
                   value={this.state.vehicle.brand}
@@ -241,8 +240,8 @@ class VehicleEdit extends React.Component {
                 <InputFormRow
                   label='Cubic capacity'
                   type='number'
-                  value={this.state.vehicle.cubicCapacity}
-                  onChange={this.onChangeCubicCapacity.bind(this)}/>
+                  value={this.state.vehicle.cubicCapacityCcm}
+                  onChange={this.onChangeCubicCapacityCcm.bind(this)}/>
 
                 <InputFormRow
                   label='Registration date'
@@ -269,28 +268,35 @@ class VehicleEdit extends React.Component {
                 <ImageManager vehicleId={this.state.vehicle._id} images={this.state.vehicle.images}/>
 
                 <div className="panel panel-default">
-                  <div className='panel-heading'>Auction Item</div>
+                  <div className='panel-heading'>Sales document</div>
                   <div className='panel-body'>
+                    <InputFormRow
+                      label='Buy Now Amount'
+                      type='number'
+                      value={this.state.salesDocument.buyNowAmount}
+                      onChange={this.onChangeBuyNowAmount.bind(this)}/>
+                    <InputFormRow
+                      label='Start amount'
+                      type='number'
+                      value={this.state.salesDocument.auctionStartAmount}
+                      onChange={this.onChangeAuctionStartAmount.bind(this)}/>
+                    <InputFormRow
+                      label='Increment by'
+                      type='number'
+                      value={this.state.salesDocument.auctionIncrement}
+                      onChange={this.onChangeAuctionIncrement.bind(this)}/>
+                    <InputFormRow
+                      label='Minimum expected amount'
+                      type='number'
+                      value={this.state.salesDocument.auctionExpectedAmount}
+                      onChange={this.onChangeAuctionExpectedAmount.bind(this)}/>
                     <div className="form-group">
-                      <label className="col-sm-2 control-label">ID</label>
+                      <label className="col-sm-2 control-label">Status</label>
                       <div className="col-sm-10">
-                        <p className="form-control-static">{this.state.auctionItem._id}</p>
+                        <p className="form-control-static">{this.state.salesDocument._id}</p>
                       </div>
                     </div>
-                    <div className="form-group">
-                      <label className="col-sm-2 control-label">Start amount</label>
-                      <div className="col-sm-10">
-                        <input type='text' className='form-control' ref='startAmountTextField' value={this.state.auctionItem.startAmount}
-                             onChange={this.onChangeStartAmount.bind(this)} autoFocus/>
-                      </div>
-                    </div>
-                    <div className="form-group">
-                      <label className="col-sm-2 control-label">Increment by</label>
-                      <div className="col-sm-10">
-                        <input type='text' className='form-control' ref='incrementByTextField' value={this.state.auctionItem.incrementBy}
-                             onChange={this.onChangeIncrementBy.bind(this)} autoFocus/>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
 

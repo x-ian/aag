@@ -17,7 +17,7 @@ const resetState = {
     mdTransmission: "",
     mdFuelType: "",
     powerOutputPs: "",
-    cubicCapacity: "",
+    cubicCapacityCcm: "",
     vdRegistrationDate: "",
     vdOdometerKm: ""
   },

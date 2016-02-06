@@ -45,6 +45,7 @@ var io = require('socket.io')(server);
 // CRUD access for DB documents
 require('./routes/api-auctions')(app);
 require('./routes/api-auctionitems')(app);
+require('./routes/api-salesdocuments')(app);
 require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);

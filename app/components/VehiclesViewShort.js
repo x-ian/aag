@@ -44,7 +44,7 @@ class VehiclesViewShort extends React.Component {
         <div className="row" key={vehicle._id}>
           <div className="col-sm-3">
             <Link to={'/vehicles/view/' + vehicle._id}>
-              { vehicle.images[0] ?
+              { vehicle.images && vehicle.images[0] ?
                 (
                   <img src={vehicle.images[0].thumbnail} style={{width: '150px'}}/>
                 ) : (

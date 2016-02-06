@@ -10,6 +10,7 @@ const resetState = {
   auctionItem: null,
   vehicle: null,
   auction: null,
+  salesDocument: null,
   participants: [],
   recentBids: [],
   currentBidId: null,
@@ -25,8 +26,8 @@ class AuctionItem extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.params.id) {
-      this.activateAuctionItem(this.props.params.id, this.props.location.query.auctionId);
+    if (this.props.location.query.salesDocumentId && this.props.location.query.auctionId) {
+      this.activateAuctionItem(this.props.location.query.salesDocumentId, this.props.location.query.auctionId);
     };
 
     let socket = io.connect();
@@ -44,44 +45,23 @@ class AuctionItem extends React.Component {
 
   }
 
-  getVehicle(id) {
+  activateAuctionItem(salesDocumentId, auctionId) {
     $.ajax({
-      url: '/api/vehicles/' + id,
-      dataType: 'json'
-    }).done((data) => {
-        this.setState({vehicle: data});
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
-  }
-
-  getRecentBids(auctionItemId) {
-    $.ajax({
-      url: '/api/recentBids/' + auctionItemId,
-      dataType: 'json'
-    }).done((data) => {
-        this.setState({recentBids: data});
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
-  }
-
-  activateAuctionItem(auctionItemId, auctionId) {
-    $.ajax({
-      url: '/api/activateauctionitem/' + auctionItemId + '?auctionId=' + auctionId,
+      url: '/api/activateauctionitem?salesDocumentId=' + salesDocumentId + '&auctionId=' + auctionId,
       type: 'POST',
       dataType: 'json'
     }).done((data) => {
       console.log(data);
-      this.setState({auctionItem: data});
-      this.getVehicle(this.state.auctionItem.vehicle);
-      this.getRecentBids(this.state.auctionItem._id);
+      this.setState({auctionItem: data['auctionItem'] });
+      this.setState({recentBids: data['recentBids'] });
+      this.setState({vehicle: data['vehicle'] });
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
   }
 
   updateAfterAction(ai, button) {
+
       event.preventDefault();
       $.ajax({
         url: '/api/promoteraction/' + this.state.auctionItem._id,
@@ -96,6 +76,12 @@ class AuctionItem extends React.Component {
       }).fail((jqXhr) => {
         console.log('ERROR: ' + jqXhr);
       });
+      if (button === 'SELL' || button === 'CLOSE') {
+        console.log('JAAAAAA');
+        setTimeout(function(){
+          this.props.history.pushState(null, '/promoter/auctions/' + this.props.location.query.auctionId);
+        }.bind(this), 1000);
+      }
   }
 
   render() {

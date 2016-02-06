@@ -49,7 +49,7 @@ class Start extends React.Component {
 
   onClickJoin(event) {
     event.preventDefault();
-    this.props.history.pushState(null, '/bidder/auction');
+    this.props.history.pushState(null, '/bidder/auction/' + this.state._id);
   }
 
   render() {

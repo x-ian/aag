@@ -10,7 +10,7 @@ var vehicleSchema = new mongoose.Schema({
     gear: String,
     fuelType: String,
     powerOutputPs: Number,
-    cubicCapacity: Number,
+    cubicCapacityCcm: Number,
   // },
   // vehicleData: {
     registrationDate: String,

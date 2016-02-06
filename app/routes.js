@@ -34,10 +34,10 @@ export default (
     <Route path='/promoter/auctions/:id' component={PromoterAuction} />
     <Route path='/promoter/vehicles/:id' component={PromoterVehicle} />
 
-      <Route path='/promoter/auctionitem/:id' component={PromoterAuctionItem} />
+      <Route path='/promoter/auctionitem' component={PromoterAuctionItem} />
 
     <Route path='/bidder/start' component={BidderStart} />
-    <Route path='/bidder/auction/:id' component={BidderAuction} />
+    <Route path='/bidder/auction' component={BidderAuction} />
 
   </Route>
 );

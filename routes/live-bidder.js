@@ -1,5 +1,6 @@
 var Auction = require('../models/auction');
 var AuctionItem = require('../models/auctionitem');
+var SalesDocument = require('../models/salesdocument');
 var Bid = require('../models/bid');
 
 function calcNewAuctionItemStatus(action, prevStatus) {
@@ -15,7 +16,7 @@ function calcNewAuctionItemStatus(action, prevStatus) {
       case "WAITING_FINAL_CALL_EMPTY":
         return 'INCOMING_BID';
       default:
-        console.log("Unknown status - " + item.status);
+        console.log("Unknown status - " + prevStatus);
     }
   } else {
     console.log("Unknown action - " + action);
@@ -51,13 +52,28 @@ module.exports = function(app, io) {
     });
   });
 
-  /**
-   * GET next current or future auction
-   */
   app.get('/api/currentauctionitem', function(req, res, next) {
-    // TODO assume only one ever
-    // AuctionItem.findById('56a53bf0e955ee0f54b1d651', function(err, item) {
-    AuctionItem.findOne({}, function(err, item) {
+    console.log('todo');
+    var auctionId = req.query.auctionId;
+    Auction.findById(auctionId).populate('currentAuctionItem').exec(function(err, a) {
+      if (err || !a) return next(err);
+      if (!a.currentActionItem) {
+        return res.json({auctionItem: '', vehicle: '', salesDocument: ''});
+      } else {
+        SalesDocument.findOne({auctionItem: a.currentAuctionItem}, function(err, sd) {
+          if (err || !sd) return next(err);
+          Vehicle.findById(sd.vehicle, function(err, v) {
+            return res.json({auctionItem: a.currentAuctionItem, vehicle: v, salesDocument: sd});
+          });
+        });
+      }
+    });
+  });
+
+
+  app.get('/api/currentauction', function(req, res, next) {
+    console.log('todo');
+    Auction.findOne({}, function(err, item) {
       if (err || !item) return next(err);
       return res.json(item);
     });
