@@ -1,71 +1,170 @@
 import React from 'react';
 import {Link} from 'react-router';
+import AuctionItem from './AuctionItem.js';
+import VehicleQueue from './VehicleQueue.js';
 
-var Auction = React.createClass({
-  getInitialState: function() {
-    return {upcomingVehicles: [], closedAuctionItems: []};
-  },
+var socket;
 
-  componentDidMount: function() {
+const resetState = {
+  auction: null,
+  auctionItem: null,
+  salesDocument: null,
+  vehicle: null,
+  recentBids: [],
+  participants: [],
+  upcomingVehicles: [],
+  closedAuctionItems: []
+}
+
+class Auction extends React.Component {
+
+  constructor() {
+    super();
+    this.state = resetState;
+  }
+
+  componentDidMount() {
+    this.updateVehiclesQueues();
+
+    socket = io.connect();
+
+    let socket = io.connect();
+    socket.on('auctionAction', (data) => {
+      console.log('IO AuctionItem status ' + this.state.auctionItem.status);
+      this.setState({auctionItem: data['auctionItem'] });
+      this.setState({recentBids: data['recentBids'] });
+      // TODO: if already a current bid present, deny this newly incoming one
+      this.setState({currentBidId: null});
+      if (data['currentBidId']) this.setState({currentBidId: data['currentBidId'] });
+    });
+    socket.on('participants', (data) => {
+      this.setState({participants: data });
+    });
+
+    // this.getCurrentAuction();
+    // socket.on('auctionAction', (data) => {
+    //   console.log('IO AuctionItem status ' + data);
+    //   this.setState({auctionItem: data['auctionItem'] });
+    //   this.setState({recentBids: data['recentBids'] });
+    // });
+    // socket.on('newAuctionItem', (data) => {
+    //   console.log('IO newAuctionItem ' + data);
+    //   this.setState({vehicle: data['vehicle']});
+    //   this.setState({auctionItem: data['auctionItem']});
+    //   this.setState({recentBids: null});
+    // });
+  }
+
+  componentWillUnmount() {
+    if (socket) {
+      socket.removeListener('auctionAction');
+      socket.removeListener('participants');
+      socket.removeListener('newAuctionItem');
+    }
+  }
+
+  updateVehiclesQueues() {
     $.ajax({
-      url: '/api/upcomingvehicles',
+      url: '/api/upcomingvehicles?auctionId=' + this.props.params.id,
       dataType: 'json',
       cache: false,
-      success: function(data) {
+    }).done((data) => {
         this.setState({upcomingVehicles: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
     });
     $.ajax({
-      url: '/api/closedauctionitems',
+      url: '/api/closedauctionitems?auctionId=' + this.props.params.id,
       dataType: 'json',
       cache: false,
-      success: function(data) {
+    }).done((data) => {
         this.setState({closedAuctionItems: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
     });
+  }
 
-  },
+  onClickAuctionItemActivate(salesDocumentId) {
+    this.activateAuctionItem(salesDocumentId, this.props.params.id);
+  }
 
-  render: function () {
-    let upcomingVehicleList = this.state.upcomingVehicles.map((sd, index) => {
-      return (
-        <div key={sd._id} className='list-group-item animated fadeIn'>
-          <div className='media'>
-            {sd._id} - {sd.vehicle.title} - {sd.vehicle.classification} -
-            <Link
-              to={'/promoter/auctionitem?salesDocumentId=' + sd._id + '&auctionId=' + this.props.params.id}>Activate</Link>
-          </div>
-        </div>
-      );
+  activateAuctionItem(salesDocumentId, auctionId) {
+    event.preventDefault();
+    $.ajax({
+      url: '/api/activateauctionitem?salesDocumentId=' + salesDocumentId + '&auctionId=' + auctionId,
+      type: 'POST',
+      dataType: 'json'
+    }).done((data) => {
+      this.setState({auctionItem: data['auctionItem'] });
+      this.setState({recentBids: data['recentBids'] });
+      this.setState({vehicle: data['vehicle'] });
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
     });
-    let closedAuctionItemList = this.state.closedAuctionItems.map((ai, index) => {
-      return (
-        <div key={ai._id} className='list-group-item animated fadeIn'>
-          <div className='media'>
-            {ai._id} - {ai.salesDocument.vehicle.title} - {ai.salesDocument.vehicle.classification}
-          </div>
-        </div>
-      );
-    });
+  }
 
+  onClickAuctionItemReschedule(auctionItemId) {
+    this.rescheduleAuctionItem(auctionItemId, this.props.params.id);
+  }
+
+  rescheduleAuctionItem(auctionItemId, auctionId) {
+    event.preventDefault();
+    $.ajax({
+      url: '/api/rescheduleauctionitem/' + auctionItemId + '?auctionId=' + auctionId,
+      type: 'POST',
+      dataType: 'json'
+    }).done((data) => {
+      this.updateVehiclesQueues();
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
+  }
+
+  updateAfterAction(ai, button) {
+      event.preventDefault();
+      $.ajax({
+        url: '/api/promoteraction/' + this.state.auctionItem._id,
+        dataType: 'json',
+        type: 'POST',
+        data: {
+          action: button,
+          currentBidId: this.state.currentBidId
+        }
+      }).done((data) => {
+        this.setState(data);
+      }).fail((jqXhr) => {
+        console.log('ERROR: ' + jqXhr);
+      });
+      if (button === 'SELL' || button === 'CLOSE') {
+        this.updateVehiclesQueues();
+        setTimeout(function(){
+          this.setState({auctionItem: null, vehicle: null});
+        }.bind(this), 2000);
+      }
+  }
+
+  render() {
     return (
-      <div className='container'>
-        <div className='list-group'>
-          <div className='panel-heading'>Upcoming Auction Items</div>
-          {upcomingVehicleList}
-
-          <div className='panel-heading'>Closed Auction Items</div>
-          {closedAuctionItemList}
-        </div>
+      <div>
+        {this.state.auctionItem ?
+          (
+            <AuctionItem updateAfterAction={this.updateAfterAction.bind(this)}
+              vehicle={this.state.vehicle}
+              auctionItem={this.state.auctionItem}
+              recentBids={this.state.recentBids}
+              participants={this.state.participants}
+              />
+          ) : (
+            <VehicleQueue auctionId={this.props.params.auctionId}
+              onClickAuctionItemActivate={this.onClickAuctionItemActivate.bind(this)}
+              onClickAuctionItemReschedule={this.onClickAuctionItemReschedule.bind(this)}
+              upcomingVehicles={this.state.upcomingVehicles}
+              closedAuctionItems={this.state.closedAuctionItems}/>
+          )
+        }
       </div>
     );
   }
-});
+}
 
 export default Auction;

@@ -37,29 +37,30 @@ module.exports = function (app, io) {
 
     app.get('/api/upcomingvehicles', function(req, res, next) {
       var auctionId = req.query['auctionId'];
-/*
-      // auctionId AND (SOLD or CLOSE_EMPTY)
-      AuctionItem.find(/*{
-          $or: [ { status: 'NOT_OPEN' }, { status: null } ]
-        }*//*).populate('vehicle').exec(function(err, item) {
-          if (err) return next(err);
-          return res.json(item);
-        });
-*/
-      SalesDocument.find({ auctionItem: null }).populate('vehicle').exec(function(err, item) {
-        if (err) return next(err);
-        return res.json(item);
-      });
-    });
-
-
-    app.get('/api/closedauctionitems', function(req, res, next) {
-      var auctionId = req.query['auctionId'];
-      // auctionId AND (SOLD or CLOSE_EMPTY)
       AuctionItem.find(
         {
           $and: [
-            // { auction: auctionId},
+            { auction: auctionId}//,
+            // { $or: [ { status: 'NOT_OPEN' }, { status: null } ] }
+          ]
+        }).exec(function(err, items) {
+          if (err) return next(err);
+          // all salesdocuments
+          let sdIds = items.map((ai) => { return ai.salesDocument });
+          console.log(sdIds);
+          SalesDocument.find({'_id': { $nin: sdIds }}).populate('vehicle').exec(function(err, item) {
+            if (err) return next(err);
+            return res.json(item);
+          });
+        });
+    });
+
+    app.get('/api/closedauctionitems', function(req, res, next) {
+      var auctionId = req.query['auctionId'];
+      AuctionItem.find(
+        {
+          $and: [
+            { auction: auctionId},
             { $or: [ { status: 'SOLD' }, { status: 'CLOSED_EMPTY' } ] }
           ]
         }).populate({ path: 'salesDocument', model: 'SalesDocument', populate: { path: 'vehicle', model: 'Vehicle'}}).exec(function(err, item) {
@@ -83,8 +84,6 @@ module.exports = function (app, io) {
     SalesDocument.findById(salesDocumentId, function(err, sd) {
       if (err || !sd) return next(err);
       AuctionItem.findOne({salesDocument: sd}, function(err, ai) {
-        console.log('3');
-        console.log(ai);
         if (err) return next(err);
         var newAi = {
           startAmount: sd.auctionStartAmount,
@@ -119,6 +118,14 @@ module.exports = function (app, io) {
           });
         }
       });
+    });
+  });
+
+  app.post('/api/rescheduleauctionitem/:id', function(req, res, next) {
+    var auctionItemId = req.params.id;
+    AuctionItem.findByIdAndRemove(auctionItemId, function(err, ai2) {
+      if (err) return next(err);
+      return res.json({message: 'item resetted'});
     });
   });
 
