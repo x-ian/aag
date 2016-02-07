@@ -69,6 +69,21 @@ module.exports = function (app, io) {
       });
     });
 
+    app.get('/api/incompleteauctionitems', function(req, res, next) {
+      var auctionId = req.query['auctionId'];
+      AuctionItem.find(
+        {
+          $and: [
+            { auction: auctionId},
+            { status: { $nin: [ 'SOLD', 'CLOSED_EMPTY' ] } }
+          ]
+        }).populate({ path: 'salesDocument', model: 'SalesDocument', populate: { path: 'vehicle', model: 'Vehicle'}}).exec(function(err, item) {
+          if (err) return next(err);
+          return res.json(item);
+      });
+    });
+
+
   app.post('/api/startauction/:id', function(req, res, next) {
     Auction.findByIdAndUpdate(req.params.id, { closedAt: null, active: true }, function(err, item) {
       if (err || !item) return next(err);

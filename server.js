@@ -80,12 +80,15 @@ app.use(function(err, req, res, next) {
  */
 io.sockets.on('connection', function(socket) {
   console.log('a client connected with id %s', socket.id);
-
   clients[socket.id] = { id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
-
   var keys = Object.keys(clients);
   var values = keys.map(function(v) { return clients[v]; });
   io.sockets.emit('participants', values);
+
+  socket.on('producer audio chunk', function(msg){
+    io.volatile.emit('consumer audio chunk', msg);
+  });
+
 
   // for (key in socket.request.headers) {
   //   console.log(key);

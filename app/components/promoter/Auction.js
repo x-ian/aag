@@ -2,6 +2,7 @@ import React from 'react';
 import {Link} from 'react-router';
 import AuctionItem from './AuctionItem.js';
 import VehicleQueue from './VehicleQueue.js';
+import AudioProducer from './AudioProducer.js';
 
 var socket;
 
@@ -13,7 +14,8 @@ const resetState = {
   recentBids: [],
   participants: [],
   upcomingVehicles: [],
-  closedAuctionItems: []
+  closedAuctionItems: [],
+  incompleteAuctionItems: []
 }
 
 class Auction extends React.Component {
@@ -27,8 +29,13 @@ class Auction extends React.Component {
     this.updateVehiclesQueues();
 
     socket = io.connect();
+    console.log(socket.sessionid);
 
-    let socket = io.connect();
+    setTimeout(function(){
+      console.log(socket);
+      console.log(socket.sessionid);
+    }.bind(this), 2000);
+
     socket.on('auctionAction', (data) => {
       console.log('IO AuctionItem status ' + this.state.auctionItem.status);
       this.setState({auctionItem: data['auctionItem'] });
@@ -63,6 +70,10 @@ class Auction extends React.Component {
     }
   }
 
+  broadCastPromoterAudioChunk(ab1) {
+    socket.emit('producer audio chunk', ab1);
+  }
+
   updateVehiclesQueues() {
     $.ajax({
       url: '/api/upcomingvehicles?auctionId=' + this.props.params.id,
@@ -79,6 +90,15 @@ class Auction extends React.Component {
       cache: false,
     }).done((data) => {
         this.setState({closedAuctionItems: data});
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
+    $.ajax({
+      url: '/api/incompleteauctionitems?auctionId=' + this.props.params.id,
+      dataType: 'json',
+      cache: false,
+    }).done((data) => {
+        this.setState({incompleteAuctionItems: data});
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
@@ -159,7 +179,8 @@ class Auction extends React.Component {
               onClickAuctionItemActivate={this.onClickAuctionItemActivate.bind(this)}
               onClickAuctionItemReschedule={this.onClickAuctionItemReschedule.bind(this)}
               upcomingVehicles={this.state.upcomingVehicles}
-              closedAuctionItems={this.state.closedAuctionItems}/>
+              closedAuctionItems={this.state.closedAuctionItems}
+              incompleteAuctionItems={this.state.incompleteAuctionItems}/>
           )
         }
       </div>

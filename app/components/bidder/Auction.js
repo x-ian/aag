@@ -21,7 +21,7 @@ class Auction extends React.Component {
   }
 
   componentDidMount() {
-     socket = io.connect();
+    socket = io.connect();
 
     this.getCurrentAuction();
     socket.on('auctionAction', (data) => {
@@ -47,7 +47,6 @@ class Auction extends React.Component {
     socket.removeListener('newAuctionItem');
     // socket.close();
   }
-
 
   getCurrentAuction(id) {
     $.ajax({

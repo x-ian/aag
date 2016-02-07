@@ -23,12 +23,24 @@ var VehicleQueue = React.createClass({
         </div>
       );
     });
+    let incompleteAuctionItemList = this.props.incompleteAuctionItems.map((ai, index) => {
+      return (
+        <div key={ai._id} className='list-group-item animated fadeIn'>
+          <div className='media'>
+            {ai._id} - {ai.salesDocument.vehicle.title} - {ai.salesDocument.vehicle.classification} - <button className='btn btn-secondary' onClick={this.props.onClickAuctionItemReschedule.bind(this, ai._id)}>Reschedule</button>
+          </div>
+        </div>
+      );
+    });
 
     return (
       <div className='container'>
         <div className='list-group'>
-          <div className='panel-heading'>Upcoming Auction Items</div>
+          <div className='panel-heading'>Upcoming Vehicle</div>
           {upcomingVehicleList}
+
+          <div className='panel-heading'>Incomplete Auction Items</div>
+          {incompleteAuctionItemList}
 
           <div className='panel-heading'>Closed Auction Items</div>
           {closedAuctionItemList}
