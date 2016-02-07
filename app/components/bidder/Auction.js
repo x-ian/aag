@@ -21,7 +21,7 @@ class Auction extends React.Component {
   }
 
   componentDidMount() {
-    socket = io.connect();
+    socket = io.connect('/auction');
 
     this.getCurrentAuction();
     socket.on('auctionAction', (data) => {

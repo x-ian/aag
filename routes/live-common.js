@@ -2,7 +2,7 @@ var Auction = require('../models/auction');
 var AuctionItem = require('../models/auctionitem');
 var Bid = require('../models/bid');
 
-module.exports = function (app, io, clients) {
+module.exports = function (app, auctionIo, clients) {
 
   app.get('/api/recentBids/:id', function(req, res, next) {
 

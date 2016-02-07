@@ -28,13 +28,7 @@ class Auction extends React.Component {
   componentDidMount() {
     this.updateVehiclesQueues();
 
-    socket = io.connect();
-    console.log(socket.sessionid);
-
-    setTimeout(function(){
-      console.log(socket);
-      console.log(socket.sessionid);
-    }.bind(this), 2000);
+    socket = io.connect('/auction');
 
     socket.on('auctionAction', (data) => {
       console.log('IO AuctionItem status ' + this.state.auctionItem.status);

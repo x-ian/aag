@@ -2096,7 +2096,7 @@ var Auction = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      socket = io.connect();
+      socket = io.connect('/auction');
 
       this.getCurrentAuction();
       socket.on('auctionAction', function (data) {
@@ -3152,13 +3152,7 @@ var Auction = function (_React$Component) {
 
       this.updateVehiclesQueues();
 
-      socket = io.connect();
-      console.log(socket.sessionid);
-
-      setTimeout(function () {
-        console.log(socket);
-        console.log(socket.sessionid);
-      }.bind(this), 2000);
+      socket = io.connect('/auction');
 
       socket.on('auctionAction', function (data) {
         console.log('IO AuctionItem status ' + _this2.state.auctionItem.status);

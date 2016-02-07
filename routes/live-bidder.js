@@ -23,7 +23,7 @@ function calcNewAuctionItemStatus(action, prevStatus) {
   }
 }
 
-module.exports = function(app, io) {
+module.exports = function(app, auctionIo) {
 
   /**
    * GET next current or future auction
@@ -109,7 +109,7 @@ module.exports = function(app, io) {
             if (err || !bids) return next(err);
 
             // send back results to all
-            io.sockets.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: bid._id});
+            auctionIo.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: bid._id});
             // and just for this request
             return res.json({auctionItem: item, recentBids: bids});
           });

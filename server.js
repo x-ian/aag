@@ -41,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+var auction = io.of('/auction');
 
 // CRUD access for DB documents
 require('./routes/api-auctions')(app);
@@ -49,9 +50,9 @@ require('./routes/api-salesdocuments')(app);
 require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);
-require('./routes/live-common')(app, io, clients);
-require('./routes/live-bidder')(app, io);
-require('./routes/live-promoter')(app, io);
+require('./routes/live-common')(app, auction, clients);
+require('./routes/live-bidder')(app, auction);
+require('./routes/live-promoter')(app, auction);
 
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {
@@ -75,20 +76,40 @@ app.use(function(err, req, res, next) {
   res.send({ message: err.message });
 });
 
+// maybe volatile on namespaces/rooms doesn't properly work
+// https://github.com/socketio/socket.io/issues/1741
+// https://github.com/socketio/socket.io/issues/1952
+// http://stackoverflow.com/questions/25265860/socketio-volatile-emit-to-namespace
+// moved into dedicated namespace
+// socket.on('producer audio chunk', function(msg){
+//   console.log('volatile emit');
+//   io.volatile.emit('consumer audio chunk', msg);
+//   // socket.emit('consumer audio chunk', msg);
+// });
+var audio = io.of('/audio-stream');
+audio.on('connection', function(socket){
+    console.log('connected to audio stream with id %s', socket.id);
+
+    socket.on('producer audio chunk', function(msg){
+      audio.volatile.emit('consumer audio chunk', msg);
+    });
+    socket.on('disconnect', function() {
+      console.log('disconnected from audio stream with id %s', socket.id);
+    });
+});
+
 /**
  * Socket.io stuff.
  */
-io.sockets.on('connection', function(socket) {
-  console.log('a client connected with id %s', socket.id);
+// io.sockets.on('connection', function(socket) {
+var auction = io.of('/auction');
+auction.on('connection', function(socket){
+  console.log('connected to auction with id %s', socket.id);
+
   clients[socket.id] = { id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
   var keys = Object.keys(clients);
   var values = keys.map(function(v) { return clients[v]; });
-  io.sockets.emit('participants', values);
-
-  socket.on('producer audio chunk', function(msg){
-    io.volatile.emit('consumer audio chunk', msg);
-  });
-
+  auction.emit('participants', values);
 
   // for (key in socket.request.headers) {
   //   console.log(key);
@@ -101,12 +122,12 @@ io.sockets.on('connection', function(socket) {
     //     location data
 
   socket.on('disconnect', function() {
-    console.log('a client disconnected with id %s', socket.id);
+    console.log('disconnected from auction with id %s', socket.id);
     clients[socket.id] = null;
     delete(clients[socket.id]);
     var keys2 = Object.keys(clients);
     var values2 = keys2.map(function(v) { return clients[v]; });
-    io.sockets.emit('participants', values2);
+    auction.emit('participants', values2);
   });
 
 });

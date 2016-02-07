@@ -32,7 +32,7 @@ function calcNewAuctionItemStatus(action, prevStatus) {
   }
 }
 
-module.exports = function (app, io) {
+module.exports = function (app, auctionIo) {
 
 
     app.get('/api/upcomingvehicles', function(req, res, next) {
@@ -117,7 +117,7 @@ module.exports = function (app, io) {
             Vehicle.findById(sd.vehicle, function(err, vehicle) {
               if (err || !vehicle) return next(err);
               Auction.findByIdAndUpdate(auctionId, {currentAuctionItem: ai2}).exec();
-              io.sockets.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
+              auctionIo.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
               return res.json({auctionItem: ai2, vehicle: vehicle, recentBids: null});
             })
           });
@@ -127,7 +127,7 @@ module.exports = function (app, io) {
             Vehicle.findById(sd.vehicle, function(err, vehicle) {
               if (err || !vehicle) return next(err);
               Auction.findByIdAndUpdate(auctionId, {currentAuctionItem: ai2}).exec();
-              io.sockets.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
+              auctionIo.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
               return res.json({auctionItem: ai2, vehicle: vehicle, recentBids: null});
             })
           });
@@ -182,7 +182,7 @@ module.exports = function (app, io) {
            if (err || !bids) return next(err);
 
            // send back results to all
-           io.sockets.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: null});
+           auctionIo.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: null});
            // and just for this request
            return res.json({auctionItem: item, recentBids: bids});
          });

@@ -7,12 +7,14 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script>
 
-    var socket = io();
+    // var socket = io();
+    var socket = io('/audio-stream');
 
 	var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 	var source;
 
 	socket.on('consumer audio chunk',  function(msg){
+    console.log('data');
 		// for a very strange reason the arraybuffer seems to be prefixed with a '4'
 		// (at least when NOT sending a file, but streaming right from a microphone)
 		// thus leading to an odd number of elements and therefore failing to instanciate the Int16Array
