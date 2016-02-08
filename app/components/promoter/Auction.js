@@ -177,6 +177,7 @@ class Auction extends React.Component {
               incompleteAuctionItems={this.state.incompleteAuctionItems}/>
           )
         }
+        <br/><br/><br/><AudioProducer/>
       </div>
     );
   }

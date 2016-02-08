@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router';
 import AuctionItem from './AuctionItem.js';
+import AudioConsumer from './AudioConsumer.js';
 
 var socket;
 
@@ -93,6 +94,7 @@ class Auction extends React.Component {
     return (
       <div>
         {auction}
+        <br/><br/>        <AudioConsumer/>
       </div>
     );
   }

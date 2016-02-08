@@ -5,8 +5,8 @@
   </head>
   <body>
 	  <p>Auction Audio Stream control</p>
-	  <button onclick="startRecording()">Start Recording</button>
-	  <button onclick="stopRecording()">Stop Recording</button>
+	  <button onclick="startRecording()">Start streaming</button>
+	  <button onclick="stopRecording()">Stop streaming</button>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script>
 
@@ -45,6 +45,8 @@
       var bufferSize = 16384; //2048;
       recorder = context.createScriptProcessor(bufferSize, 1, 1);
 
+      var counter = 0;
+
       recorder.onaudioprocess = function(e){
         if(!recording) return;
         console.log ('recording');
@@ -52,7 +54,11 @@
 		    var ab1 = convertoFloat32ToInt16(left);
 
 		    console.log('emit bytes: ' + ab1.byteLength);
-        socket.emit('producer audio chunk', ab1);
+        var msg = {
+          counter: (counter++),
+          chunk: ab1
+        }
+        socket.emit('producer audio chunk', msg);
 
     		// some logging
     		var ab = new Int16Array(ab1);
