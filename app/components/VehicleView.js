@@ -44,26 +44,24 @@ class VehicleView extends React.Component {
 
   onClickBuyNow(event) {
     event.preventDefault();
+  }
 
-    $.ajax({
-      url: '/api/vehiclesfull/' + this.state.vehicle._id,
-      dataType: 'json',
-      type: 'DELETE'
-    }).done((data) => {
-      // doesnt seem right, but dont know how else to get back to the list after successful add
-      setTimeout(function(){
-        this.props.history.pushState(null, '/vehicles');
-      }.bind(this), 1000);
-      this.setState(resetState);
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
+  onClickContactSeller(event) {
+    event.preventDefault();
+
+    var link = "mailto:info@auto-auction-germany.com"
+    //     + "?cc=myCCaddress@example.com"
+         + "?subject=" + escape("Vehicle inquiry for vehicle " + this.state.vehicle._id)
+    //     + "&body=" + escape(document.getElementById('myText').value)
+         ;
+
+         window.location.href = link;
   }
 
   onClickCancel(event) {
     event.preventDefault();
     this.setState(resetState);
-    this.props.history.pushState(null, '/vehicles');
+    window.history.back();
   }
 
   setVehicle(id) {
@@ -86,7 +84,6 @@ class VehicleView extends React.Component {
 
     return (
         <div className='container'>
-
           <div className='panel panel-default'>
             <div className='panel-heading'>View Vehicle</div>
             <div className='panel-body'>
@@ -137,6 +134,11 @@ class VehicleView extends React.Component {
                   {this.state.vehicle.damages}
                 </div>
               </div>
+              <hr/>
+              <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>&nbsp;
+              <button className='btn btn-secondary' onClick={this.onClickBuyNow.bind(this)}>Buy now</button>&nbsp;
+              <button className='btn btn-secondary' onClick={this.onClickContactSeller.bind(this)}>Contact seller</button>
+
             </div>
           </div>
         </div>

@@ -1665,42 +1665,39 @@ var VehicleView = function (_React$Component) {
   }, {
     key: 'onClickBuyNow',
     value: function onClickBuyNow(event) {
-      var _this2 = this;
-
+      event.preventDefault();
+    }
+  }, {
+    key: 'onClickContactSeller',
+    value: function onClickContactSeller(event) {
       event.preventDefault();
 
-      $.ajax({
-        url: '/api/vehiclesfull/' + this.state.vehicle._id,
-        dataType: 'json',
-        type: 'DELETE'
-      }).done(function (data) {
-        // doesnt seem right, but dont know how else to get back to the list after successful add
-        setTimeout(function () {
-          this.props.history.pushState(null, '/vehicles');
-        }.bind(_this2), 1000);
-        _this2.setState(resetState);
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
+      var link = "mailto:info@auto-auction-germany.com"
+      //     + "?cc=myCCaddress@example.com"
+       + "?subject=" + escape("Vehicle inquiry for vehicle " + this.state.vehicle._id)
+      //     + "&body=" + escape(document.getElementById('myText').value)
+      ;
+
+      window.location.href = link;
     }
   }, {
     key: 'onClickCancel',
     value: function onClickCancel(event) {
       event.preventDefault();
       this.setState(resetState);
-      this.props.history.pushState(null, '/vehicles');
+      window.history.back();
     }
   }, {
     key: 'setVehicle',
     value: function setVehicle(id) {
-      var _this3 = this;
+      var _this2 = this;
 
       this.setState(resetState);
       $.ajax({
         url: '/api/vehiclesfull/' + id,
         dataType: 'json'
       }).done(function (data) {
-        _this3.setState({ vehicle: data.vehicle });
+        _this2.setState({ vehicle: data.vehicle });
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
@@ -1808,6 +1805,24 @@ var VehicleView = function (_React$Component) {
                 { className: 'col-sm-9' },
                 this.state.vehicle.damages
               )
+            ),
+            _react2.default.createElement('hr', null),
+            _react2.default.createElement(
+              'button',
+              { className: 'btn btn-secondary', onClick: this.onClickCancel.bind(this) },
+              'Cancel'
+            ),
+            ' ',
+            _react2.default.createElement(
+              'button',
+              { className: 'btn btn-secondary', onClick: this.onClickBuyNow.bind(this) },
+              'Buy now'
+            ),
+            ' ',
+            _react2.default.createElement(
+              'button',
+              { className: 'btn btn-secondary', onClick: this.onClickContactSeller.bind(this) },
+              'Contact seller'
             )
           )
         )
