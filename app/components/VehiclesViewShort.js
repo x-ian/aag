@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router';
+import MultiLineView from './common/MultiLineView.js';
 
 const resetState = {
   vehicles: []
@@ -38,7 +39,6 @@ class VehiclesViewShort extends React.Component {
   }
 
   render() {
-
     let vehiclesList = this.state.vehicles.map((vehicle, index) => {
       return (
         <div className="row" key={vehicle._id}>
@@ -53,8 +53,11 @@ class VehiclesViewShort extends React.Component {
               }
             </Link>
           </div>
-          <div className="col-sm-9">
-            {vehicle.title}<br/>{vehicle.registrationDate}<br/>{vehicle.powerOutputPs} PS<br/>{vehicle.odometerKm} KM
+          <div className="col-sm-4">
+            <strong>{vehicle.title}</strong><br/>{vehicle.registrationDate}<br/>{vehicle.powerOutputPs} PS<br/>{vehicle.odometerKm} km
+          </div>
+          <div className="col-sm-5">
+            <MultiLineView text={vehicle.description} maxRows={4} maxChars={200}/>
           </div>
         </div>
       );

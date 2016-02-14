@@ -2,6 +2,7 @@ import React from 'react';
 import {Link} from 'react-router';
 import _ from "underscore";
 var ImageGallery = require('react-image-gallery');
+import MultiLineView from './common/MultiLineView.js';
 
 const resetState = {
   vehicle: {
@@ -85,7 +86,7 @@ class VehicleView extends React.Component {
     return (
         <div className='container'>
           <div className='panel panel-default'>
-            <div className='panel-heading'>View Vehicle</div>
+            <div className='panel-heading'>View Vehicle: {this.state.vehicle.title}</div>
             <div className='panel-body'>
               <div className="row">
                 <div className="col-sm-6">
@@ -104,34 +105,36 @@ class VehicleView extends React.Component {
                   }
                 </div>
                 <div className="col-sm-6">
-                  {this.state.vehicle.title}<br/>
                   {this.state.vehicle.registrationDate}<br/>
                   {this.state.vehicle.powerOutputPs} PS<br/>
-                  {this.state.vehicle.odometerKm} KM
+                  {this.state.vehicle.odometerKm} km<br/><br/>
+                  <MultiLineView text={this.state.vehicle.description}/>
                 </div>
               </div>
+              <hr/>
               <div className="row">
                 <div className="col-sm-3">Additional details</div>
                 <div className="col-sm-9">
-                  {this.state.vehicle.description}<br/>
                   {this.state.vehicle.brand}<br/>
                   {this.state.vehicle.classification}<br/>
                   {this.state.vehicle.model}<br/>
                   {this.state.vehicle.transmission}<br/>
                   {this.state.vehicle.fuelType}<br/>
-                {this.state.vehicle.cubicCapacityCcm}
+                  {this.state.vehicle.cubicCapacityCcm} ccm
                 </div>
               </div>
+              <hr/>
               <div className="row">
                 <div className="col-sm-3">Features</div>
                 <div className="col-sm-9">
-                  {this.state.vehicle.features}
+                  <MultiLineView text={this.state.vehicle.features}/>
                 </div>
               </div>
+              <hr/>
               <div className="row">
                 <div className="col-sm-3">Damages</div>
                 <div className="col-sm-9">
-                  {this.state.vehicle.damages}
+                  <MultiLineView text={this.state.vehicle.damages}/>
                 </div>
               </div>
               <hr/>
