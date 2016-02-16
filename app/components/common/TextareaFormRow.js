@@ -14,7 +14,8 @@ class TextareaFormRow extends React.Component {
         <div className="col-sm-10">
           <textarea className='form-control'
             value={this.props.value}
-            onChange={this.props.onChange.bind(this)}/>
+            onChange={this.props.onChange.bind(this)}
+            rows={3}/>
         </div>
       </div>
     );

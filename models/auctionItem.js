@@ -10,9 +10,9 @@ var auctionItemSchema = new mongoose.Schema({
     'INCOMING_BID', 'WAITING_FINAL_CALL',
     'SOLD', 'WAITING_FINAL_CALL_EMPTY', 'CLOSED_EMPTY']
   },
-  salesDocument: {
+  vehicle: {
      type: mongoose.Schema.Types.ObjectId,
-     ref: 'SalesDocument'
+     ref: 'Vehicle'
    },
   auction: {
     type: mongoose.Schema.Types.ObjectId,

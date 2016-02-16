@@ -1,4 +1,5 @@
 var Vehicle = require('../models/vehicle');
+var SalesInformation = require('../models/vehicle');
 var AuctionItem = require('../models/auctionitem');
 var SalesDocument = require('../models/salesdocument');
 var Bid = require('../models/bid');
@@ -14,6 +15,7 @@ function mapVehicleReqBody(reqBody, withId, withImages) {
   var o = {
     title: reqBody['vehicle[title]'],
     description: reqBody['vehicle[description]'],
+    // modelData
     brand: reqBody['vehicle[brand]'],
     classification: reqBody['vehicle[classification]'],
     model: reqBody['vehicle[model]'],
@@ -21,27 +23,21 @@ function mapVehicleReqBody(reqBody, withId, withImages) {
     fuelType: reqBody['vehicle[fuelType]'],
     powerOutputPs: reqBody['vehicle[powerOutputPs]'],
     cubicCapacityCcm: reqBody['vehicle[cubicCapacityCcm]'],
+    // vehicleData
     registrationDate: reqBody['vehicle[registrationDate]'],
     odometerKm: reqBody['vehicle[odometerKm]'],
     features: reqBody['vehicle[features]'],
     damages: reqBody['vehicle[damages]'],
+    // salesData
+    buyNowAmount: reqBody['vehicle[buyNowAmount]'],
+    auctionStartAmount: reqBody['vehicle[auctionStartAmount]'],
+    auctionIncrement: reqBody['vehicle[auctionIncrement]'],
+    auctionExpectedAmount: reqBody['vehicle[auctionExpectedAmount]'],
+    status: reqBody['vehicle[status]']
   };
   if (withId) o._id = reqBody['vehicle[_id]'];
   if (withImages) o.images = reqBody['vehicle[images]'];
 
-  return o;
-}
-
-function mapSalesDocumentReqBody(reqBody, withId, vehicleId) {
-  var o = {
-    buyNowAmount: reqBody['salesDocument[buyNowAmount]'],
-    auctionStartAmount: reqBody['salesDocument[auctionStartAmount]'],
-    auctionIncrement: reqBody['salesDocument[auctionIncrement]'],
-    auctionExpectedAmount: reqBody['salesDocument[auctionExpectedAmount]'],
-    //status
-    vehicle: vehicleId
-  };
-  if (withId) o._id = reqBody['salesDocument[_id]'];
   return o;
 }
 
@@ -53,7 +49,6 @@ module.exports = function (app) {
   app.get('/api/vehicles', function(req, res, next) {
     Vehicle.find(function(err, item) {
       if (err || !item) return next(err);
-      // return res.send(item);
       return res.json(item);
     });
   });
@@ -106,21 +101,14 @@ module.exports = function (app) {
 
   app.delete('/api/vehiclesfull/:id', function(req,res,next) {
     var vehicleId = req.params.id;
-    SalesDocument.find({vehicle: vehicleId}, function(err, sds) {
+
+    // auctionitems & bids
+    AuctionItem.find({vehicle: vehicleId}, function(err, ais) {
       if (err) return next(err);
-      sds.forEach(function(sd, index, array) {
-        AuctionItem.findById(sd.auctionItem, function(err, ais) {
-          var ids = ais.map(function(ai) { return ai._id; });
-
-          // bids
-          Bid.find({auctionItem: {$in: ids}}).remove().exec();
-        });
-
-        // auctionitems
-        AuctionItem.findById(sd.auctionItem).remove().exec();
-
-        // sales document
-        sd.remove();
+      var ids = ais.map(function(ai) { return ai._id; });
+      Bid.find({auctionItem: {$in: ids}}).remove().exec();
+      ais.forEach(function(ai, index, array) {
+        ai.remove();
       });
     });
 
@@ -132,6 +120,14 @@ module.exports = function (app) {
 
     return res.json({ message: 'Item(s) deleted' });
   });
+
+  app.get('/api/vehiclesfull', function(req, res, next) { 
+    Vehicle.find(function(err, item) {
+      if (err || !item) return next(err);
+      return res.json({vehicle: item});
+    });
+  });
+
 
   app.get('/api/vehiclesfull/:id', function(req, res, next) { 
     Vehicle.findById(req.params.id, function(err, item) {
@@ -146,14 +142,6 @@ module.exports = function (app) {
 
   app.put('/api/vehiclesfull/:id', function(req, res, next) { 
     var vehicleId = req.params.id;
-    var salesDocumentId = req.body['salesDocument[_id]'];
-    if (salesDocumentId) {
-      SalesDocument.findByIdAndUpdate(salesDocumentId, mapSalesDocumentReqBody(req.body, false, vehicleId)).exec();
-    } else {
-      SalesDocument.create(mapSalesDocumentReqBody(req.body, false, vehicleId), function(err, item) {
-        if (err || !item) return next(err);
-      });
-    }
     Vehicle.findByIdAndUpdate(req.params.id, mapVehicleReqBody(req.body, false, false), function(err, item) {
       if (err || !item) return next(err);
       return res.json({ message: 'Item updated' });
@@ -164,6 +152,17 @@ module.exports = function (app) {
     Vehicle.create(mapVehicleReqBody(req.body, false, false), function (err, item) {
       if (err || !item) return next(err);
       SalesDocument.create(mapSalesDocumentReqBody(req.body, false, item._id));
+      return res.json({ message: 'Item added' });
+    });
+  });
+
+  app.post('/api/vehiclesfull2', function(req, res, next) { 
+    Vehicle.create(mapVehicleReqBody(req.body, false, false), function (err, item) {
+      if (err || !item) return next(err);
+      console.log(item);
+      console.log(mapSalesInformationReqBody(req.body));
+      Vehicle.findByIdAndUpdate(item._id, { salesInformation: mapSalesInformationReqBody(req.body) });
+      console.log(item);
       return res.json({ message: 'Item added' });
     });
   });
@@ -213,6 +212,4 @@ module.exports = function (app) {
 
     return res.json({message: 'yo'});
   });
-
-
 }

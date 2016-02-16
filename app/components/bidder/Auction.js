@@ -78,7 +78,7 @@ class Auction extends React.Component {
 
   getVehicle(id) {
     $.ajax({
-      url: '/api/vehiclesfull/' + id,
+      url: '/api/vehicles/' + id,
       dataType: 'json'
     }).done((data) => {
     }).fail((jqXhr) => {

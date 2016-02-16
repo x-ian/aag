@@ -3,6 +3,7 @@ import {Link} from 'react-router';
 import _ from "underscore";
 var ImageGallery = require('react-image-gallery');
 import MultiLineView from './common/MultiLineView.js';
+import VehicleSales from './common/VehicleSales.js';
 
 const resetState = {
   vehicle: {
@@ -43,10 +44,6 @@ class VehicleView extends React.Component {
     }
   }
 
-  onClickBuyNow(event) {
-    event.preventDefault();
-  }
-
   onClickContactSeller(event) {
     event.preventDefault();
 
@@ -68,10 +65,10 @@ class VehicleView extends React.Component {
   setVehicle(id) {
     this.setState(resetState);
     $.ajax({
-      url: '/api/vehiclesfull/' + id,
+      url: '/api/vehicles/' + id,
       dataType: 'json'
     }).done((data) => {
-      this.setState({vehicle: data.vehicle});
+      this.setState({vehicle: data});
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
@@ -105,6 +102,7 @@ class VehicleView extends React.Component {
                   }
                 </div>
                 <div className="col-sm-6">
+                  <VehicleSales vehicle={this.state.vehicle}/><br/>
                   {this.state.vehicle.registrationDate}<br/>
                   {this.state.vehicle.powerOutputPs} PS<br/>
                   {this.state.vehicle.odometerKm} km<br/><br/>
@@ -138,8 +136,14 @@ class VehicleView extends React.Component {
                 </div>
               </div>
               <hr/>
+              <div className="row">
+                <div className="col-sm-3">Sales</div>
+                <div className="col-sm-9">
+                  <VehicleSales vehicle={this.state.vehicle}/>
+                </div>
+              </div>
+              <hr/>
               <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>&nbsp;
-              <button className='btn btn-secondary' onClick={this.onClickBuyNow.bind(this)}>Buy now</button>&nbsp;
               <button className='btn btn-secondary' onClick={this.onClickContactSeller.bind(this)}>Contact seller</button>
 
             </div>

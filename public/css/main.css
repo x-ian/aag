@@ -5,6 +5,7 @@
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 @import "../../css/image-gallery.css";
+@import '../../css/react-select.css';
 html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;

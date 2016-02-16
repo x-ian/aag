@@ -5,7 +5,7 @@ var salesDocumentSchema = new mongoose.Schema({
   auctionStartAmount: Number,
   auctionIncrement: Number,
   auctionExpectedAmount: Number,
-  status: { type: String, enum: ['NO_OUTCOME', 'SOLD_BUY_NOW', 'SOLD_AUCTION'] },
+  status: { type: String, enum: ['PRIVATE', 'PUBLISHED', 'SOLD_BUY_NOW', 'SOLD_AUCTION'] },
   vehicle: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Vehicle'
