@@ -1,7 +1,6 @@
 var Vehicle = require('../models/vehicle');
 var SalesInformation = require('../models/vehicle');
 var AuctionItem = require('../models/auctionitem');
-var SalesDocument = require('../models/salesdocument');
 var Bid = require('../models/bid');
 var multiparty = require('multiparty');
 var fs = require('fs');
@@ -132,11 +131,7 @@ module.exports = function (app) {
   app.get('/api/vehiclesfull/:id', function(req, res, next) { 
     Vehicle.findById(req.params.id, function(err, item) {
       if (err || !item) return next(err);
-      SalesDocument.findOne({'vehicle': req.params.id}, function(err2, item2) {
-        if (err2) return next(err2);
-        if (!item2) return res.json({vehicle: item});
-        return res.json({vehicle: item, salesDocument: item2});
-      });
+      return res.json({vehicle: item});
     });
   });
 
@@ -151,8 +146,7 @@ module.exports = function (app) {
   app.post('/api/vehiclesfull', function(req, res, next) { 
     Vehicle.create(mapVehicleReqBody(req.body, false, false), function (err, item) {
       if (err || !item) return next(err);
-      SalesDocument.create(mapSalesDocumentReqBody(req.body, false, item._id));
-      return res.json({ message: 'Item added' });
+       return res.json({ message: 'Item added' });
     });
   });
 

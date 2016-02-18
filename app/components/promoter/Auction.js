@@ -9,7 +9,6 @@ var socket;
 const resetState = {
   auction: null,
   auctionItem: null,
-  salesDocument: null,
   vehicle: null,
   recentBids: [],
   participants: [],
@@ -27,6 +26,7 @@ class Auction extends React.Component {
 
   componentDidMount() {
     this.updateVehiclesQueues();
+    this.startAuction();
 
     socket = io.connect('/auction');
 
@@ -68,6 +68,19 @@ class Auction extends React.Component {
     socket.emit('producer audio chunk', ab1);
   }
 
+  startAuction() {
+    $.ajax({
+      url: '/api/startauction/' + this.props.params.id,
+      type: 'POST',
+      dataType: 'json',
+      cache: false,
+    }).done((data) => {
+        this.setState({auction: data});
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
+  }
+
   updateVehiclesQueues() {
     $.ajax({
       url: '/api/upcomingvehicles?auctionId=' + this.props.params.id,
@@ -98,14 +111,14 @@ class Auction extends React.Component {
     });
   }
 
-  onClickAuctionItemActivate(salesDocumentId) {
-    this.activateAuctionItem(salesDocumentId, this.props.params.id);
+  onClickAuctionItemActivate(vehicleId) {
+    this.activateAuctionItem(vehicleId, this.props.params.id);
   }
 
-  activateAuctionItem(salesDocumentId, auctionId) {
+  activateAuctionItem(vehicleId, auctionId) {
     event.preventDefault();
     $.ajax({
-      url: '/api/activateauctionitem?salesDocumentId=' + salesDocumentId + '&auctionId=' + auctionId,
+      url: '/api/activateauctionitem?vehicleId=' + vehicleId + '&auctionId=' + auctionId,
       type: 'POST',
       dataType: 'json'
     }).done((data) => {

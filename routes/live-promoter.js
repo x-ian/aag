@@ -1,7 +1,6 @@
 var Auction = require('../models/auction');
 var Vehicle = require('../models/vehicle');
 var AuctionItem = require('../models/auctionitem');
-var SalesDocument = require('../models/salesdocument');
 var Bid = require('../models/bid');
 
 function calcNewAuctionItemStatus(action, prevStatus) {
@@ -32,11 +31,17 @@ function calcNewAuctionItemStatus(action, prevStatus) {
   }
 }
 
-module.exports = function (app, auctionIo) {
-
+module.exports = function (app, auctionIo, bidQueueStream) {
 
     app.get('/api/upcomingvehicles', function(req, res, next) {
+      // todo something with auctionId
       var auctionId = req.query['auctionId'];
+
+      Vehicle.find({status: 'PUBLISHED'}, function(err, item) {
+        if (err) return next(err);
+        return res.json(item);
+      });
+      /*
       AuctionItem.find(
         {
           $and: [
@@ -53,6 +58,7 @@ module.exports = function (app, auctionIo) {
             return res.json(item);
           });
         });
+        */
     });
 
     app.get('/api/closedauctionitems', function(req, res, next) {
@@ -63,7 +69,7 @@ module.exports = function (app, auctionIo) {
             { auction: auctionId},
             { $or: [ { status: 'SOLD' }, { status: 'CLOSED_EMPTY' } ] }
           ]
-        }).populate({ path: 'salesDocument', model: 'SalesDocument', populate: { path: 'vehicle', model: 'Vehicle'}}).exec(function(err, item) {
+        }).populate({ path: 'vehicle', model: 'Vehicle'}).exec(function(err, item) {
           if (err) return next(err);
           return res.json(item);
       });
@@ -77,7 +83,7 @@ module.exports = function (app, auctionIo) {
             { auction: auctionId},
             { status: { $nin: [ 'SOLD', 'CLOSED_EMPTY' ] } }
           ]
-        }).populate({ path: 'salesDocument', model: 'SalesDocument', populate: { path: 'vehicle', model: 'Vehicle'}}).exec(function(err, item) {
+        }).populate({ path: 'vehicle', model: 'Vehicle'}).exec(function(err, item) {
           if (err) return next(err);
           return res.json(item);
       });
@@ -85,53 +91,49 @@ module.exports = function (app, auctionIo) {
 
 
   app.post('/api/startauction/:id', function(req, res, next) {
-    Auction.findByIdAndUpdate(req.params.id, { closedAt: null, active: true }, function(err, item) {
-      if (err || !item) return next(err);
-      // simply take first vehicle for now and create/overwrite an auctionitem
-      Vehicle.findOne
-      return res.json({ message: 'Auction started' });
+    console.log('1');
+    // reset all active auctions
+    Auction.update({ active: true }, { active: false } , {multi: true }, function(err, num) {
+      console.log('2');
+      if (err) return next(err);
+      // activate select auction
+      console.log('3');
+      Auction.findByIdAndUpdate(req.params.id, { startedAt: new Date(), closedAt: null, active: true }, function(err, item) {
+        console.log('4');
+        if (err || !item) return next(err);
+        console.log('5');
+        return res.json(item);
+      });
     });
   });
 
   app.post('/api/activateauctionitem', function(req, res, next) {
-    var salesDocumentId = req.query.salesDocumentId;
+    var vehicleId = req.query.vehicleId;
     var auctionId = req.query.auctionId;
-    SalesDocument.findById(salesDocumentId, function(err, sd) {
-      if (err || !sd) return next(err);
-      AuctionItem.findOne({salesDocument: sd}, function(err, ai) {
-        if (err) return next(err);
-        var newAi = {
-          startAmount: sd.auctionStartAmount,
-          incrementBy: sd.auctionIncrement,
-          expectedAmount: sd.auctionExpectedAmount,
-          startTimestamp: new Date(),
-          endTimestamp: null,
-          status: 'NOT_OPEN',
-          salesDocument: salesDocumentId,
-          auction: auctionId,
-          highestBid: null
-        }
-        if (!ai) {
-          AuctionItem.create(newAi, function(err, ai2) {
-            if (err || !ai2) return next(err);
-            Vehicle.findById(sd.vehicle, function(err, vehicle) {
-              if (err || !vehicle) return next(err);
-              Auction.findByIdAndUpdate(auctionId, {currentAuctionItem: ai2}).exec();
-              auctionIo.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
-              return res.json({auctionItem: ai2, vehicle: vehicle, recentBids: null});
-            })
-          });
-        } else {
-          AuctionItem.findByIdAndUpdate(ai._id, newAi, function(err, ai2) {
-            if (err || !ai2) return next(err);
-            Vehicle.findById(sd.vehicle, function(err, vehicle) {
-              if (err || !vehicle) return next(err);
-              Auction.findByIdAndUpdate(auctionId, {currentAuctionItem: ai2}).exec();
-              auctionIo.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
-              return res.json({auctionItem: ai2, vehicle: vehicle, recentBids: null});
-            })
-          });
-        }
+
+    Vehicle.findByIdAndUpdate(vehicleId, {status: 'IN_AUCTION'}, function(err, vehicle) {
+      if (err || !vehicle) return next(err);
+      // TODO what if a current auctionitem should be rejoined
+      AuctionItem.find({vehicle: vehicleId}).remove().exec();
+      var newAi = {
+        startAmount: vehicle.auctionStartAmount,
+        incrementBy: vehicle.auctionIncrement,
+        expectedAmount: vehicle.auctionExpectedAmount,
+        startTimestamp: new Date(),
+        endTimestamp: null,
+        status: 'NOT_OPEN',
+        vehicle: vehicleId,
+        auction: auctionId,
+        recentAcceptedBidAmount: 0,
+        recentAcceptedBidSequenceNumber: 0,
+        nextExpectedBidAmount: vehicle.auctionStartAmount,
+        highestBid: null
+      }
+      AuctionItem.create(newAi, function(err, ai2) {
+        if (err || !ai2) return next(err);
+        Auction.findByIdAndUpdate(auctionId, {currentAuctionItem: ai2}).exec();
+        auctionIo.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
+        return res.json({auctionItem: ai2, vehicle: vehicle, recentBids: null});
       });
     });
   });
@@ -140,7 +142,11 @@ module.exports = function (app, auctionIo) {
     var auctionItemId = req.params.id;
     AuctionItem.findByIdAndRemove(auctionItemId, function(err, ai2) {
       if (err) return next(err);
-      return res.json({message: 'item resetted'});
+      Vehicle.findByIdAndUpdate(ai2.vehicle, {status: 'PUBLISHED'}, function(err, item) {
+        if (err) return next(err);
+        Bid.find({auctionItem: auctionItemId}).remove().exec();
+        return res.json({message: 'item resetted'});
+      });
     });
   });
 

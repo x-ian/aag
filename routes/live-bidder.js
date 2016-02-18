@@ -1,7 +1,8 @@
 var Auction = require('../models/auction');
 var AuctionItem = require('../models/auctionitem');
-var SalesDocument = require('../models/salesdocument');
+var Vehicle = require('../models/vehicle');
 var Bid = require('../models/bid');
+var BidQueue = require('../models/bidqueue');
 
 function calcNewAuctionItemStatus(action, prevStatus) {
   if (action === 'BID') {
@@ -23,7 +24,7 @@ function calcNewAuctionItemStatus(action, prevStatus) {
   }
 }
 
-module.exports = function(app, auctionIo) {
+module.exports = function(app, auctionIo, bidQueueStream) {
 
   /**
    * GET next current or future auction
@@ -53,42 +54,68 @@ module.exports = function(app, auctionIo) {
   });
 
   app.get('/api/currentauctionitem', function(req, res, next) {
-    console.log('todo');
     var auctionId = req.query.auctionId;
     Auction.findById(auctionId).populate('currentAuctionItem').exec(function(err, a) {
       if (err || !a) return next(err);
-      if (!a.currentActionItem) {
-        return res.json({auctionItem: '', vehicle: '', salesDocument: ''});
-      } else {
-        SalesDocument.findOne({auctionItem: a.currentAuctionItem}, function(err, sd) {
-          if (err || !sd) return next(err);
-          Vehicle.findById(sd.vehicle, function(err, v) {
-            return res.json({auctionItem: a.currentAuctionItem, vehicle: v, salesDocument: sd});
-          });
+      Vehicle.findById(a.currentAuctionItem.vehicle, function(err, v) {
+        // auctionIo.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: null});
+        // 3. get new recent 5 bids
+        Bid.find({'auctionItem':a.currentAuctionItem._id}).populate('user')
+        .sort('-timestamp').limit(5).exec(function(err, bids) {
+          if (err) return next(err);
+          return res.json({auctionItem: a.currentAuctionItem, vehicle: v, recentBids: bids, currentBidId: null});
         });
-      }
+      });
     });
   });
 
 
   app.get('/api/currentauction', function(req, res, next) {
-    console.log('todo');
     Auction.findOne({}, function(err, item) {
       if (err || !item) return next(err);
       return res.json(item);
     });
   });
 
+  app.post('/api/bidderaction2/:id', function(req, res, next) {
+    var auctionItemId = req.params.id;
+    var action = req.body.action;
+    var auctionId=req.body.auctionId;
+    var bidAmount = req.body.bidAmount;
+    var recentAcceptedBidSequenceNumber = req.body.recentAcceptedBidSequenceNumber;
+
+    Bid.create({
+      amount: bidAmount,
+      timestamp: new Date(),
+      // sequenceNumber: recentAcceptedBidSequenceNumber++,
+      sequenceNumberBase: recentAcceptedBidSequenceNumber,
+      status: 'PENDING',
+      auctionItem: auctionItemId,
+      user: '56a61b7a0fb2b162ee581e5e', // TODO
+      userIpAddress: req.ip
+    }, function(err, bid) {
+      if (err) return next(err);
+      var bidQueueItem = new BidQueue({auction:auctionId, bid:bid});
+      bidQueueItem.save();
+      return res.json({message: 'Bid scheduled'});
+    });
+  });
 
   app.post('/api/bidderaction/:id', function(req, res, next) {
     var auctionItemId = req.params.id;
     var action = req.body.action;
+    var bidAmount = req.body.bidAmount;
+    var recentAcceptedBidSequenceNumber = req.body.recentAcceptedBidSequenceNumber;
+
+    // TODO check if bid is too late
+
+    // TOD check if bid values are consistent
 
     // 1: create a bid from incoming request
     Bid.create({
-      amount: 200, // TODO
+      amount: bidAmount,
       timestamp: new Date(),
-      sequenceNumber: 0, // TODO
+      sequenceNumber: recentAcceptedBidSequenceNumber++,
       status: 'PENDING',
       auctionItem: auctionItemId,
       user: '56a61b7a0fb2b162ee581e5e', // TODO
@@ -100,6 +127,10 @@ module.exports = function(app, auctionIo) {
       AuctionItem.findById(auctionItemId, function(err, item) {
         if (err || !item) return next(err);
         item.status = calcNewAuctionItemStatus(action, item.status);
+        item.recentAcceptedBidAmount = bidAmount,
+        item.nextExpectedBidAmount = parseInt(bidAmount) + parseInt(item.incrementBy);
+        item.recentAcceptedBidSequenceNumber = recentAcceptedBidSequenceNumber;
+        item.highestBid = bid;
         item.save(function(err) {
           if (err) return next(err);
 

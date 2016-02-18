@@ -8,7 +8,6 @@ var socket;
 const resetState = {
   auction: null,
   auctionItem: null,
-  salesDocument: null,
   vehicle: null,
   recentBids: [],
   participants: []
@@ -70,17 +69,7 @@ class Auction extends React.Component {
     }).done((data) => {
       this.setState({auctionItem: data.auctionItem});
       this.setState({vehicle: data.vehicle});
-      this.setState({salesDocument: data.salesDocument});
-    }).fail((jqXhr) => {
-      console.log('ERROR: ' + jqXhr);
-    });
-  }
-
-  getVehicle(id) {
-    $.ajax({
-      url: '/api/vehicles/' + id,
-      dataType: 'json'
-    }).done((data) => {
+      this.setState({recentBids: data.recentBids});
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });

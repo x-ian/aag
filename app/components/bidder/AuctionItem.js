@@ -34,11 +34,13 @@ class AuctionItem extends React.Component {
   updateAfterAction(ai, button) {
       event.preventDefault();
       $.ajax({
-        url: '/api/bidderaction/' + this.props.auctionItem._id,
+        url: '/api/bidderaction2/' + this.props.auctionItem._id,
         dataType: 'json',
         type: 'POST',
         data: {
-          action: button
+          action: button,
+          recentAcceptedBidSequenceNumber: this.props.auctionItem.recentAcceptedBidSequenceNumber,
+          bidAmount: this.props.auctionItem.nextExpectedBidAmount
         }
       }).done((data) => {
         this.setState(data);
@@ -55,7 +57,7 @@ class AuctionItem extends React.Component {
              { this.props.vehicle ? <VehicleDetails vehicle={this.props.vehicle}/> : '' }
            </div>
            <div className='col-sm-6'>
-             { this.props.auctionItem ? <AuctionStatus status={this.props.auctionItem.status} updateAfterAction={this.updateAfterAction.bind(this)}/> : '' }
+             { this.props.auctionItem ? <AuctionStatus auctionItem={this.props.auctionItem} updateAfterAction={this.updateAfterAction.bind(this)}/> : '' }
            </div>
          </div>
          <div className='row'>

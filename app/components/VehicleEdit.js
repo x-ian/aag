@@ -326,7 +326,7 @@ class VehicleEdit extends React.Component {
                           value={this.state.vehicle.status}
                           options={[
                             { value: 'DRAFT', label: 'Draft' },
-                            { value: 'PUBLISHED', label: 'Published' },
+                            { value: 'PUBLISHED', label: 'Published (waiting for next auction)' },
                             { value: 'IN_AUCTION', label: 'Currently in auction' },
                             { value: 'SOLD_BUY_NOW', label: 'Sold from Buy now' },
                             { value: 'SOLD_AUCTION', label: 'Sold in auction' }]}

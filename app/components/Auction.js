@@ -6,6 +6,7 @@ import DateTimeSelect from './common/DateTimeSelect.js'
 const resetState = {
   _id: "",
   scheduledAt: null,
+  startedAt: null,
   closedAt: null,
   location: null,
   active: null
@@ -36,7 +37,9 @@ class Auction extends React.Component {
     this.setState({active: e.target.checked});
    }
 
-  onChangeScheduledAt(e) { (e === 'Invalid date') ? this.setState({closedAt: ''}) : this.setState({scheduledAt: e}) }
+  onChangeScheduledAt(e) { (e === 'Invalid date') ? this.setState({scheduledAt: ''}) : this.setState({scheduledAt: e}) }
+
+  onChangeStartedAt(e) { (e === 'Invalid date') ? this.setState({startedAt: ''}) : this.setState({startedAt: e}) }
 
   onChangeClosedAt(e) { (e === 'Invalid date') ? this.setState({closedAt: ''}) : this.setState({closedAt: e}); }
 
@@ -96,13 +99,14 @@ class Auction extends React.Component {
       });
   }
 
-  addAuction(scheduledAt, closedAt, location, active) {
+  addAuction(scheduledAt, startedAt, closedAt, location, active) {
     $.ajax({
       url: '/api/auctions',
       dataType: 'json',
       type: 'POST',
       data: {
           scheduledAt: scheduledAt,
+          startedAt: startedAt,
           closedAt: closedAt,
           active: active,
           location: location
@@ -121,7 +125,7 @@ class Auction extends React.Component {
        });
   }
 
-  updateAuction(id, scheduledAt, closedAt, location, active) {
+  updateAuction(id, scheduledAt, startedAt, closedAt, location, active) {
     $.ajax({id,
       url: '/api/auctions/' + id,
       dataType: 'json',
@@ -129,6 +133,7 @@ class Auction extends React.Component {
       data: {
           id: id,
           scheduledAt: scheduledAt,
+          startedAt: startedAt,
           closedAt: closedAt,
           active: active,
           location: location
@@ -151,6 +156,7 @@ class Auction extends React.Component {
     event.preventDefault();
 
     var scheduledAt = this.state.scheduledAt;
+    var startedAt = this.state.startedAt;
     var closedAt = this.state.closedAt;
     var active = this.state.active;
     var location = this.state.location;
@@ -163,9 +169,9 @@ class Auction extends React.Component {
 
     if (scheduledAt) {
       if (this.state._id) {
-        this.updateAuction(this.state._id, scheduledAt, closedAt, location, active)
+        this.updateAuction(this.state._id, scheduledAt, startedAt, closedAt, location, active)
       } else {
-        this.addAuction(scheduledAt, closedAt, location, active);
+        this.addAuction(scheduledAt, startedAt, closedAt, location, active);
       }
     }
   }
@@ -202,6 +208,16 @@ class Auction extends React.Component {
                 <label className="col-sm-2 control-label">Scheduled at</label>
                 <div className="col-sm-10">
                   <DateTimeSelect onChange={this.onChangeScheduledAt.bind(this)} dateTime={this.state.scheduledAt} ref='scheduledAtDateField'/>
+                {/*
+                  <input type='text' className='form-control' ref='openAtTextField' value={this.state.openAt}
+                    onChange={this.onChangeOpenAt.bind(this)} autoFocus/>
+                */}
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="col-sm-2 control-label">Started at</label>
+                <div className="col-sm-10">
+                  <DateTimeSelect onChange={this.onChangeStartedAt.bind(this)} dateTime={this.state.startedAt} ref='startedAtDateField'/>
                 {/*
                   <input type='text' className='form-control' ref='openAtTextField' value={this.state.openAt}
                     onChange={this.onChangeOpenAt.bind(this)} autoFocus/>

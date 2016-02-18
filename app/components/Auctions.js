@@ -29,7 +29,7 @@ var Auctions = React.createClass({
 
   render: function () {
     var columns = [
-      'location', 'scheduledAt', 'closedAt', 'active'
+      'location', 'scheduledAt', 'startedAt', 'closedAt', 'active'
     ]
     var columnMetadata = [
       {
@@ -43,14 +43,19 @@ var Auctions = React.createClass({
           'order': 2,
       },
       {
+          'columnName': "startedAt",
+          'displayName': "Started at",
+          'order': 3,
+      },
+      {
           'columnName': "closedAt",
           'displayName': "Closed at",
-          'order': 3,
+          'order': 4,
       },
       {
           'columnName': "active",
           'displayName': "active",
-          'order': 4,
+          'order': 5,
       }
     ];
 

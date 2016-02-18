@@ -42,17 +42,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var auction = io.of('/auction');
+var BidQueue = require('./models/bidqueue');
+var bidQueueStream = BidQueue.find().tailable(true, {awaitdata: true, numberOfRetries:  Number.MAX_VALUE}).stream();
 
 // CRUD access for DB documents
 require('./routes/api-auctions')(app);
 require('./routes/api-auctionitems')(app);
-require('./routes/api-salesdocuments')(app);
+// require('./routes/api-salesdocuments')(app);
 require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);
-require('./routes/live-common')(app, auction, clients);
-require('./routes/live-bidder')(app, auction);
-require('./routes/live-promoter')(app, auction);
+require('./routes/live-common')(app, auction, clients, bidQueueStream);
+require('./routes/live-bidder')(app, auction, bidQueueStream);
+require('./routes/live-promoter')(app, auction, bidQueueStream);
 
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {
@@ -129,6 +131,29 @@ auction.on('connection', function(socket){
     var values2 = keys2.map(function(v) { return clients[v]; });
     auction.emit('participants', values2);
   });
+
+});
+
+bidQueueStream.on('error', function (err) {
+  console.log('bidQueueOnError');
+	console.error(err);
+});
+
+socketPromoter = io.of('/promoter');
+
+// listen to the mongo capped collection
+bidQueueStream.on('data', function(bidQueue){
+  console.log('bidQueueOnData');
+  console.log(bidQueue);
+
+  // make sure that after node restart not all queued bids are reprocessed
+
+  // consistency and validation checks
+
+  // check if more recent bid was already processed
+
+  // notify promoter about valid incoming bid
+  socketPromoter.emit('incoming bid', bidQueue.bid);
 
 });
 

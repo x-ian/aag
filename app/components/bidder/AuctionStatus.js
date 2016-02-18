@@ -20,19 +20,23 @@ class AuctionStatus extends React.Component {
             <div className='media'>
 
               {(() => {
-                switch (this.props.status) {
+                switch (this.props.auctionItem.status) {
                   case "NOT_OPEN":
                     return <div>Wait for auctioneer to open</div>;
                   case "NO_BIDS_YET":
-                    return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
                   case "WAITING_FOR_BIDS":
-                    return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    if (false /* highestdidder === Me*/) {
+                      return 'Highest bidder';
+                    } else {
+                      return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
+                    }
                   case "INCOMING_BID":
                     return <div>Please wait; processing bids</div>;
                   case "WAITING_FINAL_CALL":
-                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
                   case "WAITING_FINAL_CALL_EMPTY":
-                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid</button>;
+                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
                   case "SOLD":
                     return '';
                   case "CLOSED_EMPTY":
@@ -42,7 +46,7 @@ class AuctionStatus extends React.Component {
                 }
               })()}
 
-              &nbsp;({this.props.status})
+              &nbsp;({this.props.auctionItem.status})
             </div>
           </div>
         </div>
