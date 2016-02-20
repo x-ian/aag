@@ -5,7 +5,7 @@ var bidSchema = new mongoose.Schema({
   timestamp: Date,
   sequenceNumber: Number,
   sequenceNumberBase: Number,
-  status: { type: String, enum: ['PENDING', 'TOO_LATE', 'ACCEPTED', 'REJECTED', 'WON'] },
+  status: { type: String, enum: ['PENDING', 'REJECTED_OUTDATED', 'ACCEPTED', 'REJECTED', 'REJECTED_SERVER_BUSY','WON', 'REJECTED_INVALID'] },
   auctionItem: {
        type: mongoose.Schema.Types.ObjectId,
        ref: 'AuctionItem'

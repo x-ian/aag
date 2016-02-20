@@ -2186,6 +2186,7 @@ var resetState = {
   auction: null,
   auctionItem: null,
   vehicle: null,
+  myLatestBid: null,
   recentBids: [],
   participants: []
 };
@@ -2268,6 +2269,28 @@ var Auction = function (_React$Component) {
       });
     }
   }, {
+    key: 'updateAfterAction',
+    value: function updateAfterAction(ai, button) {
+      var _this5 = this;
+
+      event.preventDefault();
+      $.ajax({
+        url: '/api/bidderaction2/' + this.state.auctionItem._id,
+        dataType: 'json',
+        type: 'POST',
+        data: {
+          action: button,
+          auctionId: this.state.auction._id,
+          recentAcceptedBidSequenceNumber: this.state.auctionItem.recentAcceptedBidSequenceNumber,
+          bidAmount: this.state.auctionItem.nextExpectedBidAmount
+        }
+      }).done(function (data) {
+        _this5.setState({ myLatestBid: data['myBid'] });
+      }).fail(function (jqXhr) {
+        console.log('ERROR: ' + jqXhr);
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       var auction = _react2.default.createElement(
@@ -2288,7 +2311,7 @@ var Auction = function (_React$Component) {
         _react2.default.createElement('br', null),
         'waiting for Auctioneer to release next AuctionItem'
       );
-      if (this.state.auctionItem) auction = _react2.default.createElement(_AuctionItem2.default, { auctionItem: this.state.auctionItem, vehicle: this.state.vehicle, participants: this.state.participants, recentBids: this.state.recentBids });
+      if (this.state.auctionItem) auction = _react2.default.createElement(_AuctionItem2.default, { updateAfterAction: this.updateAfterAction.bind(this), auctionItem: this.state.auctionItem, vehicle: this.state.vehicle, participants: this.state.participants, recentBids: this.state.recentBids });
 
       return _react2.default.createElement(
         'div',
@@ -2346,26 +2369,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var resetState = {
-  auctionItem: null,
-  vehicle: null,
-  auction: null,
-  participants: [],
-  recentBids: [],
-  // optimization shortcut
-  lastestBid: null
-};
-
 var AuctionItem = function (_React$Component) {
   _inherits(AuctionItem, _React$Component);
 
   function AuctionItem() {
     _classCallCheck(this, AuctionItem);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AuctionItem).call(this));
-
-    _this.state = resetState;
-    return _this;
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(AuctionItem).call(this));
   }
 
   _createClass(AuctionItem, [{
@@ -2377,27 +2387,6 @@ var AuctionItem = function (_React$Component) {
       // not sure if this works
       // this.props.socket.removeListener('auctionAction');
       // this.props.socket.removeListener('participants');
-    }
-  }, {
-    key: 'updateAfterAction',
-    value: function updateAfterAction(ai, button) {
-      var _this2 = this;
-
-      event.preventDefault();
-      $.ajax({
-        url: '/api/bidderaction2/' + this.props.auctionItem._id,
-        dataType: 'json',
-        type: 'POST',
-        data: {
-          action: button,
-          recentAcceptedBidSequenceNumber: this.props.auctionItem.recentAcceptedBidSequenceNumber,
-          bidAmount: this.props.auctionItem.nextExpectedBidAmount
-        }
-      }).done(function (data) {
-        _this2.setState(data);
-      }).fail(function (jqXhr) {
-        console.log('ERROR: ' + jqXhr);
-      });
     }
   }, {
     key: 'render',
@@ -2416,7 +2405,7 @@ var AuctionItem = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'col-sm-6' },
-            this.props.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { auctionItem: this.props.auctionItem, updateAfterAction: this.updateAfterAction.bind(this) }) : ''
+            this.props.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { auctionItem: this.props.auctionItem, updateAfterAction: this.props.updateAfterAction.bind(this) }) : ''
           )
         ),
         _react2.default.createElement(
@@ -3981,6 +3970,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var socket;
+var socketPromoter;
 
 var resetState = {
   auction: null,
@@ -3990,7 +3980,8 @@ var resetState = {
   participants: [],
   upcomingVehicles: [],
   closedAuctionItems: [],
-  incompleteAuctionItems: []
+  incompleteAuctionItems: [],
+  incomingBid: null
 };
 
 var Auction = function (_React$Component) {
@@ -4013,15 +4004,24 @@ var Auction = function (_React$Component) {
       this.updateVehiclesQueues();
       this.startAuction();
 
+      socketPromoter = io.connect('/promoter');
+
       socket = io.connect('/auction');
+
+      socketPromoter.on('incoming bid', function (data) {
+        console.log('Promoter incoming bid');
+        console.log(data);
+        _this2.setState({ incomingBid: data['incomingBid'] });
+        _this2.setState({ auctionItem: data['auctionItem'] });
+      });
 
       socket.on('auctionAction', function (data) {
         console.log('IO AuctionItem status ' + _this2.state.auctionItem.status);
-        _this2.setState({ auctionItem: data['auctionItem'] });
+        // this.setState({auctionItem: data['auctionItem'] });
         _this2.setState({ recentBids: data['recentBids'] });
         // TODO: if already a current bid present, deny this newly incoming one
-        _this2.setState({ currentBidId: null });
-        if (data['currentBidId']) _this2.setState({ currentBidId: data['currentBidId'] });
+        // this.setState({currentBidId: null});
+        // if (data['currentBidId']) this.setState({currentBidId: data['currentBidId'] });
       });
       socket.on('participants', function (data) {
         _this2.setState({ participants: data });
@@ -4154,24 +4154,24 @@ var Auction = function (_React$Component) {
 
       event.preventDefault();
       $.ajax({
-        url: '/api/promoteraction/' + this.state.auctionItem._id,
+        url: '/api/promoteraction2/' + this.state.auctionItem._id,
         dataType: 'json',
         type: 'POST',
         data: {
           action: button,
-          currentBidId: this.state.currentBidId
+          incomingBidId: this.state.incomingBid ? this.state.incomingBid._id : null
         }
       }).done(function (data) {
         _this7.setState(data);
+        if (button === 'SELL' || button === 'CLOSE') {
+          _this7.updateVehiclesQueues();
+          setTimeout(function () {
+            this.setState({ auctionItem: null, vehicle: null });
+          }.bind(_this7), 2000);
+        }
       }).fail(function (jqXhr) {
         console.log('ERROR: ' + jqXhr);
       });
-      if (button === 'SELL' || button === 'CLOSE') {
-        this.updateVehiclesQueues();
-        setTimeout(function () {
-          this.setState({ auctionItem: null, vehicle: null });
-        }.bind(this), 2000);
-      }
     }
   }, {
     key: 'render',
@@ -4180,6 +4180,7 @@ var Auction = function (_React$Component) {
         'div',
         null,
         this.state.auctionItem ? _react2.default.createElement(_AuctionItem2.default, { updateAfterAction: this.updateAfterAction.bind(this),
+          incomingBid: this.state.incomingBid,
           vehicle: this.state.vehicle,
           auctionItem: this.state.auctionItem,
           recentBids: this.state.recentBids,
@@ -4268,7 +4269,7 @@ var AuctionItem = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'col-sm-6' },
-            this.props.auctionItem ? _react2.default.createElement(_PromoterStatus2.default, { status: this.props.auctionItem.status, updateAfterAction: this.props.updateAfterAction.bind(this) }) : ''
+            this.props.auctionItem ? _react2.default.createElement(_PromoterStatus2.default, { auctionItem: this.props.auctionItem, incomingBid: this.props.incomingBid, updateAfterAction: this.props.updateAfterAction.bind(this) }) : ''
           )
         ),
         _react2.default.createElement(
@@ -4525,7 +4526,7 @@ var PromoterStatus = function (_React$Component) {
             'div',
             { className: 'media' },
             function () {
-              switch (_this2.props.status) {
+              switch (_this2.props.auctionItem.status) {
                 case "NOT_OPEN":
                   return _react2.default.createElement(
                     'button',
@@ -4551,20 +4552,23 @@ var PromoterStatus = function (_React$Component) {
                     _react2.default.createElement(
                       'button',
                       { className: 'btn btn-success', onClick: _this2.onClickAcceptBid.bind(_this2) },
-                      'Accept bid'
+                      'Accept bid: ',
+                      _this2.props.incomingBid.amount
                     ),
                     ' ',
                     _react2.default.createElement(
                       'button',
                       { className: 'btn btn-info', onClick: _this2.onClickRejectBid.bind(_this2) },
-                      'Reject bid'
+                      'Reject bid: ',
+                      _this2.props.incomingBid.amount
                     )
                   );
                 case "WAITING_FINAL_CALL":
                   return _react2.default.createElement(
                     'button',
                     { className: 'btn btn-danger', onClick: _this2.onClickSell.bind(_this2) },
-                    'Sell'
+                    'Sell: ',
+                    _this2.props.incomingBid.amount
                   );
                 case "WAITING_FINAL_CALL_EMPTY":
                   return _react2.default.createElement(
@@ -4581,7 +4585,7 @@ var PromoterStatus = function (_React$Component) {
               }
             }(),
             ' (',
-            this.props.status,
+            this.props.auctionItem.status,
             ')'
           )
         )

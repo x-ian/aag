@@ -19,7 +19,7 @@ class AuctionItem extends React.Component {
                   { this.props.vehicle ? <VehicleDetails vehicle={this.props.vehicle}/> : '' }
                 </div>
                 <div className='col-sm-6'>
-                  { this.props.auctionItem ? <PromoterStatus status={this.props.auctionItem.status} updateAfterAction={this.props.updateAfterAction.bind(this)}/> : '' }
+                  { this.props.auctionItem ? <PromoterStatus auctionItem={this.props.auctionItem} incomingBid={this.props.incomingBid} updateAfterAction={this.props.updateAfterAction.bind(this)}/> : '' }
                 </div>
               </div>
               <div className='row'>

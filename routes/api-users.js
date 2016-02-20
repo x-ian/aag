@@ -8,7 +8,6 @@ module.exports = function (app) {
   app.get('/api/users', function(req, res, next) {
     User.find(function(err, item) {
       if (err || !item) return next(err);
-      // return res.send(item);
       return res.json(item);
     });
   });

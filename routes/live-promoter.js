@@ -1,7 +1,29 @@
+var log = require('../lib/log');
+var logLive = require('../lib/logLive');
+
 var Auction = require('../models/auction');
 var Vehicle = require('../models/vehicle');
 var AuctionItem = require('../models/auctionitem');
 var Bid = require('../models/bid');
+
+function auctionItemSaveAndEmit(item, res, auctionIo) {
+  item.processingBid = false;
+  item.save(function (err) {
+    log.info('AuctionItem updated ' + item._id);
+    if (err) return next(err);
+
+    // 3. get new recent 5 bids
+    Bid.find({'auctionItem':item._id}).populate('user')
+    .sort('-timestamp').limit(5).exec(function(err, bids) {
+      if (err || !bids) return next(err);
+
+      // send back results to all
+      auctionIo.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: null});
+      // and just for this request
+      return res.json({auctionItem: item, recentBids: bids});
+    });
+  });
+}
 
 function calcNewAuctionItemStatus(action, prevStatus) {
   switch (action) {
@@ -27,11 +49,11 @@ function calcNewAuctionItemStatus(action, prevStatus) {
       return 'CLOSED_EMPTY'
       break;
     default:
-       console.log("Unknown status");
+       log.info("Unknown status");
   }
 }
 
-module.exports = function (app, auctionIo, bidQueueStream) {
+module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
 
     app.get('/api/upcomingvehicles', function(req, res, next) {
       // todo something with auctionId
@@ -52,7 +74,7 @@ module.exports = function (app, auctionIo, bidQueueStream) {
           if (err) return next(err);
           // all salesdocuments
           let sdIds = items.map((ai) => { return ai.salesDocument });
-          console.log(sdIds);
+          log.info(sdIds);
           SalesDocument.find({'_id': { $nin: sdIds }}).populate('vehicle').exec(function(err, item) {
             if (err) return next(err);
             return res.json(item);
@@ -91,17 +113,14 @@ module.exports = function (app, auctionIo, bidQueueStream) {
 
 
   app.post('/api/startauction/:id', function(req, res, next) {
-    console.log('1');
+    var auctionId = req.params.id;
     // reset all active auctions
     Auction.update({ active: true }, { active: false } , {multi: true }, function(err, num) {
-      console.log('2');
       if (err) return next(err);
       // activate select auction
-      console.log('3');
-      Auction.findByIdAndUpdate(req.params.id, { startedAt: new Date(), closedAt: null, active: true }, function(err, item) {
-        console.log('4');
+      Auction.findByIdAndUpdate(auctionId, { startedAt: new Date(), closedAt: null, active: true }, function(err, item) {
         if (err || !item) return next(err);
-        console.log('5');
+        logLive.log('action', 'promoter startauction: %s', auctionId );
         return res.json(item);
       });
     });
@@ -133,6 +152,7 @@ module.exports = function (app, auctionIo, bidQueueStream) {
         if (err || !ai2) return next(err);
         Auction.findByIdAndUpdate(auctionId, {currentAuctionItem: ai2}).exec();
         auctionIo.emit('newAuctionItem', {auctionItem: ai2, vehicle: vehicle, recentBids: null});
+        logLive.log('action', 'promoter activateauctionitem: ' + ai2._id );
         return res.json({auctionItem: ai2, vehicle: vehicle, recentBids: null});
       });
     });
@@ -145,10 +165,104 @@ module.exports = function (app, auctionIo, bidQueueStream) {
       Vehicle.findByIdAndUpdate(ai2.vehicle, {status: 'PUBLISHED'}, function(err, item) {
         if (err) return next(err);
         Bid.find({auctionItem: auctionItemId}).remove().exec();
+        deactivateBidQueue();
+        logLive.log('action', 'promoter rescheduleauctionitem: %s', auctionItemId );
         return res.json({message: 'item resetted'});
       });
     });
   });
+
+   app.post('/api/promoteraction2/:id', function(req, res, next) {
+
+     var auctionItemId = req.params.id;
+     var incomingBidId = req.body.incomingBidId;
+     var action = req.body.action;
+
+     log.info('PromoterAction ' + auctionItemId + ' ' + incomingBidId + ' ' + action);
+     logLive.log('action', 'promoter promoteraction2: %s %s %s', action, auctionItemId, incomingBidId);
+
+     AuctionItem.findById(auctionItemId, function(err, item) {
+       if (err || !item) return next(err);
+
+       item.status = calcNewAuctionItemStatus(action, item.status);
+
+       switch (action) {
+         case 'OPEN':
+           return auctionItemSaveAndEmit(item, res, auctionIo);
+           break;
+         case 'ACCEPT':
+           Bid.findByIdAndUpdate(incomingBidId, {status: 'ACCEPTED'}, function(err, bid) {
+             if (err || !bid) return next(err);
+             item.recentAcceptedBidAmount = bid.amount;
+             item.nextExpectedBidAmount = bid.amount + item.incrementBy;
+             item.recentAcceptedBidSequenceNumber = bid.sequenceNumberBase + 1;
+             return auctionItemSaveAndEmit(item, res, auctionIo);
+           });
+           break;
+         case 'REJECT':
+           // todo somehow undo rejected bid
+           Bid.findByIdAndUpdate(incomingBidId, {status: 'REJECTED'}, function(err, bid) {
+             if (err || !bid) return next(err);
+             item.recentAcceptedBidSequenceNumber = bid.sequenceNumberBase + 1;
+             return auctionItemSaveAndEmit(item, res, auctionIo);
+           });
+           break;
+         case 'SELL':
+           Bid.findByIdAndUpdate(incomingBidId, {status: 'WON'}, function(err, bid) {
+             if (err || !bid) return next(err);
+             item.nextExpectedBidAmount = null;
+             item.endTimestamp = new Date();
+             return auctionItemSaveAndEmit(item, res, auctionIo);
+           });
+           break;
+         case 'FINAL_CALL':
+           return auctionItemSaveAndEmit(item, res, auctionIo);
+           break;
+         case 'FINAL_CALL_EMPTY':
+           return auctionItemSaveAndEmit(item, res, auctionIo);
+           break;
+         case 'CLOSE':
+           return auctionItemSaveAndEmit(item, res, auctionIo);
+           break;
+         default:
+           log.error('Unknown action');
+           break;
+       }
+     });
+
+
+/*
+         if (incomingBidId) {
+           Bid.findById(incomingBidId, function(err, bid) {
+             if (err || !bid) return next(err);
+             var bidStatus;
+             if (action === 'ACCEPT') {
+               bidStatus = 'ACCEPTED';
+               item.recentAcceptedBidAmount = bid.amount;
+               item.nextExpectedBidAmount = bid.amount + item.incrementBy;
+               item.recentAcceptedBidSequenceNumber = bid.sequenceNumberBase + 1;
+             } else if (action === 'REJECT') {
+               bidStatus = 'REJECTED';
+             } else if (action === 'SELL') {
+               bidStatus = 'WON';
+               item.nextExpectedBidAmount = null;
+               item.endTimestamp = new Date();
+             } if (action else {
+               log.info('Unknown combination of action (%s, %s) and currentbid', action, item.status);
+             }
+             bid.status = bidStatus;
+             bid.save();
+
+             return auctionItemSaveAndEmit(item, res, auctionIo);
+           });
+         } else if (action === 'ACCEPT' || action === 'REJECTED' || action === 'SELL') {
+           log.info('Unknown combination of action and currentbid');
+         } else {
+           return auctionItemSaveAndEmit(item, res, auctionIo);
+         }
+       });
+       */
+   });
 
    app.post('/api/promoteraction/:id', function(req, res, next) {
 
@@ -156,7 +270,7 @@ module.exports = function (app, auctionIo, bidQueueStream) {
      var currentBidId = req.body.currentBidId;
      var action = req.body.action;
 
-     console.log('PromoterAction ' + auctionItemId + ' ' + currentBidId + ' ' + action);
+     log.info('PromoterAction ' + auctionItemId + ' ' + currentBidId + ' ' + action);
 
      AuctionItem.findById(auctionItemId, function(err, item) {
        if (err || !item) return next(err);
@@ -171,15 +285,15 @@ module.exports = function (app, auctionIo, bidQueueStream) {
          } else if (action === 'SELL') {
            bidStatus = 'WON';
          } else {
-           console.log('Unknown combination of action and currentbid');
+           log.info('Unknown combination of action and currentbid');
          }
          Bid.findByIdAndUpdate(currentBidId, {status: bidStatus}).exec();
        } else if (action === 'ACCEPT' || action === 'REJECTED' || action === 'SELL') {
-         console.log('Unknown combination of action and currentbid');
+         log.info('Unknown combination of action and currentbid');
        }
 
        item.save(function (err) {
-         console.log('AuctionItem updated ' + item._id);
+         log.info('AuctionItem updated ' + item._id);
          if (err) return next(err);
 
          // 3. get new recent 5 bids

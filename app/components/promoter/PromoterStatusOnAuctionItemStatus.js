@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from 'react-router';
 import {isEqual} from 'underscore';
 
-class PromoterStatus extends React.Component {
+class PromoterStatusOnAuctionItemStatus extends React.Component {
 
   constructor() {
     super();
@@ -44,7 +44,7 @@ class PromoterStatus extends React.Component {
             <div className='media'>
 
               {(() => {
-                switch (this.props.auctionItem.status) {
+                switch (this.props.status) {
                   case "NOT_OPEN":
                     return <button className='btn btn-secondary' onClick={this.onClickOpenBidding.bind(this)}>Open bidding</button>;
                   case "NO_BIDS_YET":
@@ -52,10 +52,10 @@ class PromoterStatus extends React.Component {
                   case "WAITING_FOR_BIDS":
                     return <button className='btn btn-warning' onClick={this.onClickFinalCall.bind(this)}>Final call</button>;
                   case "INCOMING_BID":
-                    return <div><button className='btn btn-success' onClick={this.onClickAcceptBid.bind(this)}>Accept bid: {this.props.incomingBid.amount}</button>
-                      &nbsp;<button className='btn btn-info' onClick={this.onClickRejectBid.bind(this)}>Reject bid: {this.props.incomingBid.amount}</button></div>;
+                    return <div><button className='btn btn-success' onClick={this.onClickAcceptBid.bind(this)}>Accept bid</button>
+                      &nbsp;<button className='btn btn-info' onClick={this.onClickRejectBid.bind(this)}>Reject bid</button></div>;
                   case "WAITING_FINAL_CALL":
-                    return <button className='btn btn-danger' onClick={this.onClickSell.bind(this)}>Sell: {this.props.incomingBid.amount}</button>;
+                    return <button className='btn btn-danger' onClick={this.onClickSell.bind(this)}>Sell</button>;
                   case "WAITING_FINAL_CALL_EMPTY":
                     return <button className='btn btn-danger' onClick={this.onClickClose.bind(this)}>Close</button>;
                   case "SOLD":
@@ -67,7 +67,7 @@ class PromoterStatus extends React.Component {
                 }
               })()}
 
-              &nbsp;({this.props.auctionItem.status})
+              &nbsp;({this.props.status})
             </div>
           </div>
         </div>
@@ -75,4 +75,4 @@ class PromoterStatus extends React.Component {
   }
 };
 
-export default PromoterStatus;
+export default PromoterStatusOnAuctionItemStatus;

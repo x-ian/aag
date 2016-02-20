@@ -5,6 +5,7 @@ import VehicleQueue from './VehicleQueue.js';
 import AudioProducer from './AudioProducer.js';
 
 var socket;
+var socketPromoter;
 
 const resetState = {
   auction: null,
@@ -14,7 +15,8 @@ const resetState = {
   participants: [],
   upcomingVehicles: [],
   closedAuctionItems: [],
-  incompleteAuctionItems: []
+  incompleteAuctionItems: [],
+  incomingBid: null
 }
 
 class Auction extends React.Component {
@@ -28,15 +30,25 @@ class Auction extends React.Component {
     this.updateVehiclesQueues();
     this.startAuction();
 
+    socketPromoter = io.connect('/promoter');
+
     socket = io.connect('/auction');
+
+    socketPromoter.on('incoming bid', (data) => {
+      console.log('Promoter incoming bid');
+      console.log(data);
+      this.setState({incomingBid: data['incomingBid']});
+      this.setState({auctionItem: data['auctionItem']});
+
+    });
 
     socket.on('auctionAction', (data) => {
       console.log('IO AuctionItem status ' + this.state.auctionItem.status);
-      this.setState({auctionItem: data['auctionItem'] });
+      // this.setState({auctionItem: data['auctionItem'] });
       this.setState({recentBids: data['recentBids'] });
       // TODO: if already a current bid present, deny this newly incoming one
-      this.setState({currentBidId: null});
-      if (data['currentBidId']) this.setState({currentBidId: data['currentBidId'] });
+      // this.setState({currentBidId: null});
+      // if (data['currentBidId']) this.setState({currentBidId: data['currentBidId'] });
     });
     socket.on('participants', (data) => {
       this.setState({participants: data });
@@ -150,24 +162,24 @@ class Auction extends React.Component {
   updateAfterAction(ai, button) {
       event.preventDefault();
       $.ajax({
-        url: '/api/promoteraction/' + this.state.auctionItem._id,
+        url: '/api/promoteraction2/' + this.state.auctionItem._id,
         dataType: 'json',
         type: 'POST',
         data: {
           action: button,
-          currentBidId: this.state.currentBidId
+          incomingBidId: ( this.state.incomingBid ? this.state.incomingBid._id : null)
         }
       }).done((data) => {
         this.setState(data);
+        if (button === 'SELL' || button === 'CLOSE') {
+          this.updateVehiclesQueues();
+          setTimeout(function(){
+            this.setState({auctionItem: null, vehicle: null});
+          }.bind(this), 2000);
+        }
       }).fail((jqXhr) => {
         console.log('ERROR: ' + jqXhr);
       });
-      if (button === 'SELL' || button === 'CLOSE') {
-        this.updateVehiclesQueues();
-        setTimeout(function(){
-          this.setState({auctionItem: null, vehicle: null});
-        }.bind(this), 2000);
-      }
   }
 
   render() {
@@ -176,6 +188,7 @@ class Auction extends React.Component {
         {this.state.auctionItem ?
           (
             <AuctionItem updateAfterAction={this.updateAfterAction.bind(this)}
+              incomingBid={this.state.incomingBid}
               vehicle={this.state.vehicle}
               auctionItem={this.state.auctionItem}
               recentBids={this.state.recentBids}

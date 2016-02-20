@@ -1,3 +1,6 @@
+var log = require('../lib/log');
+var logLive = require('../lib/logLive');
+
 var Auction = require('../models/auction');
 var AuctionItem = require('../models/auctionitem');
 var Vehicle = require('../models/vehicle');
@@ -17,14 +20,14 @@ function calcNewAuctionItemStatus(action, prevStatus) {
       case "WAITING_FINAL_CALL_EMPTY":
         return 'INCOMING_BID';
       default:
-        console.log("Unknown status - " + prevStatus);
+        log.error("Unknown status - " + prevStatus);
     }
   } else {
-    console.log("Unknown action - " + action);
+    log.error("Unknown action - " + action);
   }
 }
 
-module.exports = function(app, auctionIo, bidQueueStream) {
+module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
 
   /**
    * GET next current or future auction
@@ -95,9 +98,11 @@ module.exports = function(app, auctionIo, bidQueueStream) {
       userIpAddress: req.ip
     }, function(err, bid) {
       if (err) return next(err);
+      logLive.action('bidder bidderaction2: ' + action + ' ' + auctionItemId + ' ' + auctionId + ' ' + bid._id, + ' ' + bidAmount + ' ' + recentAcceptedBidSequenceNumber);
+      activateBidQueue();
       var bidQueueItem = new BidQueue({auction:auctionId, bid:bid});
       bidQueueItem.save();
-      return res.json({message: 'Bid scheduled'});
+      return res.json({myBid: bid});
     });
   });
 
@@ -167,10 +172,10 @@ module.exports = function(app, auctionIo, bidQueueStream) {
             item.status = 'INCOMING_BID';
             break;
           default:
-            console.log("Unknown status - " + item.status);
+            log.info("Unknown status - " + item.status);
         }
       } else {
-        console.log("Unknown action - " + req.body.action);
+        log.info("Unknown action - " + req.body.action);
       }
       item.save(function(err) {
         if (err) return next(err);

@@ -8,7 +8,6 @@ module.exports = function (app) {
   app.get('/api/auctionitems', function(req, res, next) {
     AuctionItem.find(function(err, item) {
       if (err || !item) return next(err);
-      // return res.send(item);
       return res.json(item);
     });
   });

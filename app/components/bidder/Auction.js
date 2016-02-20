@@ -9,6 +9,7 @@ const resetState = {
   auction: null,
   auctionItem: null,
   vehicle: null,
+  myLatestBid: null,
   recentBids: [],
   participants: []
 }
@@ -75,10 +76,29 @@ class Auction extends React.Component {
     });
   }
 
+  updateAfterAction(ai, button) {
+      event.preventDefault();
+      $.ajax({
+        url: '/api/bidderaction2/' + this.state.auctionItem._id,
+        dataType: 'json',
+        type: 'POST',
+        data: {
+          action: button,
+          auctionId: this.state.auction._id,
+          recentAcceptedBidSequenceNumber: this.state.auctionItem.recentAcceptedBidSequenceNumber,
+          bidAmount: this.state.auctionItem.nextExpectedBidAmount
+        }
+      }).done((data) => {
+        this.setState({myLatestBid: data['myBid']});
+      }).fail((jqXhr) => {
+        console.log('ERROR: ' + jqXhr);
+      });
+  }
+
   render() {
     var auction = <h3 className='text-center'><br/><br/><br/>No active auction</h3>;
     if (this.state.auction && !this.state.auctionItem) auction = <h3 className='text-center'><br/><br/><br/>Active auction<br/>waiting for Auctioneer to release next AuctionItem</h3>;
-    if (this.state.auctionItem) auction = <AuctionItem auctionItem={this.state.auctionItem} vehicle={this.state.vehicle} participants={this.state.participants} recentBids={this.state.recentBids}/>;
+    if (this.state.auctionItem) auction = <AuctionItem updateAfterAction={this.updateAfterAction.bind(this)} auctionItem={this.state.auctionItem} vehicle={this.state.vehicle} participants={this.state.participants} recentBids={this.state.recentBids}/>;
 
     return (
       <div>

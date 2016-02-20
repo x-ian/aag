@@ -6,7 +6,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var compression = require('compression');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morgan = require('morgan');
 var async = require('async');
 var colors = require('colors');
 var mongoose = require('mongoose');
@@ -17,6 +17,7 @@ var Router = require('react-router');
 var swig  = require('swig');
 var xml2js = require('xml2js');
 var _ = require('underscore');
+var log = require('./lib/log');
 
 var config = require('./config');
 
@@ -28,12 +29,12 @@ var clients = new Object();
 
 mongoose.connect(config.database);
 mongoose.connection.on('error', function() {
-  console.info('Error: Could not connect to MongoDB. Did you forget to run `mongod`?'.red);
+  log.error('Error: Could not connect to MongoDB. Did you forget to run `mongod`?'.red);
 });
 
 app.set('port', process.env.PORT || 3000);
 app.use(compression());
-app.use(logger('dev'));
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
@@ -42,8 +43,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var auction = io.of('/auction');
+var socketPromoter = io.of('/promoter');
+
 var BidQueue = require('./models/bidqueue');
+var bidQueueActive = false;
 var bidQueueStream = BidQueue.find().tailable(true, {awaitdata: true, numberOfRetries:  Number.MAX_VALUE}).stream();
+
+function isBidQueueActive() {
+  log.debug('isBidQueueActive ' + bidQueueActive);
+  return bidQueueActive;
+}
+
+function activateBidQueue() {
+  bidQueueActive = true;
+  log.debug('activateBidQueue ' + bidQueueActive);
+}
+
+function deactivateBidQueue() {
+  bidQueueActive = false;
+  log.debug('deactivateBidQueue ' + bidQueueActive);
+}
 
 // CRUD access for DB documents
 require('./routes/api-auctions')(app);
@@ -53,8 +72,9 @@ require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);
 require('./routes/live-common')(app, auction, clients, bidQueueStream);
-require('./routes/live-bidder')(app, auction, bidQueueStream);
-require('./routes/live-promoter')(app, auction, bidQueueStream);
+require('./routes/live-bidder')(app, auction, bidQueueStream, activateBidQueue);
+require('./routes/live-promoter')(app, auction, bidQueueStream, deactivateBidQueue);
+require('./routes/live-bidqueue')(app, socketPromoter, auction, bidQueueStream, isBidQueueActive);
 
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {
@@ -73,7 +93,7 @@ app.use(function(req, res) {
 });
 
 app.use(function(err, req, res, next) {
-  console.log(err.stack.red);
+  log.info(err.stack.red);
   res.status(err.status || 500);
   res.send({ message: err.message });
 });
@@ -84,19 +104,19 @@ app.use(function(err, req, res, next) {
 // http://stackoverflow.com/questions/25265860/socketio-volatile-emit-to-namespace
 // moved into dedicated namespace
 // socket.on('producer audio chunk', function(msg){
-//   console.log('volatile emit');
+//   log.info('volatile emit');
 //   io.volatile.emit('consumer audio chunk', msg);
 //   // socket.emit('consumer audio chunk', msg);
 // });
 var audio = io.of('/audio-stream');
 audio.on('connection', function(socket){
-    console.log('connected to audio stream with id %s', socket.id);
+    log.info('connected to audio stream with id %s', socket.id);
 
     socket.on('producer audio chunk', function(msg){
       audio.volatile.emit('consumer audio chunk', msg);
     });
     socket.on('disconnect', function() {
-      console.log('disconnected from audio stream with id %s', socket.id);
+      log.info('disconnected from audio stream with id %s', socket.id);
     });
 });
 
@@ -106,7 +126,7 @@ audio.on('connection', function(socket){
 // io.sockets.on('connection', function(socket) {
 var auction = io.of('/auction');
 auction.on('connection', function(socket){
-  console.log('connected to auction with id %s', socket.id);
+  log.info('connected to auction with id %s', socket.id);
 
   clients[socket.id] = { id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
   var keys = Object.keys(clients);
@@ -114,8 +134,8 @@ auction.on('connection', function(socket){
   auction.emit('participants', values);
 
   // for (key in socket.request.headers) {
-  //   console.log(key);
-  //   console.log(socket.request.headers[key]);
+  //   log.info(key);
+  //   log.info(socket.request.headers[key]);
   // }
     // var url = 'http://freegeoip.net/json/' + socket.request.connection.remoteAddress
     // request.get url, (error, response, body) ->
@@ -124,7 +144,7 @@ auction.on('connection', function(socket){
     //     location data
 
   socket.on('disconnect', function() {
-    console.log('disconnected from auction with id %s', socket.id);
+    log.info('disconnected from auction with id %s', socket.id);
     clients[socket.id] = null;
     delete(clients[socket.id]);
     var keys2 = Object.keys(clients);
@@ -134,31 +154,8 @@ auction.on('connection', function(socket){
 
 });
 
-bidQueueStream.on('error', function (err) {
-  console.log('bidQueueOnError');
-	console.error(err);
-});
-
-socketPromoter = io.of('/promoter');
-
-// listen to the mongo capped collection
-bidQueueStream.on('data', function(bidQueue){
-  console.log('bidQueueOnData');
-  console.log(bidQueue);
-
-  // make sure that after node restart not all queued bids are reprocessed
-
-  // consistency and validation checks
-
-  // check if more recent bid was already processed
-
-  // notify promoter about valid incoming bid
-  socketPromoter.emit('incoming bid', bidQueue.bid);
-
-});
-
 server.listen(app.get('port'), function() {
-  console.log('Express server listening on port ' + app.get('port'));
+  log.info('Express server listening on port ' + app.get('port'));
 
   // just for development to notify about server restart
   var osascript = require('node-osascript');

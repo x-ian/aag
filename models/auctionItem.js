@@ -10,7 +10,8 @@ var auctionItemSchema = new mongoose.Schema({
   recentAcceptedBidAmount: Number,
   nextExpectedBidAmount: Number,
   recentAcceptedBidSequenceNumber: Number,
-
+  // used for poor mans queue
+  processingBid: { type: Boolean, default: false },
   status: { type: String, enum: ['NOT_SCHEDULED', 'NOT_OPEN', 'NO_BIDS_YET', 'WAITING_FOR_BIDS',
     'INCOMING_BID', 'WAITING_FINAL_CALL',
     'SOLD', 'WAITING_FINAL_CALL_EMPTY', 'CLOSED_EMPTY']
