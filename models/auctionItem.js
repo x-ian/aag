@@ -6,10 +6,14 @@ var auctionItemSchema = new mongoose.Schema({
   expectedAmount: Number,
   startTimestamp: Date,
   endTimestamp: Date,
-  // unsure if this belongs here
-  recentAcceptedBidAmount: Number,
   nextExpectedBidAmount: Number,
+  // unsure if this belongs here, could be removed cause of recentAcceptedBid
+  recentAcceptedBidAmount: Number,
   recentAcceptedBidSequenceNumber: Number,
+  recentAcceptedBid: {
+     type: mongoose.Schema.Types.ObjectId,
+     ref: 'Bid'
+  },
   // used for poor mans queue
   processingBid: { type: Boolean, default: false },
   status: { type: String, enum: ['NOT_SCHEDULED', 'NOT_OPEN', 'NO_BIDS_YET', 'WAITING_FOR_BIDS',
@@ -23,12 +27,7 @@ var auctionItemSchema = new mongoose.Schema({
   auction: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Auction'
-  },
-  // optimization shortcut
-  highestBid: {
-     type: mongoose.Schema.Types.ObjectId,
-     ref: 'Bid'
-   }
+  }
 });
 
 module.exports = mongoose.model('AuctionItem', auctionItemSchema);

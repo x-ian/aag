@@ -12,13 +12,13 @@ function auctionItemSaveAndEmit(item, res, auctionIo) {
     log.info('AuctionItem updated ' + item._id);
     if (err) return next(err);
 
-    // 3. get new recent 5 bids
+    // 3. get new recent 10 bids
     Bid.find({'auctionItem':item._id}).populate('user')
-    .sort('-timestamp').limit(5).exec(function(err, bids) {
+    .sort('-timestamp').limit(10).exec(function(err, bids) {
       if (err || !bids) return next(err);
 
       // send back results to all
-      auctionIo.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: null});
+      auctionIo.emit('auctionAction', {auctionItem: item, recentBids: bids});
       // and just for this request
       return res.json({auctionItem: item, recentBids: bids});
     });
@@ -196,6 +196,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
              item.recentAcceptedBidAmount = bid.amount;
              item.nextExpectedBidAmount = bid.amount + item.incrementBy;
              item.recentAcceptedBidSequenceNumber = bid.sequenceNumberBase + 1;
+             item.recentAcceptedBid = bid;
              return auctionItemSaveAndEmit(item, res, auctionIo);
            });
            break;
@@ -203,7 +204,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
            // todo somehow undo rejected bid
            Bid.findByIdAndUpdate(incomingBidId, {status: 'REJECTED'}, function(err, bid) {
              if (err || !bid) return next(err);
-             item.recentAcceptedBidSequenceNumber = bid.sequenceNumberBase + 1;
+            //  item.recentAcceptedBidSequenceNumber = bid.sequenceNumberBase + 1;
              return auctionItemSaveAndEmit(item, res, auctionIo);
            });
            break;
@@ -212,6 +213,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
              if (err || !bid) return next(err);
              item.nextExpectedBidAmount = null;
              item.endTimestamp = new Date();
+             item.recentAcceptedBid = bid;
              return auctionItemSaveAndEmit(item, res, auctionIo);
            });
            break;

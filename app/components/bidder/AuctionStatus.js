@@ -24,9 +24,8 @@ class AuctionStatus extends React.Component {
                   case "NOT_OPEN":
                     return <div>Wait for auctioneer to open</div>;
                   case "NO_BIDS_YET":
-                    return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
                   case "WAITING_FOR_BIDS":
-                    if (false /* highestdidder === Me*/) {
+                    if (this.props.myLatestBid && this.props.auctionItem.recentAcceptedBid && this.props.myLatestBid._id === this.props.auctionItem.recentAcceptedBid._id) {
                       return 'Highest bidder';
                     } else {
                       return <button className='btn btn-success' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
@@ -34,9 +33,12 @@ class AuctionStatus extends React.Component {
                   case "INCOMING_BID":
                     return <div>Please wait; processing bids</div>;
                   case "WAITING_FINAL_CALL":
-                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
                   case "WAITING_FINAL_CALL_EMPTY":
-                    return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
+                    if (this.props.myLatestBid && this.props.auctionItem.recentAcceptedBid && this.props.myLatestBid._id === this.props.auctionItem.recentAcceptedBid._id) {
+                      return 'Highest bidder';
+                    } else {
+                      return <button className='btn btn-warning' onClick={this.onClickBid.bind(this)}>Bid {this.props.auctionItem.nextExpectedBidAmount}</button>;
+                    }
                   case "SOLD":
                     return '';
                   case "CLOSED_EMPTY":

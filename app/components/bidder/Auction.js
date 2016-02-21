@@ -98,7 +98,7 @@ class Auction extends React.Component {
   render() {
     var auction = <h3 className='text-center'><br/><br/><br/>No active auction</h3>;
     if (this.state.auction && !this.state.auctionItem) auction = <h3 className='text-center'><br/><br/><br/>Active auction<br/>waiting for Auctioneer to release next AuctionItem</h3>;
-    if (this.state.auctionItem) auction = <AuctionItem updateAfterAction={this.updateAfterAction.bind(this)} auctionItem={this.state.auctionItem} vehicle={this.state.vehicle} participants={this.state.participants} recentBids={this.state.recentBids}/>;
+    if (this.state.auctionItem) auction = <AuctionItem updateAfterAction={this.updateAfterAction.bind(this)} auctionItem={this.state.auctionItem} myLatestBid={this.state.myLatestBid} vehicle={this.state.vehicle} participants={this.state.participants} recentBids={this.state.recentBids}/>;
 
     return (
       <div>

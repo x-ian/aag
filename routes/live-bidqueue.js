@@ -31,7 +31,10 @@ module.exports = function(app, socketPromoter, socketAuction, bidQueueStream, is
 
     // notify promoter about valid incoming bid
     Bid.findById(bidQueue.bid, function(err, bid) {
-      if (err || !bid) log.error(err);
+      if (err || !bid) {
+        log.error(err);
+        return;
+      }
       log.debug('processing bid queue item ' + bid._id);
 
       AuctionItem.findOneAndUpdate({ _id: bid.auctionItem, processingBid: false }, {processingBid: true}, function(err, item) {

@@ -2311,7 +2311,7 @@ var Auction = function (_React$Component) {
         _react2.default.createElement('br', null),
         'waiting for Auctioneer to release next AuctionItem'
       );
-      if (this.state.auctionItem) auction = _react2.default.createElement(_AuctionItem2.default, { updateAfterAction: this.updateAfterAction.bind(this), auctionItem: this.state.auctionItem, vehicle: this.state.vehicle, participants: this.state.participants, recentBids: this.state.recentBids });
+      if (this.state.auctionItem) auction = _react2.default.createElement(_AuctionItem2.default, { updateAfterAction: this.updateAfterAction.bind(this), auctionItem: this.state.auctionItem, myLatestBid: this.state.myLatestBid, vehicle: this.state.vehicle, participants: this.state.participants, recentBids: this.state.recentBids });
 
       return _react2.default.createElement(
         'div',
@@ -2405,7 +2405,7 @@ var AuctionItem = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'col-sm-6' },
-            this.props.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { auctionItem: this.props.auctionItem, updateAfterAction: this.props.updateAfterAction.bind(this) }) : ''
+            this.props.auctionItem ? _react2.default.createElement(_AuctionStatus2.default, { auctionItem: this.props.auctionItem, myLatestBid: this.props.myLatestBid, updateAfterAction: this.props.updateAfterAction.bind(this) }) : ''
           )
         ),
         _react2.default.createElement(
@@ -2498,16 +2498,10 @@ var AuctionStatus = function (_React$Component) {
                     'Wait for auctioneer to open'
                   );
                 case "NO_BIDS_YET":
-                  return _react2.default.createElement(
-                    'button',
-                    { className: 'btn btn-success', onClick: _this2.onClickBid.bind(_this2) },
-                    'Bid ',
-                    _this2.props.auctionItem.nextExpectedBidAmount
-                  );
                 case "WAITING_FOR_BIDS":
-                  if (false /* highestdidder === Me*/) {
-                      return 'Highest bidder';
-                    } else {
+                  if (_this2.props.myLatestBid && _this2.props.auctionItem.recentAcceptedBid && _this2.props.myLatestBid._id === _this2.props.auctionItem.recentAcceptedBid._id) {
+                    return 'Highest bidder';
+                  } else {
                     return _react2.default.createElement(
                       'button',
                       { className: 'btn btn-success', onClick: _this2.onClickBid.bind(_this2) },
@@ -2522,19 +2516,17 @@ var AuctionStatus = function (_React$Component) {
                     'Please wait; processing bids'
                   );
                 case "WAITING_FINAL_CALL":
-                  return _react2.default.createElement(
-                    'button',
-                    { className: 'btn btn-warning', onClick: _this2.onClickBid.bind(_this2) },
-                    'Bid ',
-                    _this2.props.auctionItem.nextExpectedBidAmount
-                  );
                 case "WAITING_FINAL_CALL_EMPTY":
-                  return _react2.default.createElement(
-                    'button',
-                    { className: 'btn btn-warning', onClick: _this2.onClickBid.bind(_this2) },
-                    'Bid ',
-                    _this2.props.auctionItem.nextExpectedBidAmount
-                  );
+                  if (_this2.props.myLatestBid && _this2.props.auctionItem.recentAcceptedBid && _this2.props.myLatestBid._id === _this2.props.auctionItem.recentAcceptedBid._id) {
+                    return 'Highest bidder';
+                  } else {
+                    return _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-warning', onClick: _this2.onClickBid.bind(_this2) },
+                      'Bid ',
+                      _this2.props.auctionItem.nextExpectedBidAmount
+                    );
+                  }
                 case "SOLD":
                   return '';
                 case "CLOSED_EMPTY":
