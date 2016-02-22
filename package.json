@@ -25,6 +25,7 @@
     "body-parser": "^1.14.1",
     "cldr-data": "^28.0.3",
     "compression": "^1.6.0",
+    "connect-mongostore": "^0.1.4",
     "cookie-parser": "^1.4.1",
     "envify": "^3.4.0",
     "express": "^4.13.3",

@@ -9,6 +9,7 @@ module.exports = function (app) {
 
   app.get('/api/logintest', auth.isLoggedInUser,
     function(req, res) {
+      log.debug(req.user);
       log.debug('common redirect');
       res.redirect('/');
   });

@@ -12,7 +12,7 @@ class Participants extends React.Component {
       return (
         <div key={participant.id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {participant.id} - {participant.ip} - {participant.userAgent}
+            {participant.name} ({participant.userId} {participant.id} {participant.ip} {/*participant.userAgent*/})
           </div>
         </div>
       );

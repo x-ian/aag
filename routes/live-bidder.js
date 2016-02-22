@@ -87,7 +87,10 @@ module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
     var auctionId=req.body.auctionId;
     var bidAmount = req.body.bidAmount;
     var recentAcceptedBidSequenceNumber = req.body.recentAcceptedBidSequenceNumber;
+    var user = req.user;
 
+    log.error(user);
+    
     Bid.create({
       amount: bidAmount,
       timestamp: new Date(),
@@ -95,7 +98,7 @@ module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
       sequenceNumberBase: recentAcceptedBidSequenceNumber,
       status: 'PENDING',
       auctionItem: auctionItemId,
-      user: '56a61b7a0fb2b162ee581e5e', // TODO
+      user: user,
       userIpAddress: req.ip
     }, function(err, bid) {
       if (err) return next(err);

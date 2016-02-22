@@ -12,7 +12,7 @@ class BidHistory extends React.Component {
       return (
         <div key={bid._id} className='list-group-item animated fadeIn'>
           <div className='media'>
-            {bid.sequenceNumber} - {bid.amount} - {bid.status} - {bid.timestamp} - {bid.user.name} {bid.userIpAddress}
+            {bid.user.name}: {bid.amount} - {bid.status} ({bid.sequenceNumberBase}, {bid.timestamp}, {bid.userIpAddress})
           </div>
         </div>
       );

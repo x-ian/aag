@@ -18,6 +18,8 @@ var bodyParser = require('body-parser');
 var swig  = require('swig');
 var passport = require("passport");
 var app = express();
+var session = require('express-session');
+var MongoStore = require('connect-mongostore')(session);
 app.set('port', process.env.PORT || 3000);
 app.use(require('compression')());
 app.use(require('morgan')('dev'));
@@ -26,7 +28,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(require('cookie-parser')());
 app.use(require('serve-favicon')(path.join(__dirname, 'public', 'favicon.png')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(require('express-session')({ secret: 'SECRET', resave: false, saveUninitialized: false }));
+// app.use(require('express-session')({ secret: 'SECRET', resave: false, saveUninitialized: false }));
+sessionStorage = (session({
+    secret: 'SECRET',
+    resave: false,
+    saveUninitialized: false ,
+    store: new MongoStore({'db': 'sessions'})
+  }));
+app.use(sessionStorage);
+// app.use(session({
+//     secret:'SECRET',
+//     maxAge: new Date(Date.now() + 3600000),
+//     store: new MongoStore({mongoose_connection:mongoose.connection})
+// }))
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -120,25 +134,33 @@ audio.on('connection', function(socket){
 /**
  * Socket.io stuff.
  */
+var User = require('./models/user');
+
 // io.sockets.on('connection', function(socket) {
 var auction = io.of('/auction');
-auction.on('connection', function(socket){
-  log.info('connected to auction with id %s', socket.id);
-
-  clients[socket.id] = { id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
-  var keys = Object.keys(clients);
-  var values = keys.map(function(v) { return clients[v]; });
-  auction.emit('participants', values);
-
-  // for (key in socket.request.headers) {
-  //   log.info(key);
-  //   log.info(socket.request.headers[key]);
-  // }
-    // var url = 'http://freegeoip.net/json/' + socket.request.connection.remoteAddress
-    // request.get url, (error, response, body) ->
-    //   if !error && response.statusCode == 200
-    //     data = JSON.parse body
-    //     location data
+auction
+.use(function(socket, next){
+    // Wrap the express middleware
+    sessionStorage(socket.request, {}, next);
+})
+.on('connection', function(socket){
+  // some strange thing only seems to send the bidder for now
+  if (socket.handshake.query.role === 'bidder') {
+    var userId = socket.request.session.passport ? socket.request.session.passport.user : '';
+    log.info('connected to auction with socket id %s and user id %s', socket.id, userId.id);
+    User.findById(userId, function(err, item) {
+      if (err || !item) {
+        clients[socket.id] = { name: 'anonymous', userId: '', id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
+      } else {
+        clients[socket.id] = { name: item.name, userId: userId, id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
+      }
+      var keys = Object.keys(clients);
+      var values = keys.map(function(v) { return clients[v]; });
+      auction.emit('participants', values);
+    });
+  } else {
+    log.error('socket.io /auction without parameter role received; dont list this connection as participant');
+  }
 
   socket.on('disconnect', function() {
     log.info('disconnected from auction with id %s', socket.id);

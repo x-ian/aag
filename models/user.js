@@ -8,6 +8,7 @@ var userSchema = new mongoose.Schema({
   closedAt: Date,
   isSeller: Boolean,
   isBuyer: Boolean,
+  isPromoter: Boolean,
   password: String,
   passwordCleartext: String
 });

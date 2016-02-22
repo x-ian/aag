@@ -32,7 +32,8 @@ class Auction extends React.Component {
 
     socketPromoter = io.connect('/promoter');
 
-    socket = io.connect('/auction');
+//    socket = io.connect('/auction', { query: 'role=promoter' });
+    socket = io.connect('/auction?foo=bar', { query: "role=promoter", extra: 'extra' });
 
     socketPromoter.on('incoming bid', (data) => {
       console.log('Promoter incoming bid');

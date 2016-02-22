@@ -22,7 +22,7 @@ class Auction extends React.Component {
   }
 
   componentDidMount() {
-    socket = io.connect('/auction');
+    socket = io.connect('/auction', { query: "role=bidder" });
 
     this.getCurrentAuction();
     socket.on('auctionAction', (data) => {

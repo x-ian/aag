@@ -2208,7 +2208,7 @@ var Auction = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      socket = io.connect('/auction');
+      socket = io.connect('/auction', { query: "role=bidder" });
 
       this.getCurrentAuction();
       socket.on('auctionAction', function (data) {
@@ -2842,17 +2842,18 @@ var BidHistory = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'media' },
-            bid.sequenceNumber,
-            ' - ',
+            bid.user.name,
+            ': ',
             bid.amount,
             ' - ',
             bid.status,
-            ' - ',
+            ' (',
+            bid.sequenceNumberBase,
+            ', ',
             bid.timestamp,
-            ' - ',
-            bid.user.name,
-            ' ',
-            bid.userIpAddress
+            ', ',
+            bid.userIpAddress,
+            ')'
           )
         );
       });
@@ -2917,11 +2918,15 @@ var Participants = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'media' },
+            participant.name,
+            ' (',
+            participant.userId,
+            ' ',
             participant.id,
-            ' - ',
+            ' ',
             participant.ip,
-            ' - ',
-            participant.userAgent
+            ' ',
+            ')'
           )
         );
       });
@@ -3998,7 +4003,8 @@ var Auction = function (_React$Component) {
 
       socketPromoter = io.connect('/promoter');
 
-      socket = io.connect('/auction');
+      //    socket = io.connect('/auction', { query: 'role=promoter' });
+      socket = io.connect('/auction?foo=bar', { query: "role=promoter", extra: 'extra' });
 
       socketPromoter.on('incoming bid', function (data) {
         console.log('Promoter incoming bid');
