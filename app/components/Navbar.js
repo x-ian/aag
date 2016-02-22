@@ -13,6 +13,7 @@ class Navbar extends React.Component {
   componentDidMount() {
     NavbarStore.listen(this.onChange);
     NavbarActions.getCharacterCount();
+    NavbarActions.verifySession();
 
     $(document).ajaxStart(() => {
       NavbarActions.updateAjaxAnimation('fadeIn');
@@ -45,6 +46,19 @@ class Navbar extends React.Component {
         history: this.props.history
       });
     }
+  }
+
+  activeSession() {
+    $.ajax({
+      url: '/api/activesession',
+      type: 'GET',
+      dataType: 'json',
+      cache: false,
+    }).done((data) => {
+        this.setState({auction: data});
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
   }
 
   render() {
@@ -103,6 +117,13 @@ class Navbar extends React.Component {
                 <li><Link to='/promoter/auctions'>Start auction</Link></li>
               </ul>
             </li>
+            {
+              this.state.activeSession ?
+                <li><a href='/logout'>Logout</a></li>
+              :
+                <li><Link to='/login'>Login</Link></li>
+            }
+
           </ul>
         </div>
       </nav>

@@ -10,7 +10,9 @@ class NavbarActions {
       'getCharacterCountSuccess',
       'getCharacterCountFail',
       'findCharacterSuccess',
-      'findCharacterFail'
+      'findCharacterFail',
+      'verifySessionSuccess',
+      'verifySessionFail'
     );
   }
 
@@ -36,6 +38,16 @@ class NavbarActions {
   //     .fail((jqXhr) => {
   //       this.actions.getCharacterCountFail(jqXhr)
   //     });
+  }
+
+  verifySession() {
+    $.ajax({ url: '/api/activesession' })
+      .done((data) => {
+        this.actions.verifySessionSuccess(data)
+      })
+      .fail((jqXhr) => {
+        this.actions.verifySessionFail(jqXhr)
+      });
   }
 }
 

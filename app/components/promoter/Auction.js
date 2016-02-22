@@ -30,10 +30,10 @@ class Auction extends React.Component {
     this.updateVehiclesQueues();
     this.startAuction();
 
-    socketPromoter = io.connect('/promoter');
-
 //    socket = io.connect('/auction', { query: 'role=promoter' });
     socket = io.connect('/auction?foo=bar', { query: "role=promoter", extra: 'extra' });
+
+    socketPromoter = io.connect('/promoter');
 
     socketPromoter.on('incoming bid', (data) => {
       console.log('Promoter incoming bid');
@@ -74,6 +74,9 @@ class Auction extends React.Component {
       socket.removeListener('auctionAction');
       socket.removeListener('participants');
       socket.removeListener('newAuctionItem');
+    }
+    if (socketPromoter) {
+      socket.removeListener('incoming bid');
     }
   }
 

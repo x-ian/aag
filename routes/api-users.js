@@ -49,7 +49,7 @@ module.exports = function (app) {
   /**
    * POST new user
    */
-  app.post('/api/users', auth.isLoggedInUser, function(req, res, next) {
+  app.post('/api/users', function(req, res, next) {
     User.create(req.body, function (err, item) {
       if (err || !item) return next(err);
       item.createdAt = new Date();

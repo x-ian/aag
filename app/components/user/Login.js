@@ -1,10 +1,12 @@
 import React from 'react';
 import {Link} from 'react-router';
 import InputFormRow from '../common/InputFormRow.js';
+import NotificationArea from '../common/NotificationArea.js';
 
 const resetState = {
   email: '',
   password: '',
+  notification: null
 }
 
 class Login extends React.Component {
@@ -40,8 +42,9 @@ class Login extends React.Component {
     }).done((data) => {
       this.props.history.pushState(null, '/');
     }).fail((jqXhr) => {
-      console.log('ERROR');
-      console.log(jqXhr);
+      console.log('Error: ' + jqXhr);
+      var n = {errors: [jqXhr.responseJSON.message + ' (' + jqXhr.statusText + ')']};
+      this.setState({notification: n})
     });
   }
 
@@ -53,6 +56,7 @@ class Login extends React.Component {
   render() {
     return (
       <div className='container'>
+        <NotificationArea notification={this.state.notification}/>
         <div className='panel panel-default'>
           <div className='panel-heading'>Login</div>
           <div className='panel-body'>
@@ -70,8 +74,8 @@ class Login extends React.Component {
               <div className="form-group">
                  <div className="col-sm-offset-2 col-sm-10">
                    <button type='submit' className='btn btn-primary'>Login</button>
-                   <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
-                  </div>
+                   &nbsp;No account? <Link to='/register'>Register one</Link>.
+                 </div>
               </div>
             </form>
           </div>

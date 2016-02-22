@@ -8,6 +8,7 @@ class NavbarStore {
     this.onlineUsers = 0;
     this.searchQuery = '';
     this.ajaxAnimationClass = '';
+    this.activeSession = false;
   }
 
   onFindCharacterSuccess(payload) {
@@ -19,6 +20,18 @@ class NavbarStore {
     // setTimeout(() => {
     //   payload.searchForm.classList.remove('shake');
     // }, 1000);
+  }
+
+  onVerifySessionSuccess(data) {
+    console.log('onVerifySessionS');
+    console.log(data);
+    this.activeSession = data.activeSession;
+  }
+
+  onVerifySessionFail(data) {
+    console.log('onVerifySessionF');
+    console.log(data);
+    this.activeSession = false;
   }
 
   onUpdateOnlineUsers(data) {

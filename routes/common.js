@@ -14,26 +14,25 @@ module.exports = function (app) {
       res.redirect('/');
   });
 
+  app.get('/api/activesession', function(req, res, next) {
+    if (req.user) {
+      return res.json({ activeSession: true });
+    }
+    return res.json({ activeSession: false });
+  });
+
   app.post('/api/login', function(req, res, next) {
-    log.debug('post');
     passport.authenticate('local', function(err, user, info) {
-      log.debug('err');
-      log.debug(err);
       if (err) return next(err)
       if (!user) {
-        log.debug('!user');
         return res.status(422).json(info);
         // return res.redirect('/')
       }
       req.logIn(user, function(err) {
-        log.debug('logIn');
         if (err) return next(err);
-        log.debug('logIn2');
         return res.redirect('/');
       });
     })(req, res, next);
-    // return res.redirect('/')
-
   });
 
   app.get('/logout', auth.isLoggedInUser, function(req, res){
