@@ -1,3 +1,5 @@
+var auth = require('../lib/auth');
+
 var Vehicle = require('../models/vehicle');
 var SalesInformation = require('../models/vehicle');
 var AuctionItem = require('../models/auctionitem');
@@ -65,7 +67,7 @@ module.exports = function (app) {
   /**
    * DELETE one vehicle
    */
-  app.delete('/api/vehicles/:id', function(req,res,next) {
+  app.delete('/api/vehicles/:id', auth.isLoggedInUser, function(req,res,next) {
     Vehicle.findByIdAndRemove(req.params.id, function (err, item){
       if (err || !item) return next(err);
       // return res.json(item);
@@ -76,7 +78,7 @@ module.exports = function (app) {
   /**
    * PUT update existing vehicle
    */
-  app.put('/api/vehicles/:id', function(req, res, next) { 
+  app.put('/api/vehicles/:id', auth.isLoggedInUser, function(req, res, next) { 
     Vehicle.findByIdAndUpdate(req.params.id, req.body, function(err, item) {
       if (err || !item) return next(err);
       //return res.json(item);
@@ -87,7 +89,7 @@ module.exports = function (app) {
   /**
    * POST new vehicle
    */
-  app.post('/api/vehicles', function(req, res, next) {
+  app.post('/api/vehicles', auth.isLoggedInUser, function(req, res, next) {
     delete req.body._id;
     Vehicle.create(req.body, function (err, item) {
       if (err || !item) return next(err);
@@ -98,7 +100,7 @@ module.exports = function (app) {
 
   // ---------------------------------------------------------------------------
 
-  app.delete('/api/vehiclesfull/:id', function(req,res,next) {
+  app.delete('/api/vehiclesfull/:id', auth.isLoggedInUser, function(req,res,next) {
     var vehicleId = req.params.id;
 
     // auctionitems & bids
@@ -135,7 +137,7 @@ module.exports = function (app) {
     });
   });
 
-  app.put('/api/vehiclesfull/:id', function(req, res, next) { 
+  app.put('/api/vehiclesfull/:id', auth.isLoggedInUser, function(req, res, next) { 
     var vehicleId = req.params.id;
     Vehicle.findByIdAndUpdate(req.params.id, mapVehicleReqBody(req.body, false, false), function(err, item) {
       if (err || !item) return next(err);
@@ -143,14 +145,14 @@ module.exports = function (app) {
     });
   });
 
-  app.post('/api/vehiclesfull', function(req, res, next) { 
+  app.post('/api/vehiclesfull', auth.isLoggedInUser, function(req, res, next) { 
     Vehicle.create(mapVehicleReqBody(req.body, false, false), function (err, item) {
       if (err || !item) return next(err);
        return res.json({ message: 'Item added' });
     });
   });
 
-  app.post('/api/vehiclesfull2', function(req, res, next) { 
+  app.post('/api/vehiclesfull2', auth.isLoggedInUser, function(req, res, next) { 
     Vehicle.create(mapVehicleReqBody(req.body, false, false), function (err, item) {
       if (err || !item) return next(err);
       console.log(item);
@@ -161,7 +163,7 @@ module.exports = function (app) {
     });
   });
 
-  app.post('/api/vehiclesfull/:id/addimages', function(req, res, next) { 
+  app.post('/api/vehiclesfull/:id/addimages', auth.isLoggedInUser, function(req, res, next) { 
     var vehicleId = req.params.id;
 
     var form = new multiparty.Form();

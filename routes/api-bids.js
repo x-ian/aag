@@ -1,3 +1,4 @@
+var auth = require('../lib/auth');
 var Bid = require('../models/bid');
 
 module.exports = function (app) {
@@ -5,7 +6,7 @@ module.exports = function (app) {
   /**
    * GET all bids
    */
-  app.get('/api/bids', function(req, res, next) {
+  app.get('/api/bids', auth.isLoggedInUser, function(req, res, next) {
     Bid.find(function(err, item) {
       if (err || !item) return next(err);
       // return res.send(item);
@@ -16,7 +17,7 @@ module.exports = function (app) {
   /**
    * GET one bid
    */
-  app.get('/api/bids/:id', function(req, res, next) { 
+  app.get('/api/bids/:id', auth.isLoggedInUser, function(req, res, next) { 
     Bid.findById(req.params.id, function(err, item) {
       if (err || !item) return next(err);
       return res.json(item);
@@ -26,7 +27,7 @@ module.exports = function (app) {
   /**
    * DELETE one bid
    */
-  app.delete('/api/bids/:id', function(req,res,next) {
+  app.delete('/api/bids/:id', auth.isLoggedInUser, function(req,res,next) {
     Bid.findByIdAndRemove(req.params.id, function (err, item){
       if (err || !item) return next(err);
       // return res.json(item);
@@ -37,7 +38,7 @@ module.exports = function (app) {
   /**
    * PUT update existing bid
    */
-  app.put('/api/bids/:id', function(req, res, next) { 
+  app.put('/api/bids/:id', auth.isLoggedInUser, function(req, res, next) { 
     Bid.findByIdAndUpdate(req.params.id, req.body, function(err, item) {
       if (err || !item) return next(err);
       //return res.json(item);
@@ -48,7 +49,7 @@ module.exports = function (app) {
   /**
    * POST new bid
    */
-  app.post('/api/bids', function(req, res, next) {
+  app.post('/api/bids', auth.isLoggedInUser, function(req, res, next) {
     Bid.create(req.body, function (err, item) {
       if (err || !item) return next(err);
       // return res.json(item);

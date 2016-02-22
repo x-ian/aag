@@ -1,5 +1,6 @@
 var log = require('../lib/log');
 var logLive = require('../lib/logLive');
+var auth = require('../lib/auth');
 
 var Auction = require('../models/auction');
 var AuctionItem = require('../models/auctionitem');
@@ -80,7 +81,7 @@ module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
     });
   });
 
-  app.post('/api/bidderaction2/:id', function(req, res, next) {
+  app.post('/api/bidderaction2/:id', auth.isLoggedInUser, function(req, res, next) {
     var auctionItemId = req.params.id;
     var action = req.body.action;
     var auctionId=req.body.auctionId;
@@ -106,7 +107,7 @@ module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
     });
   });
 
-  app.post('/api/bidderaction/:id', function(req, res, next) {
+  app.post('/api/bidderaction/:id', auth.isLoggedInUser, function(req, res, next) {
     var auctionItemId = req.params.id;
     var action = req.body.action;
     var bidAmount = req.body.bidAmount;

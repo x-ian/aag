@@ -1,3 +1,4 @@
+var auth = require('../lib/auth');
 var Auction = require('../models/auction');
 
 module.exports = function (app) {
@@ -26,7 +27,7 @@ module.exports = function (app) {
   /**
    * DELETE one auction
    */
-  app.delete('/api/auctions/:id', function(req,res,next) {
+  app.delete('/api/auctions/:id', auth.isLoggedInPromoter, function(req,res,next) {
     Auction.findByIdAndRemove(req.params.id, function (err, item){
       if (err || !item) return next(err);
       // return res.json(item);
@@ -37,7 +38,7 @@ module.exports = function (app) {
   /**
    * PUT update existing auction
    */
-  app.put('/api/auctions/:id', function(req, res, next) { 
+  app.put('/api/auctions/:id', auth.isLoggedInPromoter, function(req, res, next) { 
     Auction.findByIdAndUpdate(req.params.id, req.body, function(err, item) {
       if (err || !item) return next(err);
       //return res.json(item);
@@ -46,9 +47,9 @@ module.exports = function (app) {
   });
 
   /**
-   * POST new auction 
+   * POST new auction
    */
-  app.post('/api/auctions', function(req, res, next) {
+  app.post('/api/auctions', auth.isLoggedInPromoter, function(req, res, next) {
     Auction.create(req.body, function (err, item) {
       if (err || !item) return next(err);
       // return res.json(item);

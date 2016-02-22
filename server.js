@@ -1,76 +1,72 @@
 // Babel ES6/JSX Compiler
 require('babel-register');
 
+var log = require('./lib/log');
 var path = require('path');
+
+var async = require('async');
+
+var mongoose = require('mongoose');
+var configDatabase = require('./config/database');
+mongoose.connect(configDatabase.url);
+mongoose.connection.on('error', function() {
+  log.error('Error: Could not connect to MongoDB. Did you forget to run `mongod`?');
+});
+
 var express = require('express');
 var bodyParser = require('body-parser');
-var compression = require('compression');
-var favicon = require('serve-favicon');
-var morgan = require('morgan');
-var async = require('async');
-var colors = require('colors');
-var mongoose = require('mongoose');
-var request = require('request');
+var swig  = require('swig');
+var passport = require("passport");
+var app = express();
+app.set('port', process.env.PORT || 3000);
+app.use(require('compression')());
+app.use(require('morgan')('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(require('cookie-parser')());
+app.use(require('serve-favicon')(path.join(__dirname, 'public', 'favicon.png')));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(require('express-session')({ secret: 'SECRET', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+require('./lib/passport')(passport); // pass passport for configuration
+
+
 var React = require('react');
 var ReactDOM = require('react-dom/server');
 var Router = require('react-router');
-var swig  = require('swig');
-var xml2js = require('xml2js');
-var _ = require('underscore');
-var log = require('./lib/log');
-
-var config = require('./config');
-
 var routes = require('./app/routes');
-
-var app = express();
-
-var clients = new Object();
-
-mongoose.connect(config.database);
-mongoose.connection.on('error', function() {
-  log.error('Error: Could not connect to MongoDB. Did you forget to run `mongod`?'.red);
-});
-
-app.set('port', process.env.PORT || 3000);
-app.use(compression());
-app.use(morgan('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
-app.use(express.static(path.join(__dirname, 'public')));
 
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var auction = io.of('/auction');
 var socketPromoter = io.of('/promoter');
 
+
 var BidQueue = require('./models/bidqueue');
 var bidQueueActive = false;
 var bidQueueStream = BidQueue.find().tailable(true, {awaitdata: true, numberOfRetries:  Number.MAX_VALUE}).stream();
-
 function isBidQueueActive() {
   log.debug('isBidQueueActive ' + bidQueueActive);
   return bidQueueActive;
 }
-
 function activateBidQueue() {
   bidQueueActive = true;
   log.debug('activateBidQueue ' + bidQueueActive);
 }
-
 function deactivateBidQueue() {
   bidQueueActive = false;
   log.debug('deactivateBidQueue ' + bidQueueActive);
 }
 
-// CRUD access for DB documents
+var clients = new Object();
 require('./routes/api-auctions')(app);
 require('./routes/api-auctionitems')(app);
-// require('./routes/api-salesdocuments')(app);
 require('./routes/api-bids')(app);
 require('./routes/api-users')(app);
 require('./routes/api-vehicles')(app);
+require('./routes/common')(app, this);
 require('./routes/live-common')(app, auction, clients, bidQueueStream);
 require('./routes/live-bidder')(app, auction, bidQueueStream, activateBidQueue);
 require('./routes/live-promoter')(app, auction, bidQueueStream, deactivateBidQueue);
@@ -93,7 +89,8 @@ app.use(function(req, res) {
 });
 
 app.use(function(err, req, res, next) {
-  log.info(err.stack.red);
+  log.error(err);
+  log.error(err.stack);
   res.status(err.status || 500);
   res.send({ message: err.message });
 });

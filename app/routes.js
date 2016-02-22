@@ -17,6 +17,9 @@ import PromoterAuctionItem from './components/promoter/AuctionItem';
 import BidderStart from './components/bidder/Start';
 import BidderAuction from './components/bidder/Auction';
 
+import Register from './components/user/Register';
+import Login from './components/user/Login';
+
 export default (
   <Route component={App}>
     <Route path='/' component={BidderStart} />
@@ -34,10 +37,13 @@ export default (
     <Route path='/promoter/auctions/:id' component={PromoterAuction} />
     <Route path='/promoter/vehicles/:id' component={PromoterVehicle} />
 
-      <Route path='/promoter/auctionitem' component={PromoterAuctionItem} />
+    <Route path='/promoter/auctionitem' component={PromoterAuctionItem} />
 
     <Route path='/bidder/start' component={BidderStart} />
     <Route path='/bidder/auction' component={BidderAuction} />
+
+    <Route path='/register' component={Register} />
+    <Route path='/login' component={Login} />
 
   </Route>
 );

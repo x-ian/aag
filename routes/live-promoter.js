@@ -1,3 +1,4 @@
+var auth = require('../lib/auth');
 var log = require('../lib/log');
 var logLive = require('../lib/logLive');
 
@@ -97,7 +98,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
       });
     });
 
-    app.get('/api/incompleteauctionitems', function(req, res, next) {
+    app.get('/api/incompleteauctionitems', auth.isLoggedInPromoter, function(req, res, next) {
       var auctionId = req.query['auctionId'];
       AuctionItem.find(
         {
@@ -112,7 +113,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
     });
 
 
-  app.post('/api/startauction/:id', function(req, res, next) {
+  app.post('/api/startauction/:id', auth.isLoggedInPromoter, function(req, res, next) {
     var auctionId = req.params.id;
     // reset all active auctions
     Auction.update({ active: true }, { active: false } , {multi: true }, function(err, num) {
@@ -126,7 +127,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
     });
   });
 
-  app.post('/api/activateauctionitem', function(req, res, next) {
+  app.post('/api/activateauctionitem', auth.isLoggedInPromoter, function(req, res, next) {
     var vehicleId = req.query.vehicleId;
     var auctionId = req.query.auctionId;
 
@@ -158,7 +159,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
     });
   });
 
-  app.post('/api/rescheduleauctionitem/:id', function(req, res, next) {
+  app.post('/api/rescheduleauctionitem/:id', auth.isLoggedInPromoter, function(req, res, next) {
     var auctionItemId = req.params.id;
     AuctionItem.findByIdAndRemove(auctionItemId, function(err, ai2) {
       if (err) return next(err);
@@ -172,7 +173,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
     });
   });
 
-   app.post('/api/promoteraction2/:id', function(req, res, next) {
+   app.post('/api/promoteraction2/:id', auth.isLoggedInPromoter, function(req, res, next) {
 
      var auctionItemId = req.params.id;
      var incomingBidId = req.body.incomingBidId;
@@ -266,7 +267,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
        */
    });
 
-   app.post('/api/promoteraction/:id', function(req, res, next) {
+   app.post('/api/promoteraction/:id', auth.isLoggedInPromoter, function(req, res, next) {
 
      var auctionItemId = req.params.id;
      var currentBidId = req.body.currentBidId;
