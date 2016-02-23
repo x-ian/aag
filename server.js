@@ -74,6 +74,9 @@ function deactivateBidQueue() {
   log.debug('deactivateBidQueue ' + bidQueueActive);
 }
 
+var platform = require('platform');
+var freegeoip = require('node-freegeoip');
+
 var clients = new Object();
 require('./routes/api-auctions')(app);
 require('./routes/api-auctionitems')(app);
@@ -148,15 +151,22 @@ auction
   if (socket.handshake.query.role === 'bidder') {
     var userId = socket.request.session.passport ? socket.request.session.passport.user : '';
     log.info('connected to auction with socket id %s and user id %s', socket.id, userId.id);
+    var ua = platform.parse(socket.request.headers['user-agent']);
+    var system = ua.name + ' ' + ua.version + '(' + ua.layout + ') on ' + ua.os;
     User.findById(userId, function(err, item) {
-      if (err || !item) {
-        clients[socket.id] = { name: 'anonymous', userId: '', id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
-      } else {
-        clients[socket.id] = { name: item.name, userId: userId, id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: socket.request.headers['user-agent']};
-      }
-      var keys = Object.keys(clients);
-      var values = keys.map(function(v) { return clients[v]; });
-      auction.emit('participants', values);
+      var ip = socket.request.connection.remoteAddress;
+      // freegeoip.getLocation(ip, function(err2, location) {
+      //   var loc = location ? location.city + '(' + location.country_name + ')' : '';
+        var loc = '';
+        if (err || !item) {
+          clients[socket.id] = { name: 'anonymous', userId: '', id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: system, location: loc};
+        } else {
+          clients[socket.id] = { name: item.name, userId: userId, id: socket.id, ip: socket.request.connection.remoteAddress, userAgent: system, location: loc};
+        }
+        var keys = Object.keys(clients);
+        var values = keys.map(function(v) { return clients[v]; });
+        auction.emit('participants', values);
+      // });
     });
   } else {
     log.error('socket.io /auction without parameter role received; dont list this connection as participant');

@@ -5,6 +5,7 @@ var userSchema = new mongoose.Schema({
   name: String,
   email: { type : String , unique : true, required : true, dropDups: true },
   createdAt: Date,
+  deactivated: Boolean,
   closedAt: Date,
   isSeller: Boolean,
   isBuyer: Boolean,

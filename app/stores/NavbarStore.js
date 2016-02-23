@@ -9,6 +9,7 @@ class NavbarStore {
     this.searchQuery = '';
     this.ajaxAnimationClass = '';
     this.activeSession = false;
+    this.activeUser = null;
   }
 
   onFindCharacterSuccess(payload) {
@@ -32,6 +33,15 @@ class NavbarStore {
     console.log('onVerifySessionF');
     console.log(data);
     this.activeSession = false;
+  }
+
+  onActiveUserSuccess(data) {
+    console.log(data);
+    this.activeUser = data.activeUser;
+  }
+
+  onActiveUserFail(data) {
+    this.activeSession = null;
   }
 
   onUpdateOnlineUsers(data) {

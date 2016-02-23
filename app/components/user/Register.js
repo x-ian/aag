@@ -10,6 +10,7 @@ const resetState = {
   passwordRepeat: '',
   isSeller: false,
   isBuyer: false,
+  isPromoter: false,
   passwordsMatch: false
 }
 
@@ -38,6 +39,7 @@ class Register extends React.Component {
   }
   onChangeIsBuyer(e) { this.setState({isBuyer: e.target.checked}) }
   onChangeIsSeller(e) { this.setState({isSeller: e.target.checked}) }
+  onChangeIsPromoter(e) { this.setState({isPromoter: e.target.checked}) }
 
   onClickCancel(event) {
     event.preventDefault();
@@ -45,7 +47,7 @@ class Register extends React.Component {
   }
 
 
-  signup(name, email, password, isBuyer, isSeller) {
+  signup(name, email, password, isBuyer, isSeller, isPromoter) {
     $.ajax({
       url: '/api/users',
       type: 'POST',
@@ -55,7 +57,8 @@ class Register extends React.Component {
         password: password,
         email: email,
         isBuyer: isBuyer,
-        isSeller: isSeller
+        isSeller: isSeller,
+        isPromoter: isPromoter
       }
     }).done((data) => {
       this.setState(resetState);
@@ -109,6 +112,11 @@ class Register extends React.Component {
                 type='checkbox'
                 value={this.state.isSeller}
                 onChange={this.onChangeIsSeller.bind(this)}/>
+              <InputFormRow
+                label='Is Promoter'
+                type='checkbox'
+                value={this.state.isPromoter}
+                onChange={this.onChangeIsPromoter.bind(this)}/>
 
               <div className="form-group">
                  <div className="col-sm-offset-2 col-sm-10">

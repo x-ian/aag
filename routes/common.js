@@ -21,6 +21,13 @@ module.exports = function (app) {
     return res.json({ activeSession: false });
   });
 
+  app.get('/api/activeuser', function(req, res, next) {
+    if (req.user) {
+      return res.json({ activeUser: req.user });
+    }
+    return res.json({ activeUser: null });
+  });
+
   app.post('/api/login', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
       if (err) return next(err)

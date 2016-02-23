@@ -8,6 +8,8 @@ import VehicleEdit from './components/VehicleEdit';
 import VehicleView from './components/VehicleView';
 import Auctions from './components/Auctions';
 import Auction from './components/Auction';
+import Users from './components/Users';
+import User from './components/User';
 
 import PromoterAuctions from './components/promoter/Auctions';
 import PromoterAuction from './components/promoter/Auction';
@@ -32,6 +34,10 @@ export default (
     <Route path='/auctions/new' component={Auction} />
     <Route path='/auctions/:id' component={Auction} />
     <Route path='/auctions' component={Auctions} />
+
+    <Route path='/users/new' component={User} />
+    <Route path='/users/:id' component={User} />
+    <Route path='/users' component={Users} />
 
     <Route path='/promoter/auctions' component={PromoterAuctions} />
     <Route path='/promoter/auctions/:id' component={PromoterAuction} />

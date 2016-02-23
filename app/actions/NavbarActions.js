@@ -12,7 +12,9 @@ class NavbarActions {
       'findCharacterSuccess',
       'findCharacterFail',
       'verifySessionSuccess',
-      'verifySessionFail'
+      'verifySessionFail',
+      'activeUserSuccess',
+      'activeUserFail'
     );
   }
 
@@ -49,6 +51,17 @@ class NavbarActions {
         this.actions.verifySessionFail(jqXhr)
       });
   }
+
+  activeUser() {
+    $.ajax({ url: '/api/activeuser' })
+      .done((data) => {
+        this.actions.activeUserSuccess(data)
+      })
+      .fail((jqXhr) => {
+        this.actions.activeUserFail(jqXhr)
+      });
+  }
+
 }
 
 export default alt.createActions(NavbarActions);

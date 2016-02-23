@@ -14,6 +14,7 @@ class Navbar extends React.Component {
     NavbarStore.listen(this.onChange);
     NavbarActions.getCharacterCount();
     NavbarActions.verifySession();
+    NavbarActions.activeUser();
 
     $(document).ajaxStart(() => {
       NavbarActions.updateAjaxAnimation('fadeIn');
@@ -88,35 +89,48 @@ class Navbar extends React.Component {
         </div>
         <div id='navbar' className='navbar-collapse collapse'>
           <ul className='nav navbar-nav'>
-            <li className='dropdown'>
-              <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Buyer<span className='caret'></span></a>
-              <ul className='dropdown-menu'>
-                <li><Link to='/vehicles'>Browse Vehicles</Link></li>
-              </ul>
-            </li>
-            <li className='dropdown'>
-              <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Seller<span className='caret'></span></a>
-              <ul className='dropdown-menu'>
-                <li><Link to='/vehicles/new'>Add Vehicle</Link></li>
-                <li><Link to='/vehicles'>My Vehicles</Link></li>
-              </ul>
-            </li>
-            <li className='dropdown'>
-              <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Account<span className='caret'></span></a>
-              <ul className='dropdown-menu'>
-              <li><Link to='/'>Details</Link></li>
-              <li><Link to='/'>Create account</Link></li>
-              <li><Link to='/'>Log in/out</Link></li>
-              </ul>
-            </li>
-            <li className='dropdown'>
-              <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Promoter<span className='caret'></span></a>
-              <ul className='dropdown-menu'>
-                <li><Link to='/auctions/new'>New auction</Link></li>
-                <li><Link to='/auctions'>All auctions</Link></li>
-                <li><Link to='/promoter/auctions'>Start auction</Link></li>
-              </ul>
-            </li>
+            {
+              this.state.activeUser && this.state.activeUser.isBuyer ?
+              (
+                <li className='dropdown'>
+                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Buyer<span className='caret'></span></a>
+                  <ul className='dropdown-menu'>
+                    <li><Link to='/vehicles'>Browse Vehicles</Link></li>
+                  </ul>
+                </li>
+              ) : (
+                <span/>
+              )
+            }
+            {
+              this.state.activeUser && this.state.activeUser.isSeller ?
+              (
+                <li className='dropdown'>
+                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Seller<span className='caret'></span></a>
+                  <ul className='dropdown-menu'>
+                    <li><Link to='/vehicles/new'>Add Vehicle</Link></li>
+                    <li><Link to='/vehicles'>My Vehicles</Link></li>
+                  </ul>
+                </li>
+              ) : (
+                <span/>
+              )
+            }
+            {
+              this.state.activeUser && this.state.activeUser.isPromoter ?
+              (
+                <li className='dropdown'>
+                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Promoter<span className='caret'></span></a>
+                  <ul className='dropdown-menu'>
+                    <li><Link to='/users'>All users</Link></li>
+                    <li><Link to='/auctions'>All auctions</Link></li>
+                    <li><Link to='/promoter/auctions'>Start auction</Link></li>
+                  </ul>
+                </li>
+              ) : (
+                <span/>
+              )
+            }
             {
               this.state.activeSession ?
                 <li><a href='/logout'>Logout</a></li>
