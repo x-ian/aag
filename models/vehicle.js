@@ -3,6 +3,10 @@ var mongoose = require('mongoose');
 var vehicleSchema = new mongoose.Schema({
   title: String,
   description: String,
+  seller: {
+       type: mongoose.Schema.Types.ObjectId,
+       ref: 'User'
+  },
   // modelData
   brand: String,
   classification: String,
@@ -22,7 +26,13 @@ var vehicleSchema = new mongoose.Schema({
   auctionStartAmount: Number,
   auctionIncrement: Number,
   auctionExpectedAmount: Number,
-  status: { type: String, enum: ['DRAFT', 'PUBLISHED', 'IN_AUCTION', 'SOLD_BUY_NOW', 'SOLD_AUCTION'] }
+  status: { type: String, enum: ['DRAFT', 'PUBLISHED', 'IN_AUCTION', 'SOLD_BUY_NOW', 'SOLD_AUCTION', 'SOLD_AUCTION_PENDING_APPROVAL'] },
+  sellDate: Date,
+  finalSellAmount: Number,
+  buyer: {
+       type: mongoose.Schema.Types.ObjectId,
+       ref: 'User'
+  }
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);

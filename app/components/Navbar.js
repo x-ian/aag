@@ -96,6 +96,7 @@ class Navbar extends React.Component {
                   <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Buyer<span className='caret'></span></a>
                   <ul className='dropdown-menu'>
                     <li><Link to='/vehicles'>Browse Vehicles</Link></li>
+                    <li><Link to='/vehicles'>My Purchases</Link></li>
                   </ul>
                 </li>
               ) : (
@@ -109,7 +110,8 @@ class Navbar extends React.Component {
                   <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Seller<span className='caret'></span></a>
                   <ul className='dropdown-menu'>
                     <li><Link to='/vehicles/new'>Add Vehicle</Link></li>
-                    <li><Link to='/vehicles'>My Vehicles</Link></li>
+                    <li><Link to='/seller/vehicles'>My Vehicles</Link></li>
+                    <li><Link to='/seller/vehicles'>My Sales</Link></li>
                   </ul>
                 </li>
               ) : (
@@ -133,7 +135,13 @@ class Navbar extends React.Component {
             }
             {
               this.state.activeSession ?
-                <li><a href='/logout'>Logout</a></li>
+                <li className='dropdown'>
+                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>My Account<span className='caret'></span></a>
+                  <ul className='dropdown-menu'>
+                    <li><Link to='/account'>Details</Link></li>
+                    <li><a href='/logout'>Logout</a></li>
+                  </ul>
+                </li>
               :
                 <li><Link to='/login'>Login</Link></li>
             }

@@ -89,7 +89,7 @@ class VehicleEdit extends React.Component {
       // doesnt seem right, but dont know how else to get back to the list after successful add
       this.setState(resetState);
       setTimeout(function(){
-        this.props.history.pushState(null, '/vehicles');
+        this.props.history.pushState(null, '/seller/vehicles');
       }.bind(this), 1000);
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
@@ -99,7 +99,8 @@ class VehicleEdit extends React.Component {
   onClickCancel(event) {
     event.preventDefault();
     this.setState(resetState);
-    this.props.history.pushState(null, '/vehicles');
+    // this.props.history.pushState(null, '/seller/vehicles');
+    window.history.back();
   }
 
   setVehicle(id) {

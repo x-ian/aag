@@ -38,7 +38,7 @@ class VehicleViewShort extends React.Component {
           <MultiLineView text={this.props.vehicle.description} maxRows={4} maxChars={150}/>
         </div>
         <div className="col-sm-2">
-          { this.props.action === 'VehicleSales' ? <VehicleSales vehicle={this.props.vehicle}/> : '' }
+          { this.props.action === 'VehicleSales' ? (<span>{this.props.vehicle.buyNowAmount} <VehicleSales vehicle={this.props.vehicle}/></span> ) : '' }
           { this.props.action === 'VehiclePromoterActivate' ? <VehiclePromoterActivate vehicle={this.props.vehicle} onClickAuctionItemActivate={this.props.onClickAuctionItemActivate}/> : '' }
           { this.props.action === 'VehiclePromoterReschedule' ? <VehiclePromoterReschedule auctionItem={this.props.auctionItem} onClickAuctionItemReschedule={this.props.onClickAuctionItemReschedule}/> : '' }
         </div>

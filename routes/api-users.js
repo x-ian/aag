@@ -18,10 +18,14 @@ module.exports = function (app) {
    * GET one user
    */
   app.get('/api/users/:id', auth.isLoggedInUser, function(req, res, next) { 
-    User.findById(req.params.id, function(err, item) {
-      if (err || !item) return next(err);
-      return res.json(item);
-    });
+    if (req.params.id === 'current') {
+      return res.json(req.user);
+    } else {
+      User.findById(req.params.id, function(err, item) {
+        if (err || !item) return next(err);
+        return res.json(item);
+      });
+    }
   });
 
   /**
@@ -30,7 +34,6 @@ module.exports = function (app) {
   app.delete('/api/users/:id', auth.isLoggedInUser, function(req,res,next) {
     User.findByIdAndRemove(req.params.id, function (err, item){
       if (err || !item) return next(err);
-      // return res.json(item);
       return res.json({ message: 'Item deleted' });
     });
   });
@@ -41,7 +44,7 @@ module.exports = function (app) {
   app.put('/api/users/:id', auth.isLoggedInUser, function(req, res, next) { 
     User.findByIdAndUpdate(req.params.id, req.body, function(err, item) {
       if (err || !item) return next(err);
-      //return res.json(item);
+      item.password = item.generateHash(req.body.passwordCleartext);
       return res.json({ message: 'Item updated' });
     });
   });
@@ -53,9 +56,8 @@ module.exports = function (app) {
     User.create(req.body, function (err, item) {
       if (err || !item) return next(err);
       item.createdAt = new Date();
-      log.debug(req.body);
-      item.password = item.generateHash(req.body.password);
-      item.passwordCleartext = req.body.password;
+      item.password = item.generateHash(req.body.passwordCleartext);
+      item.deactivated = true;
       item.save();
       // return res.json(item);
       return res.json({ message: 'Item added' });

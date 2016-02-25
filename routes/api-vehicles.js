@@ -1,4 +1,5 @@
 var auth = require('../lib/auth');
+var log = require('../lib/log');
 
 var Vehicle = require('../models/vehicle');
 var SalesInformation = require('../models/vehicle');
@@ -16,6 +17,7 @@ function mapVehicleReqBody(reqBody, withId, withImages) {
   var o = {
     title: reqBody['vehicle[title]'],
     description: reqBody['vehicle[description]'],
+    seller: reqBody['vehicle[seller]'],
     // modelData
     brand: reqBody['vehicle[brand]'],
     classification: reqBody['vehicle[classification]'],
@@ -79,10 +81,12 @@ module.exports = function (app) {
    * PUT update existing vehicle
    */
   app.put('/api/vehicles/:id', auth.isLoggedInUser, function(req, res, next) { 
-    Vehicle.findByIdAndUpdate(req.params.id, req.body, function(err, item) {
+    Vehicle.findByIdAndUpdate(req.params.id, req.body, {new: true}, function(err, item) {
       if (err || !item) return next(err);
-      //return res.json(item);
-      return res.json({ message: 'Item updated' });
+      item.seller = req.user._id;
+      item.save();
+      return res.json(item);
+      // return res.json({ message: 'Item updated' });
     });
   });
 
@@ -93,7 +97,8 @@ module.exports = function (app) {
     delete req.body._id;
     Vehicle.create(req.body, function (err, item) {
       if (err || !item) return next(err);
-      // return res.json(item);
+      item.seller = req.user._id;
+      item.save();
       return res.json({ message: 'Item added' });
     });
   });
@@ -208,4 +213,15 @@ module.exports = function (app) {
 
     return res.json({message: 'yo'});
   });
+
+  /**
+   * GET all vehicles
+   */
+  app.get('/api/myvehicles', auth.isLoggedInUser, function(req, res, next) {
+    Vehicle.find({seller: req.user._id}, function(err, item) {
+      if (err || !item) return next(err);
+      return res.json(item);
+    });
+  });
+
 }

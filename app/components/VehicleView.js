@@ -10,6 +10,7 @@ const resetState = {
     _id: null,
     title: "",
     description: "",
+    seller: "",
     brand: "",
     model: "",
     classification: "",
@@ -60,6 +61,11 @@ class VehicleView extends React.Component {
     event.preventDefault();
     this.setState(resetState);
     window.history.back();
+  }
+
+  onClickEdit(event) {
+    event.preventDefault();
+    this.props.history.pushState(null, '/vehicles/' + this.state.vehicle._id);
   }
 
   setVehicle(id) {
@@ -144,8 +150,8 @@ class VehicleView extends React.Component {
               </div>
               <hr/>
               <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>&nbsp;
-              <button className='btn btn-secondary' onClick={this.onClickContactSeller.bind(this)}>Contact seller</button>
-
+              <button className='btn btn-secondary' onClick={this.onClickContactSeller.bind(this)}>Contact seller</button>&nbsp;
+              <button className='btn btn-secondary' onClick={this.onClickEdit.bind(this)}>Edit</button>
             </div>
           </div>
         </div>

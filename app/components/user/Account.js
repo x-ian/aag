@@ -4,6 +4,7 @@ import InputFormRow from '../common/InputFormRow.js';
 import SelectInput from '../common/SelectInput.js';
 
 const resetState = {
+  _id: '',
   email: '',
   name: '',
   passwordCleartext: '',
@@ -11,7 +12,7 @@ const resetState = {
   passwordsMatch: false
 }
 
-class Register extends React.Component {
+class Account extends React.Component {
 
   constructor() {
     super();
@@ -19,6 +20,7 @@ class Register extends React.Component {
   }
 
   componentDidMount() {
+    this.setCurrentUser();
   }
 
   componentWillUnmount() {
@@ -40,11 +42,22 @@ class Register extends React.Component {
     console.log(this.state);
   }
 
-
-  signup(name, email, passwordCleartext) {
+  setCurrentUser() {
     $.ajax({
-      url: '/api/users',
-      type: 'POST',
+      url: '/api/users/current',
+      dataType: 'json' })
+      .done((data) => {
+        this.setState(data);
+      })
+      .fail((jqXhr) => {
+        console.log('ERROR: ' + jqXhr);
+      });
+  }
+
+  updateAccount(id, name, email, passwordCleartext) {
+    $.ajax({
+      url: '/api/users/' + id,
+      type: 'PUT',
       dataType: 'json',
       data: {
         name: name,
@@ -63,14 +76,14 @@ class Register extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.signup(this.state.name, this.state.email, this.state.passwordCleartext);
+    this.updateAccount(this.state._id, this.state.name, this.state.email, this.state.passwordCleartext);
   }
 
   render() {
     return (
       <div className='container'>
         <div className='panel panel-default'>
-          <div className='panel-heading'>Register new account</div>
+          <div className='panel-heading'>Edit account</div>
           <div className='panel-body'>
             <form onSubmit={this.handleSubmit.bind(this)} className='form-horizontal'>
               <InputFormRow
@@ -96,7 +109,7 @@ class Register extends React.Component {
 
               <div className="form-group">
                  <div className="col-sm-offset-2 col-sm-10">
-                 {(this.state.name && this.state.email && this.state.passwordsMatch) ? <button type='submit' className='btn btn-primary'>Register</button> : '' }
+                 {(this.state.name && this.state.email && this.state.passwordsMatch) ? <button type='submit' className='btn btn-primary'>Save</button> : '' }
                     <button className='btn btn-secondary' onClick={this.onClickCancel.bind(this)}>Cancel</button>
                   </div>
               </div>
@@ -108,4 +121,4 @@ class Register extends React.Component {
   }
 }
 
-export default Register;
+export default Account;
