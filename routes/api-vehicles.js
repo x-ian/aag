@@ -67,6 +67,19 @@ module.exports = function (app) {
   });
 
   /**
+   * GET one vehicle
+   */
+  app.get('/api/vehiclesonlythumbnails/:id', function(req, res, next) { 
+    Vehicle.findById(req.params.id, function(err, item) {
+      if (err || !item) return next(err);
+      item.images.forEach((image)=> {
+        image.original = null;
+      });
+      return res.json(item);
+    });
+  });
+
+  /**
    * DELETE one vehicle
    */
   app.delete('/api/vehicles/:id', auth.isLoggedInUser, function(req,res,next) {
@@ -154,17 +167,6 @@ module.exports = function (app) {
     Vehicle.create(mapVehicleReqBody(req.body, false, false), function (err, item) {
       if (err || !item) return next(err);
        return res.json({ message: 'Item added' });
-    });
-  });
-
-  app.post('/api/vehiclesfull2', auth.isLoggedInUser, function(req, res, next) { 
-    Vehicle.create(mapVehicleReqBody(req.body, false, false), function (err, item) {
-      if (err || !item) return next(err);
-      console.log(item);
-      console.log(mapSalesInformationReqBody(req.body));
-      Vehicle.findByIdAndUpdate(item._id, { salesInformation: mapSalesInformationReqBody(req.body) });
-      console.log(item);
-      return res.json({ message: 'Item added' });
     });
   });
 
