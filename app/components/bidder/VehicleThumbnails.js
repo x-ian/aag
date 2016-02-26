@@ -6,6 +6,7 @@ var ImageGallery = require('react-image-gallery');
 class VehicleThumbnails extends React.Component {
 
   handleClick(index) {
+    console.log('handleClick');
     $("#modal" + index).modal("show");
   }
 
@@ -43,8 +44,9 @@ class VehicleThumbnails extends React.Component {
                 items={onlyThumbnails}
                 autoPlay={false}
                 slideInterval={5000}
-                showNav={false}
+                showNav={true}
                 onSlide={this.handleClick.bind(this)}
+                onClick={this.handleClick.bind(this)}
               />
               </div>
             ) : (

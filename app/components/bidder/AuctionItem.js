@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router';
 import VehicleDetails from '../promoter/VehicleDetails.js';
+import VehicleAllDetails from '../common/VehicleAllDetails.js';
 import VehicleThumbnails from './VehicleThumbnails.js';
 import AuctionStatus from './AuctionStatus.js';
 import BidHistory from './BidHistory.js';
@@ -34,7 +35,7 @@ class AuctionItem extends React.Component {
          </div>
          <div className='row'>
             <div className='col-sm-6'>
-              { this.props.vehicle ? <VehicleDetails vehicle={this.props.vehicle}/> : '' }
+              { this.props.vehicle ? <VehicleAllDetails vehicle={this.props.vehicle}/> : '' }
             </div>
             <div className='col-sm-6'>
               { this.props.recentBids ? <BidHistory bids={this.props.recentBids}/> : '' }
