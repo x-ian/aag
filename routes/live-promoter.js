@@ -182,7 +182,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
      log.info('PromoterAction ' + auctionItemId + ' ' + incomingBidId + ' ' + action);
      logLive.log('action', 'promoter promoteraction2: %s %s %s', action, auctionItemId, incomingBidId);
 
-     AuctionItem.findById(auctionItemId, function(err, item) {
+     AuctionItem.findById(auctionItemId).populate('vehicle').exec(function(err, item) {
        if (err || !item) return next(err);
 
        item.status = calcNewAuctionItemStatus(action, item.status);
@@ -210,11 +210,16 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
            });
            break;
          case 'SELL':
-           Bid.findByIdAndUpdate(incomingBidId, {status: 'WON'}, function(err, bid) {
+           Bid.findByIdAndUpdate(incomingBidId, {status: 'WON'}, {new: true}, function(err, bid) {
              if (err || !bid) return next(err);
              item.nextExpectedBidAmount = null;
              item.endTimestamp = new Date();
              item.recentAcceptedBid = bid;
+
+             item.vehicle.buyer = bid.user;
+             item.vehicle.sellDate = new Date();
+             item.vehicle.finalSellAmount = bid.amount;
+             item.vehicle.save();
              return auctionItemSaveAndEmit(item, res, auctionIo);
            });
            break;

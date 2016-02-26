@@ -40,7 +40,7 @@ class Login extends React.Component {
         email: email
       }
     }).done((data) => {
-      this.props.history.pushState(null, '/');
+      window.location.href='/';
     }).fail((jqXhr) => {
       console.log('Error: ' + jqXhr);
       var n = {errors: [jqXhr.responseJSON.message + ' (' + jqXhr.statusText + ')']};

@@ -150,7 +150,7 @@ auction
   // some strange thing only seems to send the bidder for now
   if (socket.handshake.query.role === 'bidder') {
     var userId = socket.request.session.passport ? socket.request.session.passport.user : '';
-    log.info('connected to auction with socket id %s and user id %s', socket.id, userId.id);
+    log.info('connected to auction with socket id %s and user id %s', socket.id, (userId ? userId.id : 'not logged in'));
     var ua = platform.parse(socket.request.headers['user-agent']);
     var system = ua.name + ' ' + ua.version + '(' + ua.layout + ') on ' + ua.os;
     User.findById(userId, function(err, item) {

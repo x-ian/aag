@@ -4413,9 +4413,7 @@ var VehicleSales = function (_React$Component) {
 
   _createClass(VehicleSales, [{
     key: 'componentDidMount',
-    value: function componentDidMount() {
-      console.log('componentdidMount: ' + this.props.vehicle._id);
-    }
+    value: function componentDidMount() {}
   }, {
     key: 'onClickBuyNow',
     value: function onClickBuyNow(event) {
@@ -4660,13 +4658,7 @@ var VehicleViewShort = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { className: 'col-sm-2' },
-          this.props.action === 'VehicleSales' ? _react2.default.createElement(
-            'span',
-            null,
-            this.props.vehicle.buyNowAmount,
-            ' ',
-            _react2.default.createElement(_VehicleSales2.default, { vehicle: this.props.vehicle })
-          ) : '',
+          this.props.action === 'VehicleSales' ? _react2.default.createElement(_VehicleSales2.default, { vehicle: this.props.vehicle }) : '',
           this.props.action === 'VehiclePromoterActivate' ? _react2.default.createElement(_VehiclePromoterActivate2.default, { vehicle: this.props.vehicle, onClickAuctionItemActivate: this.props.onClickAuctionItemActivate }) : '',
           this.props.action === 'VehiclePromoterReschedule' ? _react2.default.createElement(_VehiclePromoterReschedule2.default, { auctionItem: this.props.auctionItem, onClickAuctionItemReschedule: this.props.onClickAuctionItemReschedule }) : ''
         )
@@ -5996,7 +5988,7 @@ var Login = function (_React$Component) {
           email: email
         }
       }).done(function (data) {
-        _this2.props.history.pushState(null, '/');
+        window.location.href = '/';
       }).fail(function (jqXhr) {
         console.log('Error: ' + jqXhr);
         var n = { errors: [jqXhr.responseJSON.message + ' (' + jqXhr.statusText + ')'] };

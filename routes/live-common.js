@@ -9,7 +9,7 @@ module.exports = function (app, auctionIo, clients, bidQueueStream) {
 
     Bid.find({'auctionItem': req.params.id }).populate('user').sort('-timestamp').exec(function(err, item) {
       if (err || !item) return next(err);
-      return res.json(item.slice(-5));
+      return res.json(item.slice(-10));
     });
   });
 

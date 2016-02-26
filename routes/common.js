@@ -56,8 +56,6 @@ module.exports = function (app) {
     Vehicle.findById(vehicleId, function(err, item) {
       if (err || !item) return next(err);
       if (item.status === 'PUBLISHED' || item.status === 'IN_AUCTION') {
-        log.debug(item.buyNowAmount);
-        log.debug(buyNowAmount);
         if (item.buyNowAmount == buyNowAmount) {
           item.status = 'SOLD_BUY_NOW';
           item.sellDate = new Date();

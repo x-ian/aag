@@ -8,7 +8,6 @@ class VehicleSales extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentdidMount: ' + this.props.vehicle._id);
   }
 
   onClickBuyNow(event) {

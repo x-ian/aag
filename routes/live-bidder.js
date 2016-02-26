@@ -61,15 +61,18 @@ module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
     var auctionId = req.query.auctionId;
     Auction.findById(auctionId).populate('currentAuctionItem').exec(function(err, a) {
       if (err || !a) return next(err);
-      Vehicle.findById(a.currentAuctionItem.vehicle, function(err, v) {
-        // auctionIo.emit('auctionAction', {auctionItem: item, recentBids: bids, currentBidId: null});
-        // 3. get new recent 5 bids
-        Bid.find({'auctionItem':a.currentAuctionItem._id}).populate('user')
-        .sort('-timestamp').limit(5).exec(function(err, bids) {
-          if (err) return next(err);
-          return res.json({auctionItem: a.currentAuctionItem, vehicle: v, recentBids: bids, currentBidId: null});
+      if (!a.currentAuctionItem) {
+        // no current auction item yet
+        return res.json({auctionItem: null, vehicle: null, recentBids: null});
+      } else {
+        Vehicle.findById(a.currentAuctionItem.vehicle, function(err, v) {
+          Bid.find({'auctionItem':a.currentAuctionItem._id}).populate('user')
+          .sort('-timestamp').limit(10).exec(function(err, bids) {
+            if (err) return next(err);
+            return res.json({auctionItem: a.currentAuctionItem, vehicle: v, recentBids: bids, currentBidId: null});
+          });
         });
-      });
+      }
     });
   });
 
@@ -90,7 +93,7 @@ module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
     var user = req.user;
 
     log.error(user);
-    
+
     Bid.create({
       amount: bidAmount,
       timestamp: new Date(),
