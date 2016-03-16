@@ -183,11 +183,15 @@ auction
 
 });
 
+var os=require('os');
+
 server.listen(app.get('port'), function() {
   log.info('Express server listening on port ' + app.get('port'));
 
   // just for development to notify about server restart
-  var osascript = require('node-osascript');
-  osascript.execute("display notification \"aag (re)started\" with title \"nodemon\"");
-  osascript.execute("beep 1");
+  if (os.platform() === 'darwin') {
+    var osascript = require('node-osascript');
+    osascript.execute("display notification \"aag (re)started\" with title \"nodemon\"");
+    osascript.execute("beep 1");
+  }
 });

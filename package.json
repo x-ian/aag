@@ -61,6 +61,7 @@
     "superagent": "^1.7.2",
     "swig": "^1.4.2",
     "underscore": "^1.8.3",
+    "webpack": "^1.12.14",
     "winston": "^2.1.1"
   },
   "devDependencies": {
