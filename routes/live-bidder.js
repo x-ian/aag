@@ -92,8 +92,6 @@ module.exports = function(app, auctionIo, bidQueueStream, activateBidQueue) {
     var recentAcceptedBidSequenceNumber = req.body.recentAcceptedBidSequenceNumber;
     var user = req.user;
 
-    log.error(user);
-
     Bid.create({
       amount: bidAmount,
       timestamp: new Date(),

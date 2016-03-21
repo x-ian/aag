@@ -1,0 +1,2 @@
+{"_id":{"$oid":"56cf0677cee9b277dbc33831"},"amount":100,"timestamp":{"$date":"2016-02-25T13:49:43.960Z"},"sequenceNumberBase":0,"status":"WON","auctionItem":{"$oid":"56cf0666cee9b277dbc33830"},"user":{"$oid":"56ced19d1213830ad6b8827e"},"userIpAddress":"::1","__v":0}
+{"_id":{"$oid":"56d029fc92544f7eeb2ece84"},"amount":0,"timestamp":{"$date":"2016-02-26T10:33:32.603Z"},"sequenceNumberBase":0,"status":"PENDING","auctionItem":{"$oid":"56d02954141de255eb2b470e"},"user":{"$oid":"56ced19d1213830ad6b8827e"},"userIpAddress":"::1","__v":0}

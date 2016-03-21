@@ -1,0 +1,1 @@
+{"_id":{"$oid":"56b64df8a31f169f2932325e"},"scheduledAt":{"$date":"2016-02-16T19:46:00.000Z"},"closedAt":null,"location":"Kaiserslautern","active":true,"__v":0,"currentAuctionItem":{"$oid":"56d02954141de255eb2b470e"},"startedAt":{"$date":"2016-02-26T10:33:45.744Z"}}
