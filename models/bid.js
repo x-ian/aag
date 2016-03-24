@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var bidSchema = new mongoose.Schema({
   amount: Number,
   timestamp: Date,
-  sequenceNumber: Number,
+  // sequenceNumber: Number,
   sequenceNumberBase: Number,
   status: { type: String, enum: ['PENDING', 'REJECTED_OUTDATED', 'ACCEPTED', 'REJECTED', 'REJECTED_SERVER_BUSY','WON', 'REJECTED_INVALID'] },
   auctionItem: {
