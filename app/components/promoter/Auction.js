@@ -29,6 +29,7 @@ class Auction extends React.Component {
   componentDidMount() {
     this.updateVehiclesQueues();
     this.startAuction();
+    // this.reconnectAuction();
 
 //    socket = io.connect('/auction', { query: 'role=promoter' });
     socket = io.connect('/auction?foo=bar', { query: "role=promoter", extra: 'extra' });
@@ -92,6 +93,24 @@ class Auction extends React.Component {
       cache: false,
     }).done((data) => {
         this.setState({auction: data});
+    }).fail((jqXhr) => {
+      console.log('ERROR: ' + jqXhr);
+    });
+  }
+
+  reconnectAuction() {
+    // TODO doesnt work yet
+    $.ajax({
+      url: '/api/reconnectauction/' + this.props.params.id,
+      type: 'POST',
+      dataType: 'json',
+      cache: false,
+    }).done((data) => {
+      this.setState({auctionItem: data['auctionItem'] });
+      this.setState({recentBids: data['recentBids'] });
+      this.setState({vehicle: data['vehicle'] });
+      this.setState({auction: data['auction'] });
+      this.setState({incomingBid: data['recentIncomingBid'] });
     }).fail((jqXhr) => {
       console.log('ERROR: ' + jqXhr);
     });
