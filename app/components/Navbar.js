@@ -100,7 +100,7 @@ class Navbar extends React.Component {
                   </ul>
                 </li>
               ) : (
-                <span/>
+                <span style={{display: 'none'}}/>
               )
             }
             {
@@ -115,7 +115,7 @@ class Navbar extends React.Component {
                   </ul>
                 </li>
               ) : (
-                <span/>
+                <span style={{display: 'none'}}/>
               )
             }
             {
@@ -130,13 +130,13 @@ class Navbar extends React.Component {
                   </ul>
                 </li>
               ) : (
-                <span/>
+                <span style={{display: 'none'}}/>
               )
             }
             {
               this.state.activeSession ?
                 <li className='dropdown'>
-                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>My Account<span className='caret'></span></a>
+                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>{'My Account (' + this.state.activeUser.name + ')'} <span className='caret'></span></a>
                   <ul className='dropdown-menu'>
                     <li><Link to='/account'>Details</Link></li>
                     <li><a href='/logout'>Logout</a></li>

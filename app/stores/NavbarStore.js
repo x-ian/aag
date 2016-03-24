@@ -24,19 +24,14 @@ class NavbarStore {
   }
 
   onVerifySessionSuccess(data) {
-    console.log('onVerifySessionS');
-    console.log(data);
     this.activeSession = data.activeSession;
   }
 
   onVerifySessionFail(data) {
-    console.log('onVerifySessionF');
-    console.log(data);
     this.activeSession = false;
   }
 
   onActiveUserSuccess(data) {
-    console.log(data);
     this.activeUser = data.activeUser;
   }
 
