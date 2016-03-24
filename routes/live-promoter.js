@@ -112,6 +112,29 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
       });
     });
 
+  app.post('/api/reconnectauction/:id', auth.isLoggedInPromoter, function(req, res, next) {
+    var auctionId = req.params.id;
+    Auction.findById(auctionId).populate('currentAuctionItem').populate('recentIncomingBid').exec(function(err, auction) {
+      if (err || !auction) return next(err);
+      if (auction.currentAuctionItem) {
+        logLive.log('action', 'promoter reconnect to auction: %s with active auctionItem: %s', auctionId, auction.currentAuctionItem._id );
+        Vehicle.findById(auction.currentAuctionItem.vehicle, function(err, vehicle) {
+          if (err || !vehicle) return next(err);
+            Bid.find({'auctionItem':auction.currentAuctionItem._id}).populate('user')
+              .sort('-timestamp').limit(10).exec(function(err, recentBids) {
+              if (err) return next(err);
+              // maybe emit not necessary as clients should still have the old data, but
+              // also maybe better to make clear which item is active
+              auctionIo.emit('newAuctionItem', {auctionItem: auction.currentAuctionItem, vehicle: vehicle, recentBids: recentBids});
+              return res.json({auction: auction, auctionItem: auction.currentAuctionItem, vehicle: vehicle, recentIncomingBid: auction.recentIncomingBid, recentBids: recentBids});
+            });
+        });
+      } else {
+        logLive.log('action', 'promoter reconnect to auction: %s', auctionId );
+        return res.json({auction: auction});
+      }
+    });
+  });
 
   app.post('/api/startauction/:id', auth.isLoggedInPromoter, function(req, res, next) {
     var auctionId = req.params.id;
@@ -131,9 +154,13 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
     var vehicleId = req.query.vehicleId;
     var auctionId = req.query.auctionId;
 
+    // Vehicle.update({status: 'IN_AUCTION'}, {status: 'PUBLISHED'}, function(err, v) {
+    // TODO: also reset auctionItems and Bids?
     Vehicle.findByIdAndUpdate(vehicleId, {status: 'IN_AUCTION'}, function(err, vehicle) {
       if (err || !vehicle) return next(err);
       // TODO what if a current auctionitem should be rejoined
+      // Bid.find({'auctionitem.vehicle._id': vehicleId}).remove().exec();
+
       AuctionItem.find({vehicle: vehicleId}).remove().exec();
       var newAi = {
         startAmount: vehicle.auctionStartAmount,
@@ -157,6 +184,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
         return res.json({auctionItem: ai2, vehicle: vehicle, recentBids: null});
       });
     });
+    // });
   });
 
   app.post('/api/rescheduleauctionitem/:id', auth.isLoggedInPromoter, function(req, res, next) {
@@ -165,7 +193,8 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
       if (err) return next(err);
       Vehicle.findByIdAndUpdate(ai2.vehicle, {status: 'PUBLISHED'}, function(err, item) {
         if (err) return next(err);
-        Bid.find({auctionItem: auctionItemId}).remove().exec();
+        Bid.remove({auctionItem: auctionItemId}, function(err){});
+        // Bid.find({'auctionItem._id': auctionItemId}).remove().exec();
         deactivateBidQueue();
         logLive.log('action', 'promoter rescheduleauctionitem: %s', auctionItemId );
         return res.json({message: 'item resetted'});
@@ -182,7 +211,7 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
      log.info('PromoterAction ' + auctionItemId + ' ' + incomingBidId + ' ' + action);
      logLive.log('action', 'promoter promoteraction2: %s %s %s', action, auctionItemId, incomingBidId);
 
-     AuctionItem.findById(auctionItemId).populate('vehicle').exec(function(err, item) {
+     AuctionItem.findById(auctionItemId).populate('vehicle').populate('recentAcceptedBid').exec(function(err, item) {
        if (err || !item) return next(err);
 
        item.status = calcNewAuctionItemStatus(action, item.status);
