@@ -26,7 +26,7 @@ var vehicleSchema = new mongoose.Schema({
   auctionStartAmount: Number,
   auctionIncrement: Number,
   auctionExpectedAmount: Number,
-  status: { type: String, enum: ['DRAFT', 'PUBLISHED', 'IN_AUCTION', 'SOLD_BUY_NOW', 'SOLD_AUCTION', 'SOLD_AUCTION_PENDING_APPROVAL'] },
+  status: { type: String, enum: ['DRAFT', 'PUBLISHED', 'IN_AUCTION', 'SOLD_BUY_NOW', 'SOLD_AUCTION', 'SOLD_AUCTION_PENDING_APPROVAL', 'NOT_SOLD_AUCTION'] },
   sellDate: Date,
   finalSellAmount: Number,
   buyer: {

@@ -124,7 +124,7 @@ class VehicleEdit extends React.Component {
     }).done((data) => {
         // doesnt seem right, but dont know how else to get back to the list after successful add
         setTimeout(function(){
-          this.props.history.pushState(null, '/vehicles');
+          this.props.history.pushState(null, '/seller/vehicles');
         }.bind(this), 1000);
         this.setState(resetState);
       }).fail((jqXhr) => {
@@ -141,7 +141,7 @@ class VehicleEdit extends React.Component {
     }).done((data) => {
       // doesnt seem right, but dont know how else to get back to the list after successful add
       setTimeout(function(){
-        this.props.history.pushState(null, '/vehicles');
+        this.props.history.pushState(null, '/seller/vehicles');
       }.bind(this), 1000);
       this.setState(resetState);
     }).fail((jqXhr) => {
@@ -330,6 +330,7 @@ class VehicleEdit extends React.Component {
                             { value: 'PUBLISHED', label: 'Published (waiting for next auction)' },
                             { value: 'IN_AUCTION', label: 'Currently in auction' },
                             { value: 'SOLD_BUY_NOW', label: 'Sold from Buy now' },
+                            { value: 'NOT_SOLD_AUCTION', label: 'Not sold in last auction' },
                             { value: 'SOLD_AUCTION', label: 'Sold in auction' }]}
                           onChange={this.onChangeStatus.bind(this)}
                         />

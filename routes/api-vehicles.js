@@ -216,9 +216,6 @@ module.exports = function (app) {
     return res.json({message: 'yo'});
   });
 
-  /**
-   * GET all vehicles
-   */
   app.get('/api/myvehicles', auth.isLoggedInUser, function(req, res, next) {
     Vehicle.find({seller: req.user._id}, function(err, item) {
       if (err || !item) return next(err);
@@ -226,4 +223,34 @@ module.exports = function (app) {
     });
   });
 
+  app.get('/api/mysales', auth.isLoggedInUser, function(req, res, next) {
+    Vehicle.find({seller: req.user._id, status: 'SOLD_AUCTION'}, function(err, item) {
+      if (err || !item) return next(err);
+      return res.json(item);
+    });
+  });
+
+  app.get('/api/mypurchases', auth.isLoggedInUser, function(req, res, next) {
+    Vehicle.find(
+      {
+        $and: [
+          { buyer: req.user._id },
+          { $or: [ { status: 'SOLD_BUY_NOW' }, { status: 'SOLD_AUCTION' } ] }
+        ]
+      }, function(err, item) {
+        if (err || !item) return next(err);
+        return res.json(item);
+      }
+    );
+  });
+
+  app.get('/api/availablevehicles', auth.isLoggedInUser, function(req, res, next) {
+    Vehicle.find(
+      { $or: [ { status: 'PUBLISHED' }, { status: 'IN_AUCTION' } ] }
+      , function(err, item) {
+        if (err || !item) return next(err);
+        return res.json(item);
+      }
+    );
+  });
 }

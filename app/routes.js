@@ -5,7 +5,7 @@ import Home from './components/Home';
 
 import Vehicles from './components/Vehicles';
 import VehicleEdit from './components/VehicleEdit';
-import VehicleView from './components/VehicleView';
+import VehicleView from './components/vehicle/details/VehicleView';
 import Auctions from './components/Auctions';
 import Auction from './components/Auction';
 import Users from './components/Users';
@@ -16,7 +16,11 @@ import PromoterAuction from './components/promoter/Auction';
 import PromoterVehicle from './components/promoter/Vehicle';
 import PromoterAuctionItem from './components/promoter/AuctionItem';
 
-import SellerVehicles from './components/seller/MyVehicles';
+import SellerVehicles from './components/vehicle/list/SellerMyVehicles';
+import SellerSales from './components/vehicle/list/SellerMySales';
+
+import BuyerPurchases from './components/vehicle/list/BuyerMyPurchases';
+import BuyerVehicles from './components/vehicle/list/BuyerAvailableVehicles';
 
 import BidderStart from './components/bidder/Start';
 import BidderAuction from './components/bidder/Auction';
@@ -35,6 +39,10 @@ export default (
     <Route path='/vehicles/view/:id' component={VehicleView} />
 
     <Route path='/seller/vehicles' component={SellerVehicles} />
+    <Route path='/seller/sales' component={SellerSales} />
+
+    <Route path='/buyer/purchases' component={BuyerPurchases} />
+    <Route path='/buyer/vehicles' component={BuyerVehicles} />
 
     <Route path='/auctions/new' component={Auction} />
     <Route path='/auctions/:id' component={Auction} />

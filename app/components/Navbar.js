@@ -95,8 +95,8 @@ class Navbar extends React.Component {
                 <li className='dropdown'>
                   <a href='#' className='dropdown-toggle' data-toggle='dropdown'>Buyer<span className='caret'></span></a>
                   <ul className='dropdown-menu'>
-                    <li><Link to='/vehicles'>Browse Vehicles</Link></li>
-                    <li><Link to='/vehicles'>My Purchases</Link></li>
+                    <li><Link to='/buyer/vehicles'>Available Vehicles</Link></li>
+                    <li><Link to='/buyer/purchases'>My Purchases</Link></li>
                   </ul>
                 </li>
               ) : (
@@ -111,7 +111,7 @@ class Navbar extends React.Component {
                   <ul className='dropdown-menu'>
                     <li><Link to='/vehicles/new'>Add Vehicle</Link></li>
                     <li><Link to='/seller/vehicles'>My Vehicles</Link></li>
-                    <li><Link to='/seller/vehicles'>My Sales</Link></li>
+                    <li><Link to='/seller/sales'>My Sales</Link></li>
                   </ul>
                 </li>
               ) : (
@@ -136,7 +136,7 @@ class Navbar extends React.Component {
             {
               this.state.activeSession ?
                 <li className='dropdown'>
-                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>{'My Account (' + this.state.activeUser.name + ')'} <span className='caret'></span></a>
+                  <a href='#' className='dropdown-toggle' data-toggle='dropdown'>{'My Account (' + (this.state.activeUser ? this.state.activeUser.name : '') + ')'} <span className='caret'></span></a>
                   <ul className='dropdown-menu'>
                     <li><Link to='/account'>Details</Link></li>
                     <li><a href='/logout'>Logout</a></li>

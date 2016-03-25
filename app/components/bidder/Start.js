@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router';
-import VehiclesViewShort from '../VehiclesViewShort.js';
+import VehiclesViewShort from '../vehicle/list/VehiclesViewShort.js';
 
 const resetState = {
   _id: null,

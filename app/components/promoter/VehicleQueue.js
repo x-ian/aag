@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router';
-import VehicleViewShort from '../common/VehicleViewShort.js';
+import VehicleViewShort from '../vehicle/list/VehicleViewShort.js';
 
 var VehicleQueue = React.createClass({
 

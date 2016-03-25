@@ -248,7 +248,13 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
              item.vehicle.buyer = bid.user;
              item.vehicle.sellDate = new Date();
              item.vehicle.finalSellAmount = bid.amount;
-             item.vehicle.save();
+             item.vehicle.status = 'SOLD_AUCTION';
+             item.vehicle.save(function (err) {
+               log.debug(err);
+               log.debug('saved');
+               log.debug(item.vehicle);
+             });
+
              return auctionItemSaveAndEmit(item, res, auctionIo);
            });
            break;
@@ -259,6 +265,13 @@ module.exports = function (app, auctionIo, bidQueueStream, deactivateBidQueue) {
            return auctionItemSaveAndEmit(item, res, auctionIo);
            break;
          case 'CLOSE':
+           item.vehicle.status = 'NOT_SOLD_AUCTION';
+           item.vehicle.save(function (err) {
+             log.debug(err);
+             log.debug('saved');
+             log.debug(item.vehicle);
+           });
+           
            return auctionItemSaveAndEmit(item, res, auctionIo);
            break;
          default:
